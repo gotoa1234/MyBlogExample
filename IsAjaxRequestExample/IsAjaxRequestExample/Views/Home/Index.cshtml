@@ -1,0 +1,58 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<script src="~/Scripts/jquery-3.4.1.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#button1').click(function () {
+            $.ajax({
+                url: 'https://localhost:44313/Home/AjaxCall',
+                type: 'post',
+                dataType: 'json', // 預期從server接收的資料型態
+                contentType: 'application/json; charset=utf-8', // 要送到server的資料型態
+                headers: {
+                    "Accept": "application/json, text/javascript, */*; q=0.01",
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+                data: "",
+                success: function (result) {
+                    console.log("Post呼叫後端(X-Requested-With正確) IsAjax:" + result.IsAjax);
+                },
+            });
+        });
+
+        $('#button2').click(function () {
+            $.ajax({
+                url: 'https://localhost:44313/Home/AjaxCall',
+                type: 'post',
+                dataType: 'json', // 預期從server接收的資料型態
+                contentType: 'application/json; charset=utf-8', // 要送到server的資料型態
+                headers: {
+                    "Accept": "application/json, text/javascript, */*; q=0.01",
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    'Cache-Control': 'no-cache',
+                    'Pragma': 'no-cache',
+                    'X-Requested-With': 'null',
+                },
+                data: "",
+                success: function (result) {
+                    console.log("Post呼叫後端(X-Requested-With不帶資料) IsAjax:" + result.IsAjax);
+                },
+            });
+        });
+    });
+
+</script>
+
+
+<div class="row">
+    <br />
+    <button id="button1">Post呼叫後端(X-Requested-With正確)</button>
+    <br />
+    <br />
+    <button id="button2">Post呼叫後端(X-Requested-With不帶資料)</button>
+</div>
+
