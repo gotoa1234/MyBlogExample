@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32210.238
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsbuildAddtionNoCommitFile", "MsbuildAddtionNoCommitFile\MsbuildAddtionNoCommitFile.csproj", "{0787BD03-BD3E-4E38-9941-9D90B9BB9EC4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0787BD03-BD3E-4E38-9941-9D90B9BB9EC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0787BD03-BD3E-4E38-9941-9D90B9BB9EC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0787BD03-BD3E-4E38-9941-9D90B9BB9EC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0787BD03-BD3E-4E38-9941-9D90B9BB9EC4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8216049B-EB72-47A4-91D8-28931414E2B5}
+	EndGlobalSection
+EndGlobal
