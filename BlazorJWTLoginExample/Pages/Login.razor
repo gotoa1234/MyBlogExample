@@ -1,0 +1,70 @@
+﻿@page "/login"
+@using BlazorJWTLoginExample.Model
+@using System.Security.Claims
+@using System.IdentityModel.Tokens.Jwt
+@using BlazorJWTLoginExample.Service
+@using Microsoft.IdentityModel.Tokens
+@using System.Text
+@inject IHttpContextAccessor HttpContextAccessor
+@inject NavigationManager Navigation
+@inject JsonWebTokenService jwtService
+
+<h3>Login</h3>
+
+<div class="alert @AlertClass" role="alert">@AlertMessage</div>
+
+<EditForm Model="@LoginModel" OnValidSubmit="LoginWork">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="username" class="form-label">Username</label>
+        <InputText id="username" class="form-control" @bind-Value="LoginModel.Username" />
+        <ValidationMessage For="@(() => LoginModel.Username)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <InputText id="password" class="form-control" @bind-Value="LoginModel.Password" />
+        <ValidationMessage For="@(() => LoginModel.Password)" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Login</button>
+</EditForm>
+
+@code {
+    private LoginModel LoginModel { get; set; } = new LoginModel();
+
+    private string AlertClass { get; set; }
+    private string AlertMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {     
+        await base.OnInitializedAsync();
+
+        await HttpContextAccessor.HttpContext.Session.LoadAsync();
+        HttpContextAccessor.HttpContext.Session.SetString("JWT", "");
+        await HttpContextAccessor.HttpContext.Session.CommitAsync();
+    }
+
+    private async Task LoginWork()
+    {
+        // 1. 假設驗證用戶成功...        
+        var user = new User { Username = LoginModel.Username};
+        // 2. 產生用戶假資料
+        var id = 334567;
+        var type = "一般用戶";
+        var nickName = "Little Boy";
+
+        var token = jwtService.GenerateToken(user, id, type, nickName);
+
+        // 將 JWT 存儲在 Session 中
+        await HttpContextAccessor.HttpContext.Session.LoadAsync();
+        HttpContextAccessor.HttpContext.Session.SetString("JWT", token);
+        await HttpContextAccessor.HttpContext.Session.CommitAsync();
+
+        // 導航到需要登入後才能訪問的頁面
+        Navigation.NavigateTo("/protected");
+    }
+
+     
+}

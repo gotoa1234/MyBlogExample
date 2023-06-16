@@ -1,0 +1,12 @@
+﻿@page "/logout"
+@inject IHttpContextAccessor HttpContextAccessor
+@inject NavigationManager Navigation
+
+@code {
+    protected override void OnInitialized()
+    {
+        // 移除 Session 中的 JWT
+        HttpContextAccessor.HttpContext.Session.Remove("JWT");
+        Navigation.NavigateTo("/login");
+    }
+}

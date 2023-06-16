@@ -1,0 +1,70 @@
+﻿@page "/protected"
+@using System.IdentityModel.Tokens.Jwt
+@using System.Security.Claims
+@using Microsoft.IdentityModel.Tokens
+@inject IHttpContextAccessor HttpContextAccessor
+@inject NavigationManager Navigation
+
+@if (IsAuthenticated)
+{
+    <h3>歡迎使用本系統：@UserName</h3>
+    <h3>權限：@Type</h3>
+    <h3>身分證ID：@Id</h3>
+    <h3>暱稱：@NickName</h3>
+    <div class="nav-item px-3">
+        <button @onclick="LogoutMethod">登出</button>
+    </div>
+}
+else
+{
+    <p>未登入</p>
+}
+
+@code {
+    private bool IsAuthenticated => ValidateJwtToken(HttpContextAccessor?.HttpContext?.Session?.GetString("JWT"));
+    private string UserName { get; set; } = string.Empty;
+    private string Type { get; set; } = string.Empty;
+    private string Id { get; set; } = string.Empty;
+    private string NickName { get; set; } = string.Empty;
+
+
+    private bool ValidateJwtToken(string token)
+    {
+        if (string.IsNullOrEmpty(token))
+            return false;
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var jwtToken = tokenHandler.ReadJwtToken(token);
+
+        if (CheckExpiration(jwtToken))
+        {
+            UserName = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            Type = jwtToken.Claims.FirstOrDefault(c => c.Type == "type")?.Value;
+            Id = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value; ;
+            NickName = jwtToken.Claims.FirstOrDefault(c => c.Type == "nickname")?.Value; ;
+            return true; // JWT Token 仍然有效
+        }
+        return false;
+    }
+
+    //檢查JWT過期
+    private bool CheckExpiration(JwtSecurityToken jwtToken)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var expiration = jwtToken.ValidTo; // 取得過期時間
+        var now = DateTime.UtcNow; // 取得當前時間
+        if (expiration < now)
+        {
+            return false; // JWT Token 已經過期
+        }
+        return true;
+    }
+
+    private void LogoutMethod()
+    {
+        // 移除 Session 中的 JWT，導回首頁
+        HttpContextAccessor.HttpContext.Session.Remove("JWT");
+        Navigation.NavigateTo("/login");
+
+    }
+}
