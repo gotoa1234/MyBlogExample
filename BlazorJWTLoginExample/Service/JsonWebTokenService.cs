@@ -15,7 +15,7 @@ namespace BlazorJWTLoginExample.Service
         /// <summary>
         /// 產生JWT 
         /// </summary>
-        public string GenerateToken(User user,
+        public string GenerateToken(LoginModel user,
             int id, string type, string nickName)
         {
             // 1.攜帶用戶資訊(塞在Token中)
@@ -43,6 +43,5 @@ namespace BlazorJWTLoginExample.Service
             // 4. 最後產生token為字串格式
             return  new JwtSecurityTokenHandler().WriteToken(token);             
         }
-
     }
 }

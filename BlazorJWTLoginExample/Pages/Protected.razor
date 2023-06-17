@@ -5,12 +5,14 @@
 @inject IHttpContextAccessor HttpContextAccessor
 @inject NavigationManager Navigation
 
+<!-- 1. 檢核當前是否已經登入 -->
 @if (IsAuthenticated)
 {
     <h3>歡迎使用本系統：@UserName</h3>
     <h3>權限：@Type</h3>
     <h3>身分證ID：@Id</h3>
     <h3>暱稱：@NickName</h3>
+    <!-- 4-1. 登出按鈕-->
     <div class="nav-item px-3">
         <button @onclick="LogoutMethod">登出</button>
     </div>
@@ -21,23 +23,27 @@ else
 }
 
 @code {
+    //2. 登入條件:依照當前Token是否驗證通過
     private bool IsAuthenticated => ValidateJwtToken(HttpContextAccessor?.HttpContext?.Session?.GetString("JWT"));
     private string UserName { get; set; } = string.Empty;
     private string Type { get; set; } = string.Empty;
     private string Id { get; set; } = string.Empty;
     private string NickName { get; set; } = string.Empty;
 
-
+    //3. 驗證Token
     private bool ValidateJwtToken(string token)
     {
+        //3-1. 空的為驗證失敗
         if (string.IsNullOrEmpty(token))
             return false;
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var jwtToken = tokenHandler.ReadJwtToken(token);
 
+        //3-2. token存在的情況下，檢查是否過期
         if (CheckExpiration(jwtToken))
         {
+            //3-3.沒有過期則將用戶資料從Token取出，顯示在操作頁面上
             UserName = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
             Type = jwtToken.Claims.FirstOrDefault(c => c.Type == "type")?.Value;
             Id = jwtToken.Claims.FirstOrDefault(c => c.Type == "id")?.Value; ;
@@ -60,11 +66,12 @@ else
         return true;
     }
 
+    //4-2. 登出行為
     private void LogoutMethod()
     {
         // 移除 Session 中的 JWT，導回首頁
         HttpContextAccessor.HttpContext.Session.Remove("JWT");
-        Navigation.NavigateTo("/login");
+        Navigation.NavigateTo("/");
 
     }
 }
