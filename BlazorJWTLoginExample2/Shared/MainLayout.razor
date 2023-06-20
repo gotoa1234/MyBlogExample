@@ -1,0 +1,26 @@
+﻿@using System.Text
+@using System.IdentityModel.Tokens.Jwt
+@using BlazorJWTLoginExample2.Service
+@using BlazorJWTLoginExample2.Util
+@using Microsoft.IdentityModel.Tokens
+@inject IHttpContextAccessor HttpContextAccessor
+@inject JsonWebTokenService jwtService;
+@inherits LayoutComponentBase
+
+<PageTitle>JWTLoginExample</PageTitle>
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+
+@code {
+
+}
