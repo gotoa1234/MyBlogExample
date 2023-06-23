@@ -1,8 +1,6 @@
 
-using BlazorJWTLoginExample2.Middleware;
 using BlazorJWTLoginExample2.Repository;
 using BlazorJWTLoginExample2.Service;
-using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +34,6 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseSession(); // 添加 Session 中介軟體
 
-app.UseMiddleware<UserLoginSessionHandlerMiddleware>();// 添加 Middleware
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 

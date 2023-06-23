@@ -7,7 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 //STEP 2¡Gµù¥UªA°È
 builder.Services.AddSingleton<ConfigureSettingService>();
-
+builder.Services.AddTransient<ConfigureSettingService>();
+builder.Services.AddScoped<ConfigureSettingService>();
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

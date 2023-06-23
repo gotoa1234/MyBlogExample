@@ -6,21 +6,7 @@ namespace BlazorJWTLoginExample2.Repository
     public class SqliteRepository : ISqliteRepository
     {
         /// <summary>
-        /// 取得令牌
-        /// </summary>
-        public string GetToken(string account)
-        {
-            var sql = $@"
-SELECT Token
-  FROM AccountToken
- WHERE AccountName = @AccountName
-;";
-            return SqlLiteDbUtil.Master.QueryFirstOrDefault<string>(sql, new { AccountName = account});
-        }
-
-
-        /// <summary>
-        /// 紀錄令牌
+        /// 1. 紀錄令牌
         /// </summary>
         public void InsertOrUpdateToken(string account, string token)
         {
@@ -32,7 +18,20 @@ INSERT OR REPLACE INTO AccountToken (AccountName, Token, IsValid, LastDateTime)
         }
 
         /// <summary>
-        /// 設成無效令牌
+        /// 2. 取得令牌
+        /// </summary>
+        public string GetToken(string account)
+        {
+            var sql = $@"
+SELECT Token
+  FROM AccountToken
+ WHERE AccountName = @AccountName
+;";
+            return SqlLiteDbUtil.Master.QueryFirstOrDefault<string>(sql, new { AccountName = account });
+        }
+
+        /// <summary>
+        /// 3. 設成無效令牌
         /// </summary>        
         public void UpdateTokenInValid(string account, string token)
         {

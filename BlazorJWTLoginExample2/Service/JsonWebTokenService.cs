@@ -23,12 +23,6 @@ namespace BlazorJWTLoginExample2.Service
         public string GenerateToken(LoginModel user,
             int id, string type, string nickName)
         {
-            var currentToken = GetToken(user.Username);
-            if (!string.IsNullOrEmpty(currentToken))
-            {
-                return currentToken;
-            }
-
             var claims = new[] {
                 new Claim(ClaimTypes.Name, user.Username),
                 new Claim("type", type),
@@ -47,29 +41,27 @@ namespace BlazorJWTLoginExample2.Service
                 expires: DateTime.UtcNow.AddSeconds(120)//過期時間：如果超過此token會直接報廢
             );
 
-            //1. 註冊Token到資料庫中
+            //1. 登入時：註冊Token到資料庫中
             var newToken = new JwtSecurityTokenHandler().WriteToken(token);
             RegistToken(user.Username, newToken);
 
             return newToken;             
         }
 
-        public string GetToken(string account)
-        {
-            return _repository.GetToken(account);
-        }
-
         public void RegistToken(string userName, string token)
         {
             _repository.InsertOrUpdateToken(userName, token);
         }
-
+        
+        /// <summary>
+        /// 2. 登入後的頁面
+        /// </summary>        
         public bool IsMatchToken(string currentToken)
         {            
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtToken = tokenHandler.ReadJwtToken(currentToken);
 
-            //1. 檢核時間簽名憑證
+            //2-1. 檢核時間簽名憑證
             var jwtKey = Encoding.UTF8.GetBytes(ConstUtil.SignKey);                        
             tokenHandler.ValidateToken(currentToken, new TokenValidationParameters
             {
@@ -81,17 +73,30 @@ namespace BlazorJWTLoginExample2.Service
                 IssuerSigningKey = new SymmetricSecurityKey(jwtKey)
             }, out var validatedToken);
 
-            //2. 檢核是否有用戶
+            //2-2. 檢核是否有用戶
             var UserName = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
             if (string.IsNullOrEmpty(UserName))
                 return false;
 
-            //3. 檢核資料庫
+            //2-3. 檢核資料庫
             if (currentToken != _repository.GetToken(UserName))
             {
+                //如果不相同跳出
                 return false;
             }
             return true;
+        }
+
+        //3. 登出時的頁面
+        public void SetInValid(string currentToken)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(currentToken);
+            var userName = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+            if (!string.IsNullOrEmpty(userName))
+            {
+                _repository.UpdateTokenInValid(userName, currentToken);
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ namespace BlazorJWTLoginExample2.NewFolder
     /// </summary>
     public static class SqlLiteDbUtil
     {
+        //1. 設定連線配置
         public const string DatabaseFileName = @"MyLogin.db";
         public const string ConnectionString = "Data Source=" + DatabaseFileName;
 
@@ -20,7 +21,7 @@ namespace BlazorJWTLoginExample2.NewFolder
 
         public static IDbConnection Master { get; private set; }
 
-        #region 資料庫建構
+        #region 2-1. 資料庫建構
         private static void CreateDatabaseIfNotExists()
         {
             if (!File.Exists(DatabaseFileName))
@@ -32,6 +33,7 @@ namespace BlazorJWTLoginExample2.NewFolder
                 CreateDatabase();
             }
 
+            //2-2. 建立登入表
             void CreateDatabase()
             {
                 Master.Execute($@"

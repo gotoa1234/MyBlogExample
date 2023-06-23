@@ -34,10 +34,10 @@ else
         if (string.IsNullOrEmpty(token))
             return false;
 
-        //1. token存在的情況下，檢查是否過期
+        //1-1. token存在的情況下，檢查是否過期
         if (jwtService.IsMatchToken(token))
         {
-            //2.沒有過期則將用戶資料從Token取出，顯示在操作頁面上
+            //1-2. 沒有過期則將用戶資料從Token取出，顯示在操作頁面上
             var tokenHandler = new JwtSecurityTokenHandler();
             var jwtToken = tokenHandler.ReadJwtToken(token);
             UserName = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
@@ -46,14 +46,16 @@ else
             NickName = jwtToken.Claims.FirstOrDefault(c => c.Type == "nickname")?.Value; 
             return true;
         }
+        //1-3. token被註銷、或者過期視為不存在
         return false;
     }
-    //4-2. 登出行為
+
+    //3. 登出行為
     private void LogoutMethod()
     {
         // 移除 Session 中的 JWT，導回首頁
         HttpContextAccessor.HttpContext.Session.Remove("JWT");
+        jwtService.SetInValid(HttpContextAccessor?.HttpContext?.Session?.GetString("JWT"));
         Navigation.NavigateTo("/");
-
     }
 }

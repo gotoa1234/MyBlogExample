@@ -14,7 +14,6 @@
 
 <div class="alert @AlertClass" role="alert">@AlertMessage</div>
 
-<!-- 1. 提供輸入帳號、密碼完成登入 -->
 <EditForm Model="@LoginModel" OnValidSubmit="LoginWork">
     <DataAnnotationsValidator />
 
@@ -39,7 +38,6 @@
     private string AlertClass { get; set; }
     private string AlertMessage { get; set; }
 
-    //2. 頁面載入時，確認是否已經登入，如果登入則跳過Token清除
     protected override async Task OnInitializedAsync()
     {     
         await base.OnInitializedAsync();        
@@ -51,24 +49,18 @@
         }
     }
 
-    //3. 登入的實作
     private async Task LoginWork()
-    {
-        // 3-1. 假設驗證用戶成功...        
+    {     
         var user = new LoginModel { Username = LoginModel.Username};
-        // 3-2. 產生用戶假資料 (通常是資料庫取得)
         var id = 334567;
         var type = "一般用戶";
         var nickName = "Little Boy";
 
         var token = jwtService.GenerateToken(user, id, type, nickName);
 
-        // 3-3. 將 JWT 存儲在 Session 中
         await HttpContextAccessor.HttpContext.Session.LoadAsync();
         HttpContextAccessor.HttpContext.Session.SetString("JWT", token);
         await HttpContextAccessor.HttpContext.Session.CommitAsync();
-
-        // 3-4. 導頁到需要登入後才能訪問的頁面
         Navigation.NavigateTo("/protected");
     }
 

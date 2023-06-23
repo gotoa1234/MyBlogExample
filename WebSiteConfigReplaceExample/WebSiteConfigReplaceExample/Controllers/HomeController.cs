@@ -19,6 +19,16 @@ namespace WebSiteConfigReplaceExample.Controllers
 
         public IActionResult Index()
         {
+            //System.Console.WriteLine("使用吹風機插頭");
+            //IElectricalPlug hairDryerPlug = new HairDryerPlug();
+            //var socket = new Socket(hairDryerPlug);
+            //socket.SendPower();
+
+            IPluging hairDryerPlug = new HairDryerPlug();
+            var socket = new Socket(hairDryerPlug);
+            socket.Connection();
+
+
             //STEP3-1：以下兩種方法皆可取得設定值
             ViewBag.MasterDatabase = NotDIGetAppsettingMethod();
             ViewBag.MasterDatabase = _myConfigSetting.MasterDatabase;
