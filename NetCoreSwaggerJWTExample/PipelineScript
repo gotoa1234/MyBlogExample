@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+
+    stages {
+        //1.
+        stage('GitCheckOut') {
+            steps {
+               git branch: 'main', credentialsId: 'b4a2cb32-6ef5-4a35-9ee7-8df67e63cfb0', url: 'https://github.com/gotoa1234/MyBlogExample.git'
+            }
+        }
+
+        //2.
+        stage('PublishFile') {
+            steps {
+               bat '''path C:\\Program Files\\dotnet\\
+dotnet publish NetCoreSwaggerJWTExample\\NetCoreSwaggerJWTExample\\NetCoreSwaggerJWTExample.csproj -c Release -o D:\\Self_IIS'''
+            }
+        }
+        
+        //3. 
+        stage('deleteDir') {
+            steps{
+                deleteDir()
+            }
+        }
+    }
+}
