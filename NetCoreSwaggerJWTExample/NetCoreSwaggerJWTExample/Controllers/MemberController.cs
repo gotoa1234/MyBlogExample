@@ -20,7 +20,7 @@ namespace NetCoreSwaggerJWTExample.Controllers
         /// <summary>        
         /// 1-1. 登入
         /// </summary>        
-        [HttpPost]
+        [HttpGet]
         [AllowAnonymous]
         public ActionResult Login(string user, string password)
         {
