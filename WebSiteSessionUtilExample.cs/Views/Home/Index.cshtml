@@ -1,0 +1,26 @@
+﻿@using WebSiteSessionUtilExample.cs.Common.Util
+@{
+    ViewData["Title"] = "首頁-資訊";
+}
+
+<div class="text-center">
+    <div>當前Session內容：</div>
+    <table>
+        <tr>
+            <td>SessionId：</td>
+            <td>@SessionUtil.SessionId</td>
+        </tr>
+        <tr>
+            <td>登入者帳號：</td>
+            <td>@SessionUtil.Account</td>
+        </tr>
+        <tr>
+            <td>登入並紀錄Session時間：</td>
+            <td>@SessionUtil.DateTimeRecord</td>
+        </tr>
+        <tr>
+            <td>登入者年齡：</td>
+            <td>@SessionUtil.Age</td>
+        </tr>
+    </table>
+</div>
