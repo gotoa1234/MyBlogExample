@@ -1,0 +1,24 @@
+﻿@model WebSiteCaptchaLoginExample.Models.LoginViewModel
+@{
+    ViewData["Title"] = "管理員-登入";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>管理員登入頁面</p>
+<form method="post" asp-controller="Home" asp-action="AdminLoginVerify">
+    <div>
+        <label>帳號：</label>
+        <input type="text" asp-for="SubmitData.Account" />
+    </div>
+    <div>
+        <label>密碼：</label>
+        <input type="text" asp-for="SubmitData.Password" />
+    </div>
+    <div>
+        <label>驗證碼：</label>
+        <input type="text" asp-for="SubmitData.InputCaptcha" />
+        <br/><img style='width:180px;height:60px;border:1px solid #ccc;' id='captchaImage' class='cursor-pointer absolute r-0 t-0' src='@Model.Chapcha' alt="验证码">
+    </div>
+    <!-- 提交按鈕 -->
+    <button type="submit">提交</button>
+</form>
