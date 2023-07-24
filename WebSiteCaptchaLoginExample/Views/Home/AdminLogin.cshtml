@@ -6,19 +6,31 @@
 
 <p>管理員登入頁面</p>
 <form method="post" asp-controller="Home" asp-action="AdminLoginVerify">
-    <div>
-        <label>帳號：</label>
-        <input type="text" asp-for="SubmitData.Account" />
-    </div>
-    <div>
-        <label>密碼：</label>
-        <input type="text" asp-for="SubmitData.Password" />
-    </div>
-    <div>
-        <label>驗證碼：</label>
-        <input type="text" asp-for="SubmitData.InputCaptcha" />
-        <br/><img style='width:180px;height:60px;border:1px solid #ccc;' id='captchaImage' class='cursor-pointer absolute r-0 t-0' src='@Model.Chapcha' alt="验证码">
-    </div>
-    <!-- 提交按鈕 -->
-    <button type="submit">提交</button>
+    <table>
+        <tr>
+            <td>帳號：</td>
+            <td><input type="text" asp-for="SubmitData.Account" /></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>密碼：</td>
+            <td><input type="text" asp-for="SubmitData.Password" /></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>驗證碼：</td>
+            <td><input type="text" asp-for="SubmitData.InputCaptcha" /></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><img style='width:180px;height:60px;border:1px solid #ccc;' id='captchaImage' class='cursor-pointer absolute r-0 t-0' src='@Model.Chapcha' alt="验证码"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td> <button type="submit">管理者登入</button></td>
+            <td></td>
+        </tr>
+    </table>
 </form>

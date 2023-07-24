@@ -1,6 +1,36 @@
-﻿@{
+﻿@model WebSiteCaptchaLoginExample.Models.LoginViewModel
+@{
     ViewData["Title"] = "用戶-登入";
 }
 <h1>@ViewData["Title"]</h1>
 
 <p>用戶登入頁面</p>
+<form method="post" asp-controller="Home" asp-action="UserLoginVerify">
+    <table>
+        <tr>
+            <td>帳號：</td>
+            <td><input type="text" asp-for="SubmitData.Account" /></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>密碼：</td>
+            <td><input type="text" asp-for="SubmitData.Password" /></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>驗證碼：</td>
+            <td><input type="text" asp-for="SubmitData.InputCaptcha" /></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><img style='width:180px;height:60px;border:1px solid #ccc;' id='captchaImage' class='cursor-pointer absolute r-0 t-0' src='@Model.Chapcha' alt="验证码"></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td> <button type="submit">用戶登入</button></td>
+            <td></td>
+        </tr>
+    </table>
+</form>

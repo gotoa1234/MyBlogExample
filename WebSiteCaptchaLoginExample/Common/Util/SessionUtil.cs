@@ -3,10 +3,6 @@
     public static class SessionUtil
     {
         private static IHttpContextAccessor _httpContextAccessor;
-
-        /// <summary>
-        /// 1. 增加一個方法，提供紀錄當前HttpContext 存取者
-        /// </summary>        
         public static void Configure(IHttpContextAccessor httpContextAccessor)
         {
             _httpContextAccessor = httpContextAccessor;
@@ -28,17 +24,32 @@
         }
 
         /// <summary>
+        /// 圖形驗證碼綁定名稱 - 使驗證碼與某些Action具有關聯性
+        /// </summary>
+        public static string CaptChaBindName
+        {
+            get
+            {
+                return _httpContextAccessor?.HttpContext?.Session.GetString("CaptChaBindName") ?? string.Empty;
+            }
+            set
+            {
+                _httpContextAccessor?.HttpContext?.Session.SetString("CaptChaBindName", value);
+            }
+        }
+
+        /// <summary>
         /// 圖形驗證碼
         /// </summary>
         public static string CaptCha
         {
             get
             {
-                return _httpContextAccessor?.HttpContext?.Session.GetString("CaptCha") ?? string.Empty;
+                return _httpContextAccessor?.HttpContext?.Session.GetString($@"{CaptChaBindName}_CaptCha") ?? string.Empty;
             }
             set
             {
-                _httpContextAccessor?.HttpContext?.Session.SetString("CaptCha", value);
+                _httpContextAccessor?.HttpContext?.Session.SetString($@"{CaptChaBindName}_CaptCha", value);
             }
         }
     }
