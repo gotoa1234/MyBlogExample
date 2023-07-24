@@ -1,0 +1,17 @@
+﻿@{
+    ViewData["Title"] = "UploadImageFile";
+}
+<h1>@ViewData["Title"]</h1>
+
+<!-- Upload.cshtml -->
+@model UploadModel
+
+<form asp-controller="Home" asp-action="UpLoadFile" method="post" enctype="multipart/form-data">
+    <div>
+        <label for="Image">選擇圖片：</label>
+        <input type="file" name="Image" id="Image" accept=".jpg, .png, .gif">
+    </div>
+    <div>
+        <button type="submit">上傳</button>
+    </div>
+</form>
