@@ -1,0 +1,35 @@
+﻿@using WebSiteUplodaImageEncryptExample.Util
+@{
+    ViewData["Title"] = "上傳圖片加密範例";
+}
+<h1>@ViewData["Title"]</h1>
+
+<!-- Upload.cshtml -->
+@model UploadModel
+<!-- 1-1. 讀取圖檔，並且解密 -->
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment WebHostEnvironment
+@{
+    var file = Url.Content("~/MyImage/MyEncryptImage.png");
+    var appRootPath = WebHostEnvironment.WebRootPath;    
+    var imagePath = System.IO.Path.Combine(appRootPath, "MyImage", "MyEncryptImage.png");
+    var base64Image = string.Empty;
+    if(System.IO.File.Exists(imagePath))
+    {
+        var imageBytes = System.IO.File.ReadAllBytes(imagePath);
+        //1-2. AES解密
+        var originImage = CryptoUtil.AesDecrypt(imageBytes);
+        base64Image = Convert.ToBase64String(originImage);
+    }
+}
+<form asp-controller="Home" asp-action="UpLoadFileEncrypt" method="post" enctype="multipart/form-data">
+    <div>
+        <label for="Image">選擇圖片：</label>
+        <input type="file" name="Image" id="Image" accept=".jpg, .png, .gif">
+    </div>
+    <div>
+        <button type="submit">上傳</button>
+    </div>
+</form>
+
+<!-- 2. 圖片讀取內容 -->
+<img src="data:image/png;base64,@base64Image" style='max-height:300px; max-width:300px' />
