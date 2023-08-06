@@ -3,7 +3,8 @@
 namespace NetCoreSwaggerWebSiteAdditionExample.Base
 {
     [Route($@"Open/[controller]/[action]")]
-    [ApiExplorerSettings(IgnoreApi = true)]
+    [Area("Open")]
+    [ApiExplorerSettings(IgnoreApi = false)]
     public class OpenBaseController: BaseController
     {
     }

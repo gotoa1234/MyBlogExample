@@ -15,7 +15,6 @@ builder.Services.AddSwaggerGen(o =>
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     o.IncludeXmlComments(xmlPath, includeControllerXmlComments: true);
-    o.EnableAnnotations();//2-3 安裝 swashbuckle.aspnetcore.annotations 6.5.0
 });
 
 var app = builder.Build();
@@ -44,11 +43,6 @@ app.UseStaticFiles();
 app.UseRouting();
 
 app.UseAuthorization();
-
-//1. 添加Area 如果有要區分區域
-app.MapControllerRoute(
-    name: "areas",
-    pattern: "{area:exists}/{controller=Member}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
