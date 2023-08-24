@@ -1,0 +1,38 @@
+﻿using Microsoft.AspNetCore.SignalR;
+using NetCoreSignalRWebSiteExample.SignalR;
+
+namespace NetCoreSignalRWebSiteExample.Background
+{
+    public class PageBackroundUpdaterService : BackgroundService
+    {
+        private readonly IHubContext<UpdateHub> _hubContext;
+        private int _versionNumber = 0;
+        private readonly int _second = 5 * 1000;//5秒
+        public PageBackroundUpdaterService(IHubContext<UpdateHub> hubContext
+            )
+        {
+            _hubContext = hubContext;
+            _versionNumber = 0;
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                // 返回資訊
+                var data = $@"回報時間：{DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") } 版本號：{_versionNumber}";
+
+                // 推播訊息
+                await _hubContext.Clients.All.SendAsync("SendUpdate", data);
+
+                // 輪詢時間
+                await Task.Delay(_second, stoppingToken);
+                _versionNumber++;
+            }
+        }
+        public override void Dispose()
+        {
+            base.Dispose();
+        }
+    }
+}
