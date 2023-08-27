@@ -1,34 +1,34 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "SignalR連線測試頁面";
 }
 <!DOCTYPE html>
 <html>
 <head>
     <!-- 微軟給定的CDN https://learn.microsoft.com/zh-tw/aspnet/core/signalr/javascript-client?view=aspnetcore-7.0&tabs=visual-studio  -->
-    <!-- ※此CDN 有可能失效，最好是加入至專案中 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+    <!-- 1. ※此CDN 有可能失效，最好是加入至專案中 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.js"></script>
 </head>
 <body>
-    <!-- 接收內容 -->
+    <!-- 2. 接收內容 -->
     <div id="updateContainer"></div>
 
     <script>
-        // 預設頁面值
+        // 3. 預設頁面值
         var updateContainer = document.getElementById("updateContainer");
         updateContainer.innerHTML = `<p>New update: 初始化 </p>`;
 
-        // 創建 SignalR 連接
+        // 4. 創建 SignalR 連接
         const connection = new signalR.HubConnectionBuilder()
             .withUrl("UpdateHub")
             .build();
 
-        // 監聽 SendUpdate 事件
+        // 5. 監聽 SendUpdate 事件
         connection.on("SendUpdate", (message) => {
             const updateContainer = document.getElementById("updateContainer");
             updateContainer.innerHTML += `<p>New update: ${message}</p>`;
         });
 
-        // 啟動
+        // 6. 啟動
         connection.start()
             .then(() => {
                 console.log("連接 SignalR 成功");

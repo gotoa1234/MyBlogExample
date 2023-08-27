@@ -9,12 +9,10 @@ builder.Services.AddControllersWithViews();
 // 1. 添加 SignalR
 builder.Services.AddSignalR();
 
-// 2. 添加 MVC
 builder.Services.AddControllers();
 
-// 4. 增加背景服務 - 輪詢 Push SignalR
+// 2. 增加背景服務 - 輪詢 Push SignalR
 builder.Services.AddHostedService<PageBackroundUpdaterService>();
-
 
 var app = builder.Build();
 
@@ -26,7 +24,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -42,5 +39,6 @@ app.UseEndpoints(endpoints =>
     //3. 配置 SignalR 路由
     endpoints.MapHub<UpdateHub>("UpdateHub");
 });
+
 
 app.Run();
