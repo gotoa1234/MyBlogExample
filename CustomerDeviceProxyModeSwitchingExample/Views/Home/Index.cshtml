@@ -1,0 +1,26 @@
+﻿@using CustomerDeviceProxyModeSwitchingExample.Common
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewData["Title"] = "偵測設備";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+    @if (RequestUtil.IsMobile())
+    {
+        <h2>當前設備：手機</h2>
+    }
+    else
+    {
+        <h2>當前設備：電腦</h2>
+    }
+    <h2>User-Agent：@RequestUtil.GetClientBrowserUserAgent()</h2>
+
+
+
+</body>
+</html>

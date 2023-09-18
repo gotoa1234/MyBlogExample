@@ -1,0 +1,57 @@
+﻿@using CustomerDeviceProxyModeSwitchingExample.Common
+@{
+    ViewData["Title"] = "客製化選擇設備頁面";
+}
+<h1>@ViewData["Title"]</h1>
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@ViewData["Title"]</title>
+</head>
+<body>
+    <h1>當前選擇模式 ： @if (SessionUtil.IsUseMobile) { <p>行動模式 </p>} else { <p>電腦模式 </p>}</h1>
+    <button id="mobileButton">使用行動版</button>
+    <button id="desktopButton">使用電腦版</button>
+
+    @if (RequestUtil.IsMobile())
+    {
+        <h2>當前設備：手機</h2>
+
+    }
+    else
+    {
+        <h2>當前設備：電腦</h2>
+    }
+    <h2>User-Agent：@RequestUtil.GetClientBrowserUserAgent()</h2>
+
+
+
+    <script>
+        var mobileButton = document.getElementById("mobileButton");
+        var desktopButton = document.getElementById("desktopButton");
+
+        mobileButton.addEventListener("click", function () {            
+            callApi(1);
+        });
+
+        desktopButton.addEventListener("click", function () {            
+            callApi(0);
+        });
+
+        // 呼叫API
+        function callApi(isMobile) {            
+            fetch("/Home/SettingMode?isMobile=" + isMobile, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(function (response) {
+                alert("設定成功");                
+            })
+        }
+    </script>
+
+</body>
+</html>
