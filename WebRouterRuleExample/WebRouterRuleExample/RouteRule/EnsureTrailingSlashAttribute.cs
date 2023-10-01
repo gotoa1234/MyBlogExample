@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using System.Net;
-using System.Text.RegularExpressions;
-using System.Web;
 
 namespace WebRouterRuleExample.RouteRule
 {
@@ -11,11 +9,11 @@ namespace WebRouterRuleExample.RouteRule
         public override void OnActionExecuting(ActionExecutingContext context)
         {
             var request = context.HttpContext.Request;
-            // 檢查 URL 是否以斜槓結尾
+            // 1. 檢查邏輯 - URL 是否以斜槓結尾
             var isLegal = IsLegalUrlPath(request.Path.Value ?? string.Empty);
             if (false == isLegal)
             {
-                // 組成正確的Url 給用戶知道
+                // 2. 組成正確的Url 回傳Location給對方知道
                 var path = context.HttpContext.Request.Path;
                 var pathSplit = request.Path.Value.Split('/');                
                 var addPathList = new List<string>() { ""};
@@ -27,20 +25,21 @@ namespace WebRouterRuleExample.RouteRule
                     addPathList.Add(pathSplit[index]);
                 }
                 var queryString = context.HttpContext.Request.QueryString;                
-                var rightFullUrl = string.Join('/', addPathList) + queryString;
+                var pathFullUrl = string.Join('/', addPathList) + queryString;
+                var rightFullUrl = (context.HttpContext.Request.IsHttps ? "https://" : "http://")
+                                   + context.HttpContext.Request.Host.ToString() 
+                                   + pathFullUrl;
 
-                // 創建一個 RedirectToActionResult 以執行重定向
+                // 3-1. 創建一個 RedirectResult 實現重定向301
                 var result = new RedirectResult(WebUtility.HtmlEncode(rightFullUrl), true);
-
-                // 設定 HTTP 狀態碼為 301 Found
+                // 3-2. 設定 HTTP 狀態碼為 301
                 context.HttpContext.Response.StatusCode = 301;
 
-                // 設定 Location 標頭以指定重定向目標(就是我們建議的正確位置)
+                // 4. 設定 Location 標頭以指定重定向目標(就是我們建議的正確位置)
                 context.HttpContext.Response.Headers.Add("Location", WebUtility.HtmlEncode(rightFullUrl));
 
-                // 將結果設定到 ActionExecutingContext 中
+                // 5. 將結果設定到結果中
                 context.Result = result;
-
                 base.OnActionExecuting(context);
             }
             base.OnActionExecuting(context);
