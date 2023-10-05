@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<!-- Add the reCAPTCHA script in your HTML -->
+<script src="https://www.google.com/recaptcha/enterprise.js" async defer></script>
+
+<!-- Add the reCAPTCHA widget to your form -->
+<form action="/your-action-endpoint" method="post">
+    <!-- Your form fields go here -->
+
+    <!-- Add the reCAPTCHA widget -->
+    <div class="g-recaptcha" data-sitekey="your-site-key"></div>
+
+    <button type="submit">Submit</button>
+</form>
