@@ -1,5 +1,6 @@
 ﻿using Google.Cloud.RecaptchaEnterprise.V1;
 using Microsoft.AspNetCore.Mvc;
+using ReCAPTCHAForAspNetCoreWebSiteExmple.Models;
 
 namespace ReCAPTCHAForAspNetCoreWebSiteExmple.Controllers
 {
@@ -7,37 +8,46 @@ namespace ReCAPTCHAForAspNetCoreWebSiteExmple.Controllers
     {
         private readonly RecaptchaEnterpriseServiceClient _recaptchaService;
         private readonly IConfiguration _configuration;
+        private readonly string _projectId;
+        private readonly string _privateKey;
+
         public GoogleReCaptchaController(IConfiguration configuration)
         {
-            var projectId = configuration["RecaptchaEnterprise:ProjectId"];
-            var privateKey = configuration["RecaptchaEnterprise:PrivateKey"];
+            _projectId = configuration["RecaptchaEnterprise:ProjectId"];
+            _privateKey = configuration["RecaptchaEnterprise:PrivateKey"];
             _recaptchaService = RecaptchaEnterpriseServiceClient.Create();
             _configuration = configuration;
         }
 
         [HttpPost]
-        public async Task<IActionResult> YourAction([FromBody] dynamic data)
+        public async Task<IActionResult> RegisterAccount(RegisterAccountModel data)
         {
-            // Your action logic goes here
-
-            // Perform reCAPTCHA verification
-            var recaptchaSiteKey = _configuration["RecaptchaEnterprise:SiteKey"];
-
-            var recaptcha = await _recaptchaService.AnnotateAssessmentAsync(new AnnotateAssessmentRequest
+            try
             {
-                Name = recaptchaSiteKey, // Use your site key here
-                Annotation = AnnotateAssessmentRequest.Types.Annotation.PasswordCorrect// "human" indicates a valid user
-            });
+                var recaptcha = await _recaptchaService.AnnotateAssessmentAsync(new AnnotateAssessmentRequest
+                {
+                    Name = _projectId, // Use your site key here
+                });
 
-            if (recaptcha.ToString() != AnnotateAssessmentRequest.Types.Annotation.PasswordCorrect.ToString())
-            {
-                // Handle invalid reCAPTCHA (e.g., return an error response)
-                return StatusCode(403, "reCAPTCHA validation failed");
+                if (recaptcha.ToString() != "")// AnnotateAssessmentResponse.Types.Annotation.PasswordCorrect)
+                {
+                    // Handle invalid reCAPTCHA (e.g., return an error response)
+                    return StatusCode(403, "reCAPTCHA validation failed");
+                }
+
+                // Continue with your logic
+
+                return Ok("Success");
             }
+            catch (Exception ex)
+            {
+                // Log the exception
+                var my = ex;
 
-            // Continue with your logic
-
-            return Ok("Success");
+                // Handle the error and return an appropriate response
+                return StatusCode(500, "An error occurred during reCAPTCHA validation + EX: " + ex);
+            }
         }
+
     }
 }
