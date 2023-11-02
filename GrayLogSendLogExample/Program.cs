@@ -28,6 +28,14 @@ Log.Information($@"MilkTeaGreen Test GrayLogSendLogExample Log => INF");
 //4-3. Error 本地
 Log.Error($@"MilkTeaGreen Test GrayLogSendLogExample Log => ERR");
 
+//5. Jenkins 部署後，發個Log
+var config = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
+                                      .AddJsonFile("version.json", optional: true, reloadOnChange: true)
+                                      .Build();
+var version = config.GetSection("version").Value;
+Log.Information($@"MilkTeaGreen Test GitTag  => {version}");
+
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
