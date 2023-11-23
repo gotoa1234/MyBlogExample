@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "gRPC聊天室";
+}
+
+<!-- 在 Razor 頁面中嵌入 gRPC Web 的 JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/protobufjs@6/dist/protobuf.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/grpc-web-client@2.0.9/dist/grpc-web-client.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/grpc-web-client@2.0.9/dist/grpc-web-client.min.js"></script>
+
+<input type="text" id="usernameInput" placeholder="Enter your name">
+<input type="text" id="messageInput" placeholder="Enter your message">
+<button onclick="sendMessage()">Send Message</button>
+
+<textarea id="outputTextBox" rows="10" cols="50" readonly></textarea>
+
+
+
+<script>
+  const proto = grpc.load("proto/chat.proto");
+  const chatService = new proto.ChatApp.ChatService("http://localhost:5184");
+
+  function sendMessage() {
+    const username = document.getElementById("usernameInput").value;
+    const message = document.getElementById("messageInput").value;
+
+    if (username && message) {
+      const request = new proto.ChatApp.MessageRequest();
+      request.setUsername(username);
+      request.setMessage(message);
+
+      chatService.sendMessage(request, {}, (err, response) => {
+        if (!err) {
+          console.log(`Received response: ${response.getUsername()}: ${response.getMessage()}`);
+          // 在此處處理接收到的消息，例如將消息顯示在頁面上
+          document.getElementById("outputTextBox").value = `${response.getUsername()}: ${response.getMessage()}`;
+        } else {
+          console.error(`Error sending message: ${err}`);
+        }
+      });
+    }
+  }
+</script>

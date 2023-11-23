@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option csharp_namespace = "ChatApp";
+
+package chat;
+
+service ChatService {
+  rpc Join(JoinRequest) returns (JoinResponse);
+  rpc SendMessage(MessageRequest) returns (MessageResponse);
+}
+
+message JoinRequest {
+  string username = 1;
+}
+
+message JoinResponse {
+  repeated string activeUsers = 1;
+}
+
+message MessageRequest {
+  string username = 1;
+  string message = 2;
+}
+
+message MessageResponse {
+  string username = 1;
+  string message = 2;
+}
