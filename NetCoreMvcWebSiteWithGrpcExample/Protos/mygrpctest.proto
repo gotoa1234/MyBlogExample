@@ -1,21 +1,24 @@
+// 1. 這是proto 通訊串流使用的，安裝套件提供預設 proto3
 syntax = "proto3";
 
+// 2. 命名空間，可以同專案
 option csharp_namespace = "NetCoreMvcWebSiteWithGrpcExample";
 
+// 3. 同檔案名稱
 package mygrpctest;
 
-// The greeting service definition.
+// 4. 會對應到C#中業務邏輯的 Service的主類別名稱 
 service MyGrpcTester {
   // Sends a greeting
   rpc SayHello (HelloRequest) returns (HelloReply);
 }
 
-// The request message containing the user's name.
+// 5. 請求攜帶的參數
 message HelloRequest {
   string name = 1;
 }
 
-// The response message containing the greetings.
+// 6. 當被請求後返回內容
 message HelloReply {
   string message = 1;
 }
