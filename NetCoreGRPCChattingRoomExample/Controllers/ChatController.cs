@@ -1,42 +1,47 @@
 ﻿using ChatApp;
+using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
 
 namespace NetCoreGRPCChattingRoomExample.Controllers
 {
     public class ChatController : Controller
     {
-        private readonly ChatService.ChatServiceClient _chatClient;
+        private readonly ChatApp.ChatService.ChatServiceClient _grpcClient;
 
-        public ChatController(ChatService.ChatServiceClient chatClient)
+        public ChatController(ChatApp.ChatService.ChatServiceClient grpcClient)
         {
-            _chatClient = chatClient;
+            _grpcClient = grpcClient;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             return View();
         }
 
-        public async Task<IActionResult> JoinChat(string username)
+        [HttpGet]
+        public async Task<IActionResult> SendMessage(string user, string message)
         {
-            var request = new JoinRequest { Username = username };
-            var response = await _chatClient.JoinAsync(request);
+            // 訂閱消息
+            var request = new MessageRequest { Username = user, Message = message };            
+            //_grpcClient.Subscribe(new SubscribeRequest { SubscriberName = user });
 
-            // Process the response (e.g., update UI with active users)
-            // ...
+            var resultMessage = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") + "：";
+            var messageResponse = new MessageResponse();
+            using (var call = _grpcClient.SendMessageAsync(request))
+            {
+                messageResponse = await call.ResponseAsync;
+            }
 
-            return RedirectToAction("Index");
-        }
+            using (var call = _grpcClient.SendMessage2Async(new Message { Content = messageResponse.Username + ":" + messageResponse.Message }))
+            {
+               var messageResponse2 = await call.ResponseAsync;
+            }
 
-        public async Task<IActionResult> SendMessage(string username, string message)
-        {
-            var request = new MessageRequest { Username = username, Message = message };
-            await _chatClient.SendMessageAsync(request);
-
-            // Process the response (e.g., update UI with new message)
-            // ...
-
-            return RedirectToAction("Index");
+            return Ok(new {
+                time = resultMessage,
+                response = messageResponse
+            });
         }
     }
 }
+

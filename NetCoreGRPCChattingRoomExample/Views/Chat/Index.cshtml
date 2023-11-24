@@ -1,18 +1,92 @@
-﻿@{
-    ViewData["Title"] = "gRPC聊天室";
+﻿@using ChatApp
+@using Grpc.Core
+@using Grpc.Net.Client
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+<script>
+    window.addEventListener('messageReceived', (event) => {
+        // 將接收到的消息寫入 textarea
+        var outputTextBox = document.getElementById('outputTextBox');
+        outputTextBox.value += event.detail + '\n';
+    });
+    function appendMessageToTextBox(data) {
+        debugger;
+        var outputTextBox = document.getElementById('outputTextBox');
+        outputTextBox.value += data.content + '\n';
+    }
+</script>
+@{
+    // 將訂閱消息的 JavaScript 函數名稱傳遞給 Razor 頁面
+    var jsFunctionName = "appendMessageToTextBox";
+
 }
 
-<!-- 在 Razor 頁面中嵌入 gRPC Web 的 JavaScript -->
-<script src="https://cdn.jsdelivr.net/npm/protobufjs@6/dist/protobuf.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/grpc-web-client@2.0.9/dist/grpc-web-client.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/grpc-web-client@2.0.9/dist/grpc-web-client.min.js"></script>
+@{
+    ViewData["Title"] = "gRPC聊天室";
+    async Task SubscribeToMessages()
+    {
+        using (var channel = GrpcChannel.ForAddress("https://localhost:7184"))
+        {
+            var client = new ChatApp.ChatService.ChatServiceClient(channel);
 
-<input type="text" id="usernameInput" placeholder="Enter your name">
-<input type="text" id="messageInput" placeholder="Enter your message">
-<button onclick="sendMessage()">Send Message</button>
+            // 訂閱消息
+            using (var subscribeCall = client.Subscribe())
+            {
+                var subscribeRequest = new SubscribeRequest { SubscriberName = "ClientSubscriber" };
+                await subscribeCall.RequestStream.WriteAsync(subscribeRequest);
 
-<textarea id="outputTextBox" rows="10" cols="50" readonly></textarea>
+                // 接收消息
+                await foreach (var message in subscribeCall.ResponseStream.ReadAllAsync())
+                {
+                    // 使用 <script> 區塊中定義的 JavaScript 函數名稱
+                    await JSRuntime.InvokeAsync<object>(jsFunctionName,  new object[] { message.Content });
+                }
+            }
+        }
+    }
+}
 
+<!-- Razor 頁面上的按鈕或其他元素，當被觸發時呼叫 SubscribeToMessages 方法 -->
+<button onclick="@SubscribeToMessages()">Subscribe to Messages</button>
+
+
+<input type="text" id="usernameInput" placeholder="姓名">
+<input type="text" id="messageInput" placeholder="發送訊息">
+<button onclick="SendMessage()">Send Message</button>
+<br/>
+<br/>
+
+//<textarea id="outputTextBox" rows="10" cols="50" readonly></textarea>
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        function SendMessage()
+        {
+            const username = document.getElementById("usernameInput").value;
+            const message = document.getElementById("messageInput").value;
+            var pushData = {
+               user: username, 
+               message: message 
+            };
+            $.get("/Chat/SendMessage", pushData, function(data) {             
+                var output = $("#outputTextBox")
+                output.val(output.val() + data.time + " => " + data.response.username + "：" + data.response.message + "\n");
+                debugger;
+            });
+
+            //$("#startButton").on("click", function () {                
+            //    $.get("/Chat/SendMessage");
+            //});
+        }
+        //$(document).ready(function () {
+           
+        //});
+    </script>
+}
+
+@*
 
 
 <script>
@@ -39,4 +113,4 @@
       });
     }
   }
-</script>
+</script>*@
