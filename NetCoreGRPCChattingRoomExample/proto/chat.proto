@@ -15,15 +15,9 @@ message MessageResponse {
   string message = 2;
 }
 
-message LeaveRequest {
-  string username = 1;
-}
-
 service ChatService {
   rpc SendMessage(MessageRequest) returns (MessageResponse);
-  rpc Leave(LeaveRequest) returns (google.protobuf.Empty);
   rpc Subscribe(stream SubscribeRequest) returns (stream Message);  
-  rpc SendMessage2(Message) returns (google.protobuf.Empty);
 }
 
 message SubscribeRequest {

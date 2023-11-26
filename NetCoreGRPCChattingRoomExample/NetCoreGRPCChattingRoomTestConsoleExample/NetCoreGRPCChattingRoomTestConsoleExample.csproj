@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -17,11 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="..\NetCoreGRPCChattingRoomExample\proto\chat.proto" GrpcServices="Client">
+    <Protobuf Include="..\proto\chat.proto" GrpcServices="Client">
       <Link>Protos\chat.proto</Link>
-    </Protobuf>
-    <Protobuf Include="..\NetCoreMvcWebSiteWithGrpcExample\Protos\mygrpctest.proto" GrpcServices="Client">
-      <Link>Protos\mygrpctest.proto</Link>
     </Protobuf>
   </ItemGroup>
 

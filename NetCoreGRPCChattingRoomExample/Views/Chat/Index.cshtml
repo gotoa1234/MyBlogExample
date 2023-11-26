@@ -4,64 +4,21 @@
 @using Microsoft.JSInterop
 @inject IJSRuntime JSRuntime
 
-<script>
-    window.addEventListener('messageReceived', (event) => {
-        // 將接收到的消息寫入 textarea
-        var outputTextBox = document.getElementById('outputTextBox');
-        outputTextBox.value += event.detail + '\n';
-    });
-    function appendMessageToTextBox(data) {
-        debugger;
-        var outputTextBox = document.getElementById('outputTextBox');
-        outputTextBox.value += data.content + '\n';
-    }
-</script>
-@{
-    // 將訂閱消息的 JavaScript 函數名稱傳遞給 Razor 頁面
-    var jsFunctionName = "appendMessageToTextBox";
-
-}
-
 @{
     ViewData["Title"] = "gRPC聊天室";
-    async Task SubscribeToMessages()
-    {
-        using (var channel = GrpcChannel.ForAddress("https://localhost:7184"))
-        {
-            var client = new ChatApp.ChatService.ChatServiceClient(channel);
-
-            // 訂閱消息
-            using (var subscribeCall = client.Subscribe())
-            {
-                var subscribeRequest = new SubscribeRequest { SubscriberName = "ClientSubscriber" };
-                await subscribeCall.RequestStream.WriteAsync(subscribeRequest);
-
-                // 接收消息
-                await foreach (var message in subscribeCall.ResponseStream.ReadAllAsync())
-                {
-                    // 使用 <script> 區塊中定義的 JavaScript 函數名稱
-                    await JSRuntime.InvokeAsync<object>(jsFunctionName,  new object[] { message.Content });
-                }
-            }
-        }
-    }
 }
-
-<!-- Razor 頁面上的按鈕或其他元素，當被觸發時呼叫 SubscribeToMessages 方法 -->
-<button onclick="@SubscribeToMessages()">Subscribe to Messages</button>
-
-
 <input type="text" id="usernameInput" placeholder="姓名">
-<input type="text" id="messageInput" placeholder="發送訊息">
-<button onclick="SendMessage()">Send Message</button>
+<input type="text" id="messageInput" placeholder="訊息">
+<button onclick="SendMessage()">傳送訊息</button>
 <br/>
 <br/>
 
-//<textarea id="outputTextBox" rows="10" cols="50" readonly></textarea>
+<textarea id="outputTextBox" rows="15" cols="100" readonly></textarea>
 
 @section scripts {
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
+        //1. 傳送訊息 + 訂閱
         function SendMessage()
         {
             const username = document.getElementById("usernameInput").value;
@@ -70,47 +27,22 @@
                user: username, 
                message: message 
             };
-            $.get("/Chat/SendMessage", pushData, function(data) {             
-                var output = $("#outputTextBox")
-                output.val(output.val() + data.time + " => " + data.response.username + "：" + data.response.message + "\n");
-                debugger;
+            $.get("/Chat/SendMessage", pushData, function(data) { 
+                console.log(data);
             });
 
-            //$("#startButton").on("click", function () {                
-            //    $.get("/Chat/SendMessage");
-            //});
         }
-        //$(document).ready(function () {
-           
-        //});
+
+        //2-1. 取得訊息的輪巡
+        async function updateMessage() {
+            var outputTextBox = document.getElementById('outputTextBox');
+            var user = document.getElementById("usernameInput").value;
+            var response = await fetch('/Chat/GetMessage?user=' + user);
+            var myPageMessage = await response.text();
+            outputTextBox.value = myPageMessage + '\n';
+        }
+     
+        //2-2. 設定間隔 500ms
+        setInterval(updateMessage, 500);
     </script>
 }
-
-@*
-
-
-<script>
-  const proto = grpc.load("proto/chat.proto");
-  const chatService = new proto.ChatApp.ChatService("http://localhost:5184");
-
-  function sendMessage() {
-    const username = document.getElementById("usernameInput").value;
-    const message = document.getElementById("messageInput").value;
-
-    if (username && message) {
-      const request = new proto.ChatApp.MessageRequest();
-      request.setUsername(username);
-      request.setMessage(message);
-
-      chatService.sendMessage(request, {}, (err, response) => {
-        if (!err) {
-          console.log(`Received response: ${response.getUsername()}: ${response.getMessage()}`);
-          // 在此處處理接收到的消息，例如將消息顯示在頁面上
-          document.getElementById("outputTextBox").value = `${response.getUsername()}: ${response.getMessage()}`;
-        } else {
-          console.error(`Error sending message: ${err}`);
-        }
-      });
-    }
-  }
-</script>*@

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NetCoreGRPCChattingRoomExample.Models;
 using System.Diagnostics;
 
 namespace NetCoreGRPCChattingRoomExample.Controllers
@@ -18,15 +17,5 @@ namespace NetCoreGRPCChattingRoomExample.Controllers
             return View();
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
     }
 }
