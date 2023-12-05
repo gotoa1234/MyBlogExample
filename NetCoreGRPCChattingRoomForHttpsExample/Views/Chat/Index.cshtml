@@ -1,0 +1,48 @@
+﻿@using ChatApp
+@using Grpc.Core
+@using Grpc.Net.Client
+@using Microsoft.JSInterop
+@inject IJSRuntime JSRuntime
+
+@{
+    ViewData["Title"] = "gRPC聊天室";
+}
+<input type="text" id="usernameInput" placeholder="姓名">
+<input type="text" id="messageInput" placeholder="訊息">
+<button onclick="SendMessage()">傳送訊息</button>
+<br />
+<br />
+
+<textarea id="outputTextBox" rows="15" cols="100" readonly></textarea>
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script>
+        //1. 傳送訊息 + 訂閱
+        function SendMessage()
+        {
+            const username = document.getElementById("usernameInput").value;
+            const message = document.getElementById("messageInput").value;
+            var pushData = {
+               user: username,
+               message: message
+            };
+            $.get("/Chat/SendMessage", pushData, function(data) {
+                console.log(data);
+            });
+
+        }
+
+        //2-1. 取得訊息的輪巡
+        async function updateMessage() {
+            var outputTextBox = document.getElementById('outputTextBox');
+            var user = document.getElementById("usernameInput").value;
+            var response = await fetch('/Chat/GetMessage?user=' + user);
+            var myPageMessage = await response.text();
+            outputTextBox.value = myPageMessage + '\n';
+        }
+
+        //2-2. 設定間隔 500ms
+        setInterval(updateMessage, 500);
+    </script>
+}

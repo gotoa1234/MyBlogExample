@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="HttpsGrpcConnetionTest\**" />
+    <Content Remove="HttpsGrpcConnetionTest\**" />
+    <EmbeddedResource Remove="HttpsGrpcConnetionTest\**" />
+    <None Remove="HttpsGrpcConnetionTest\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Proto\chat.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.49.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Proto\chat.proto" GrpcServices="Both" />
+  </ItemGroup>
+
+</Project>
