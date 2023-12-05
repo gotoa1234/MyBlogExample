@@ -25,4 +25,14 @@
     <Protobuf Include="Proto\chat.proto" GrpcServices="Both" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Certification\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Certification\cert.crt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

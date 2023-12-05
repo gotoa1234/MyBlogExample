@@ -13,19 +13,25 @@ IConfigurationRoot baseBuilderData = new ConfigurationBuilder()
     .AddJsonFile(Path.Combine(Directory.GetCurrentDirectory(), "Properties", "launchSettings.json"), optional: true, reloadOnChange: true)
     .Build();
 
-// 3. 啟用 Kestrel Server ，並且設定 IP 這邊為了閱讀使用HardCode，建議放進 appsetting.json 中
-NetCoreGRPCChattingRoomForHttpsExample.Controllers.GlobalConst.Self_GRPC_URL = "https://localhost:50051";
+// 3. 啟用 Kestrel Server ，內部Server指向本地的https
+int httpsPort = builder.Configuration.GetValue<int>("Kestrel:Ports:HttpsPort", 50051);
+NetCoreGRPCChattingRoomForHttpsExample.Controllers.GlobalConst.Self_GRPC_URL = @$"https://localhost:{httpsPort}";
+
 builder.WebHost.UseKestrel(options =>
 {
-    // 3. 配置 Web Endpoint（HTTP/1.1） => 連網站用
-    options.Listen(IPAddress.Any, 5099, listenOptions => { });
+    // 4. 配置 Web Endpoint（HTTP/1.1） => 連網站用
+    var httpPort = builder.Configuration.GetValue<int>("Kestrel:Ports:HttpPort", 5099);   
+    options.Listen(IPAddress.Any, httpPort, listenOptions => { });
 
-    // 4-1. 配置Https 
-    options.Listen(IPAddress.Any, 50051, listenOptions =>
+
+    // 5. 配置Https + 使用 Server 上的產生Https憑證 (此pfx 是該Server域名產生，所以Local Debug啟動會異常)
+    var httpsPort = builder.Configuration.GetValue<int>("Kestrel:Ports:HttpsPort", 50051);
+    var pfxFile = builder.Configuration.GetValue<string>("PfxPath", string.Empty);
+    options.Listen(IPAddress.Any, httpsPort, listenOptions =>
     {
         listenOptions.Protocols = Microsoft.AspNetCore.Server.Kestrel.Core.HttpProtocols.Http2;
-        // 4-2. 開啟Https 並且指向Server 的 HTTPS 憑證位置 
-        listenOptions.UseHttps(@"/etc/nginx/certificate.pfx");        
+        // 5-2. 開啟Https 並且指向Server 的 HTTPS 憑證位置 
+        listenOptions.UseHttps(pfxFile);        
     });
 });
 

@@ -48,11 +48,11 @@ namespace NetCoreGRPCChattingRoomForHttpsExample.Controllers
 
             var resultMessage = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss") + "：";
             var messageResponse = new MessageResponse();
-            var request = new MessageRequest { Username = user, Message = message };            
+            var request = new MessageRequest { Username = user, Message = message };
 
 
-            // 1. 呼叫遠端 gRPC 傳送訊息
-            using (var channel = GrpcChannel.ForAddress(GlobalConst.Self_GRPC_URL))
+            // 1. 調整加入Https cert公開金鑰
+            using (var channel = GetGRPChannel())
             {
                 var client = new ChatApp.ChatService.ChatServiceClient(channel);
                 using (var call = client.SendMessageAsync(request))
@@ -84,18 +84,8 @@ namespace NetCoreGRPCChattingRoomForHttpsExample.Controllers
         /// </summary>        
         private static async Task SubscribeToMessages(string username)
         {
-            //var handler = new HttpClientHandler();
-            //handler.ClientCertificates.Add(new X509Certificate2(Encoding.UTF8.GetBytes(rootCert)));
-            ////6. 測試環境可以開啟這個，因為憑證是我們產的測試Https 憑證，但生產需要將此行註解
-            //handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
-
-            ////6. 建立HttpClient
-            //var channelOptions = new GrpcChannelOptions
-            //{
-            //    HttpClient = new HttpClient(handler)
-            //};
-
-            using (var channel = GrpcChannel.ForAddress(GlobalConst.Self_GRPC_URL, channelOptions))
+            //2. 訂閱也調整加入Https cert公開金鑰
+            using (var channel = GetGRPChannel())
             {
                 var client = new ChatApp.ChatService.ChatServiceClient(channel);
 
@@ -112,6 +102,25 @@ namespace NetCoreGRPCChattingRoomForHttpsExample.Controllers
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// 取得公開金鑰Cert
+        /// </summary>
+        /// <returns></returns>
+        private static GrpcChannel? GetGRPChannel()
+        {
+            var rootCert = System.IO.File.ReadAllText(@"Certification\cert.crt");
+            var handler = new HttpClientHandler();
+            handler.ClientCertificates.Add(new X509Certificate2(Encoding.UTF8.GetBytes(rootCert)));            
+            //如果憑證為測試憑證必須加入這行，如果生產有產生正式的Https 憑證把此行註解即可
+            handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
+            var channelOptions = new GrpcChannelOptions
+            {
+                HttpClient = new HttpClient(handler)
+            };
+            var client = GrpcChannel.ForAddress(GlobalConst.Self_GRPC_URL, channelOptions);
+            return client;
         }
     }
 }
