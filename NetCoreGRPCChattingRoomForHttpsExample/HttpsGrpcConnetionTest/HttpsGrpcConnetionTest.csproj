@@ -26,4 +26,10 @@
     </Protobuf>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Certification\cert.crt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

@@ -8,29 +8,30 @@ using System.Text;
 //2. 加入服務參考 -> 用戶端 -> 最新的.proto 檔案
 //3. 從Server 環境下取得憑證檔案 EX: /etc/nginx/cert.crt 
 //4. 指向檔案路徑 (※這個是測試憑證，基本上沒什麼用處)
-var rootCert = File.ReadAllText(@"C:\Users\louis671\Desktop\Example\新增資料夾\MyBlogExample\NetCoreGRPCChattingRoomForHttpsExample\HttpsGrpcConnetionTest\Certification\cert.crt");
-
+var rootCert = File.ReadAllText(@"Certification\cert.crt");
 
 //5. 設定憑證
-
 var handler = new HttpClientHandler();
 handler.ClientCertificates.Add(new X509Certificate2(Encoding.UTF8.GetBytes(rootCert)));
-//6. 測試環境可以開啟這個，因為憑證是我們產的測試Https 憑證，但生產需要將此行註解
+//6-1. 測試環境可以開啟這個，因為憑證是我們產的測試Https 憑證，但生產需要將此行註解
 handler.ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator;
 
-//6. 建立HttpClient
+//6-2. 建立HttpClient
 var channelOptions = new GrpcChannelOptions
 {
     HttpClient = new HttpClient(handler)
 };
 
+//7. 指定連線gRPC目標
 using var channel = GrpcChannel.ForAddress("https://192.168.51.62:50051", channelOptions);
 
 //8. 建立聯繫
 var client =  new ChatApp.ChatService.ChatServiceClient(channel);
 
+//9. 發送一個訊息
 var sendResponseStream = client.SendMessageAsync(new MessageRequest() { Message = "Hello", Username = "Louis" });
 
+//10. 開啟訂閱模式，等待資料推播過來
 using (var subScribeResponseStream = client.Subscribe())
 {
     using (var subscribeCall = client.Subscribe())
