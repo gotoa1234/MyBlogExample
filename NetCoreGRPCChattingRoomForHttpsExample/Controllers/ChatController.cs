@@ -25,11 +25,8 @@ namespace NetCoreGRPCChattingRoomForHttpsExample.Controllers
 
     public class ChatController : Controller
     {
-        private IConfigurationRoot _config;
-
-        public ChatController(IConfigurationRoot config)
+        public ChatController()
         {
-            _config = config;
         }
 
         public async Task<IActionResult> Index()
@@ -114,7 +111,7 @@ namespace NetCoreGRPCChattingRoomForHttpsExample.Controllers
         /// <returns></returns>
         private static GrpcChannel? GetGRPChannel()
         {
-            var rootCert = NetCoreGRPCChattingRoomForHttpsExample.Controllers.GlobalConst.Cert_Path;
+            var rootCert = System.IO.File.ReadAllText(NetCoreGRPCChattingRoomForHttpsExample.Controllers.GlobalConst.Cert_Path);
             var handler = new HttpClientHandler();
             handler.ClientCertificates.Add(new X509Certificate2(Encoding.UTF8.GetBytes(rootCert)));            
             //如果憑證為測試憑證必須加入這行，如果生產有產生正式的Https 憑證把此行註解即可
