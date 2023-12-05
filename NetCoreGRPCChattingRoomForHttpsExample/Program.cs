@@ -16,7 +16,8 @@ IConfigurationRoot baseBuilderData = new ConfigurationBuilder()
 // 3. 啟用 Kestrel Server ，內部Server指向本地的https
 int httpsPort = builder.Configuration.GetValue<int>("Kestrel:Ports:HttpsPort", 50051);
 NetCoreGRPCChattingRoomForHttpsExample.Controllers.GlobalConst.Self_GRPC_URL = @$"https://localhost:{httpsPort}";
-
+var certPath = builder.Configuration.GetValue<string>("CertPath", string.Empty);
+NetCoreGRPCChattingRoomForHttpsExample.Controllers.GlobalConst.Cert_Path = certPath;
 builder.WebHost.UseKestrel(options =>
 {
     // 4. 配置 Web Endpoint（HTTP/1.1） => 連網站用
