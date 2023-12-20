@@ -9,5 +9,14 @@ namespace NetCoreSignalRWebSiteExample.SignalR
         {
             await Clients.All.SendAsync("SendUpdate", message);
         }
+
+        /// <summary>
+        /// 接收前端傳送訊息
+        /// </summary>                
+        public async Task SendMessage(string user, string message)
+        {
+            await Clients.All.SendAsync("ReceiveMessage", user, message);
+        }
+
     }
 }

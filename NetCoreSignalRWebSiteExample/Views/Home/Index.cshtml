@@ -9,7 +9,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.0/signalr.js"></script>
 </head>
 <body>
-    <!-- 2. 接收內容 -->
+    <!-- 9. 設定dom元件 發送 & 接收內容 -->    
+    <input type="text" id="userInput" placeholder="姓名">
+    <input type="text" id="messageInput" placeholder="發送訊息">
+    <button onclick="sendMessage()">Send</button>
+
     <div id="updateContainer"></div>
 
     <script>
@@ -28,7 +32,15 @@
             updateContainer.innerHTML += `<p>New update: ${message}</p>`;
         });
 
-        // 6. 啟動
+         // 6. 訂閱可接收訊息
+        connection.on("ReceiveMessage", function (user, message) {
+            console.log(user + " says: " + message);
+            // 在这里处理接收到的消息，例如更新页面内容
+            const updateContainer = document.getElementById("updateContainer");
+            updateContainer.innerHTML += `<p>New update: ${message}</p>`;
+        });
+
+        // 7. 啟動
         connection.start()
             .then(() => {
                 console.log("連接 SignalR 成功");
@@ -36,6 +48,15 @@
             .catch((error) => {
                 console.log("錯誤訊息：" + error);
             });
+
+         // 8. 發送訊息到Hub 伺服器上
+         function sendMessage() {
+             var user = document.getElementById("userInput").value;
+             var message = document.getElementById("messageInput").value;
+             connection.invoke("SendMessage", user, message).catch(function (err) {
+                 console.error("Error invoking SendMessage: " + err.toString());
+             });
+         }
     </script>
 </body>
 
