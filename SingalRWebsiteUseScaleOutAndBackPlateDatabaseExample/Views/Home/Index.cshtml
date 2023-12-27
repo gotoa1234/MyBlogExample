@@ -23,30 +23,20 @@
 
         // 4. 創建 SignalR 連接
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("UpdateHub")
+            .withUrl("UpdateHub", { accessTokenFactory: () => "I am jwtToken" })
             .build();
 
         // 5. 監聽 SendUpdate 事件
         connection.on("SendUpdate", (message) => {
+            debugger;
             const updateContainer = document.getElementById("updateContainer");
-            updateContainer.innerHTML += `<p>New update: ${message}</p>`;
+            updateContainer.innerHTML += `<p>${message.message}</p>`;
         });
 
          // 6. 訂閱可接收訊息
         connection.on("ReceiveMessage", function (user, message) {
-            console.log(user + " says: " + message);
-            // 在这里处理接收到的消息，例如更新页面内容
-            const updateContainer = document.getElementById("updateContainer");
-            const selfName = document.getElementById("userInput").value;
-            if(user == selfName)
-            {
-                updateContainer.innerHTML += `<p>【自己】 ${user}： ${message}</p>`;
-            }
-            else
-            {
-                updateContainer.innerHTML += `<p>${user}： ${message}</p>`;
-            }
-            
+            //接收到後端SignalR Server告知呼叫成功，讓 Backplane發送到 => 5. 監聽 SendUpdate 事件
+            console.log(user + " says: " + message);           
         });
 
         // 7. 啟動
