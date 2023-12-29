@@ -9,5 +9,7 @@ namespace SingalRWebsiteUseScaleOutAndBackPlateDatabaseExample.Repository
         public Task UpdateSended(string ids, int siteNumber);
 
         public Task InsertMessage(string userId, string message);
+
+        public Task<IEnumerable<SignalRMessagesEntity>> GetHistoryMessage(int siteNumber);
     }
 }

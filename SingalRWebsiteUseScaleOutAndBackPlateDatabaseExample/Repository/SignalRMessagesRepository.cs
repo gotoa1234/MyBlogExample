@@ -84,5 +84,23 @@ VALUES (@USERID, @MESSAGE);
                 }
              );
         }
+
+        public async Task<IEnumerable<SignalRMessagesEntity>> GetHistoryMessage(int siteNumber)
+        {
+            var sql = $@"
+ SELECT	SignalRMessagesId,
+	    UserId,
+	    Message,
+	    SiteValues,
+	    CreateTime,
+	    UpdateTime
+  FROM signalrmessages
+ WHERE ( SiteValues & @Number ) != 0
+
+";
+            return await _myDb.Master.QueryAsync<SignalRMessagesEntity>(
+                sql, new { Number = siteNumber });
+
+        }
     }
 }

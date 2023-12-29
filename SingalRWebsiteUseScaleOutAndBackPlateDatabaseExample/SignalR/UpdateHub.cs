@@ -21,6 +21,23 @@ namespace SingalRWebsiteUseScaleOutAndBackPlateDatabaseExample.SignalR
             _siteNumber = (int)Math.Pow(2, (_configure.GetValue("SiteNumber", 1) - 1));
         }
 
+        /// <summary>
+        /// 建立連接時，將歷史訊息回傳
+        /// </summary>
+        /// <returns></returns>
+        public override async Task OnConnectedAsync()
+        {              
+            var getResult = await _signalRMessagesRepository.GetHistoryMessage(_siteNumber);
+            var temp = getResult.ToList();
+            for (int index = 0; index < getResult.Count(); index++)
+            {
+                temp[index].Message = $@"siteNumber: [{_siteNumber}]" + temp[index].Message;
+            }
+
+            await Clients.Caller.SendAsync("ReceiveMessage", temp);
+            await base.OnConnectedAsync();
+        }
+
         //事件名稱SendUpdate 行為:回傳message
         public async Task SendUpdate(string message)
         {

@@ -28,15 +28,19 @@
 
         // 5. 監聽 SendUpdate 事件
         connection.on("SendUpdate", (message) => {
-            debugger;
             const updateContainer = document.getElementById("updateContainer");
             updateContainer.innerHTML += `<p>${message.message}</p>`;
         });
 
          // 6. 訂閱可接收訊息
-        connection.on("ReceiveMessage", function (user, message) {
-            //接收到後端SignalR Server告知呼叫成功，讓 Backplane發送到 => 5. 監聽 SendUpdate 事件
-            console.log(user + " says: " + message);           
+        connection.on("ReceiveMessage", function (messages) {
+            const updateContainer = document.getElementById("updateContainer");
+            debugger;           
+            //接收到後端SignalR Server 回傳聊天室歷史訊息
+            messages.forEach((message) => {                
+                updateContainer.innerHTML += `<p>${message.message}</p>`;
+            });
+            
         });
 
         // 7. 啟動
