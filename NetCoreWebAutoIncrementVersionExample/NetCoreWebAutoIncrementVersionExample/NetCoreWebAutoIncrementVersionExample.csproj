@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TypeScriptRemoveComments>False</TypeScriptRemoveComments>
     <TypeScriptNoEmitOnError>True</TypeScriptNoEmitOnError>
@@ -13,9 +13,16 @@
   </PropertyGroup>
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-	<AssemblyVersion>1.2.3.4</AssemblyVersion>
-    <Version>1.0.0</Version>
-    <FileVersion>1.0.0.7</FileVersion>
+    <AssemblyVersion>3.0.0.1</AssemblyVersion>
+    <FileVersion>2.0.0.1</FileVersion>
+    <Version>1.0.0.0</Version>
+    <!--用於遞增 -->
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix>0</VersionSuffix>
   </PropertyGroup>
-  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.0" />
+  </ItemGroup>
+  <!-- 引入 UpdateVersionNumber.targets 文件 -->
+  <Import Project="UpdateVersionNumber.targets" />
 </Project>

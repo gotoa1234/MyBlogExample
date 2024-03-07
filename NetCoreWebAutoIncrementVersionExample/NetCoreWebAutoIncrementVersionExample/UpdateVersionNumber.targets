@@ -29,6 +29,6 @@
     <XmlPoke XmlInputPath="$(ProjectFile)" Query="/Project/PropertyGroup/VersionSuffix" Value="$(Revision)" />
 
 	<!-- 更新 版本號 內容 -->
-	<XmlPoke XmlInputPath="$(ProjectFile)" Query="/Project/PropertyGroup/VersionPrefix" Value="$(Major).$(Minor).$(Build).$(Revision)" />
+	<XmlPoke XmlInputPath="$(ProjectFile)" Query="/Project/PropertyGroup/Version" Value="$(Major).$(Minor).$(Build).$(Revision)" />
   </Target>
 </Project>
