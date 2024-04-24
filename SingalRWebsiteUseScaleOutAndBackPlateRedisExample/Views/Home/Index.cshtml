@@ -1,8 +1,67 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "SignalR連線測試頁面 (Redis BackPlane 模式)";
 }
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- 微軟給定的CDN https://learn.microsoft.com/zh-tw/aspnet/core/signalr/javascript-client?view=aspnetcore-7.0&tabs=visual-studio  -->
+    <!-- 1. ※此CDN 有可能失效，最好是加入至專案中 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.js"></script>
+</head>
+<body>
+    <!-- 9. 設定dom元件 發送 & 接收內容 -->    
+    <input type="text" id="userInput" placeholder="姓名">
+    <input type="text" id="messageInput" placeholder="發送訊息">
+    <button onclick="sendMessage()">Send</button>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+    <div id="updateContainer"></div>
+
+    <script>
+        // 3. 預設頁面值
+        var updateContainer = document.getElementById("updateContainer");
+        updateContainer.innerHTML = `<p>New update: 初始化 </p>`;
+
+        // 4. 創建 SignalR 連接
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("UpdateHub", { accessTokenFactory: () => "I am jwtToken" })
+            .build();
+
+        // 5. 監聽 SendUpdate 事件
+        connection.on("SendUpdate", (message) => {
+            const updateContainer = document.getElementById("updateContainer");
+            updateContainer.innerHTML += `<p>${message.message}</p>`;
+        });
+
+         // 6. 訂閱可接收訊息
+        connection.on("ReceiveMessage", function (messages) {
+            const updateContainer = document.getElementById("updateContainer");
+            debugger;           
+            //接收到後端SignalR Server 回傳聊天室歷史訊息
+            messages.forEach((message) => {                
+                updateContainer.innerHTML += `<p>${message.message}</p>`;
+            });
+            
+        });
+
+        // 7. 啟動
+        connection.start()
+            .then(() => {
+                console.log("連接 SignalR 成功");
+            })
+            .catch((error) => {
+                console.log("錯誤訊息：" + error);
+            });
+
+         // 8. 發送訊息到Hub 伺服器上
+         function sendMessage() {
+             var user = document.getElementById("userInput").value;
+             var message = document.getElementById("messageInput").value;
+             connection.invoke("SendMessage", user, message).catch(function (err) {
+                 console.error("Error invoking SendMessage: " + err.toString());
+             });
+         }
+    </script>
+</body>
+
+</html>
+

@@ -1,15 +1,17 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using StackExchange.Redis;
+
 namespace SingalRWebsiteUseScaleOutAndBackPlateRedisExample.SignalR
 {
     public class UpdateHub : Microsoft.AspNetCore.SignalR.Hub
     {
         private readonly IConfiguration _configure;
+        private readonly IDatabase _redisDatabase;
         private static string _Site = string.Empty;
         private int _siteNumber = 0;
-        //private readonly ISignalRMessagesRepository _signalRMessagesRepository;
-        public UpdateHub()//ISignalRMessagesRepository signalRMessagesRepository)
+        public UpdateHub(IDatabase redisDatabase)
         {
-            //_signalRMessagesRepository = signalRMessagesRepository;
+            _redisDatabase = redisDatabase;
             _configure = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
                                                   .AddJsonFile("appsettings.json")
                                                   .Build();
@@ -25,15 +27,17 @@ namespace SingalRWebsiteUseScaleOutAndBackPlateRedisExample.SignalR
         /// <returns></returns>
         public override async Task OnConnectedAsync()
         {
-            //var getResult = await _signalRMessagesRepository.GetHistoryMessage(_siteNumber);
-            //var temp = getResult.ToList();
-            //for (int index = 0; index < getResult.Count(); index++)
-            //{
-            //    temp[index].Message = $@"siteNumber: [{_siteNumber}]" + temp[index].Message;
-            //}
+            // 從 Redis 中獲取聊天室的歷史訊息列表
+            var chatHistory = await _redisDatabase.ListRangeAsync("ChatHistory");
 
-            await Clients.Caller.SendAsync("ReceiveMessage", "");
-            await base.OnConnectedAsync();
+            // 發送聊天室的歷史訊息給新連接的用戶
+            foreach (var message in chatHistory)
+            {
+                await Clients.Caller.SendAsync("ReceiveMessage", message);
+            }
+
+            //await Clients.Caller.SendAsync("ReceiveMessage", "");
+            //await base.OnConnectedAsync();
         }
 
         //事件名稱SendUpdate 行為:回傳message
@@ -47,15 +51,11 @@ namespace SingalRWebsiteUseScaleOutAndBackPlateRedisExample.SignalR
         /// </summary>                
         public async Task SendMessage(string user, string message)
         {
-            //2. 接收前端傳來的聊天訊息
-            var connectionId = Context.ConnectionId;
-            var jwtToken = Context.GetHttpContext()?.Request.Query["access_token"];
-
             //3. 寫入資料庫 觸發SignalR 的 Database Backplane
-            //await _signalRMessagesRepository.InsertMessage(connectionId, $@"{user}：{message}");
+            await _redisDatabase.ListLeftPushAsync("ChatHistory", $"{user}: {message}");
 
             //4. 回報前端，後端 Server 有收到訊息了
-            await Clients.All.SendAsync("ReceiveMessage", user, $@"寫入Mysql資料庫成功：" + message);
+            await Clients.All.SendAsync("ReceiveMessage", user, message);
         }
 
     }
