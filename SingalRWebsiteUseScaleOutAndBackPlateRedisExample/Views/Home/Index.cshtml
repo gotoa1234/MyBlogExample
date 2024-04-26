@@ -4,9 +4,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!-- 微軟給定的CDN https://learn.microsoft.com/zh-tw/aspnet/core/signalr/javascript-client?view=aspnetcore-7.0&tabs=visual-studio  -->
-    <!-- 1. ※此CDN 有可能失效，最好是加入至專案中 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.js"></script>
+    <!--引用 SignalR 8.0.0-->
+    <script src="~/js/signalr8.0.0.js" asp-append-version="true"></script>    
 </head>
 <body>
     <!-- 9. 設定dom元件 發送 & 接收內容 -->    
@@ -33,14 +32,13 @@
         });
 
          // 6. 訂閱可接收訊息
-        connection.on("ReceiveMessage", function (messages) {
-            const updateContainer = document.getElementById("updateContainer");
-            debugger;           
+        connection.on("ReceiveMessage", function (jsonMessage) {
+            const updateContainer = document.getElementById("updateContainer");                   
             //接收到後端SignalR Server 回傳聊天室歷史訊息
-            messages.forEach((message) => {                
-                updateContainer.innerHTML += `<p>${message.message}</p>`;
-            });
-            
+            var message = JSON.parse(jsonMessage);
+            var date = new Date(message.CreateTime * 1000); // 乘以 1000 將秒轉換為毫秒    
+            var dateString = date.toISOString().replace("T", " ").substr(0, 19); //格式為 yyyy-MM-ddTHH:mm:ss
+            updateContainer.innerHTML += `<p>[站點${message.SiteValues} ${dateString}] ${message.UserName}：${message.Message}</p>`;
         });
 
         // 7. 啟動
