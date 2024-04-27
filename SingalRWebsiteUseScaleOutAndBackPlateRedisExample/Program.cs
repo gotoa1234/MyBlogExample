@@ -1,3 +1,4 @@
+using SingalRWebsiteUseScaleOutAndBackPlateRedisExample.Redis;
 using SingalRWebsiteUseScaleOutAndBackPlateRedisExample.SignalR;
 using StackExchange.Redis;
 
@@ -6,18 +7,13 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// 1. 添加 SignalR - 並且啟用 Redis BackPlane
-//var redisConnection = builder.Configuration.GetConnectionString("RedisConnection");
-builder.Services.AddSingleton<IDatabase>(provider =>
-{
-    // 這裡配置 Redis 連接
-    var redisConnection = builder.Configuration.GetConnectionString("RedisConnection");//ConnectionMultiplexer.Connect("YourRedisConnectionString");
-    var redis = ConnectionMultiplexer.Connect(redisConnection);
-    return redis.GetDatabase();
-});
-builder.Services.AddSignalR();
+// 1. 添加 SignalR - 並且啟用 Redis BackPlane (AddStackExchangeRedis 已經內建)
+var redisConnection = builder.Configuration.GetConnectionString("RedisConnection");
+builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnection));
+builder.Services.AddSignalR().AddStackExchangeRedis(redisConnection);
 
 builder.Services.AddControllers();
+builder.Services.AddSingleton<RedisService, RedisService>();
 
 var app = builder.Build();
 
@@ -39,8 +35,6 @@ app.UseEndpoints(endpoints =>
 {
     //3. 配置 SignalR 路由
     endpoints.MapHub<UpdateHub>("UpdateHub");
-
-
 });
 
 app.MapControllerRoute(

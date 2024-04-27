@@ -34,10 +34,11 @@
          // 6. 訂閱可接收訊息
         connection.on("ReceiveMessage", function (jsonMessage) {
             const updateContainer = document.getElementById("updateContainer");                   
-            //接收到後端SignalR Server 回傳聊天室歷史訊息
+            // 6-2. 接收到後端SignalR Server 回傳聊天室歷史訊息
             var message = JSON.parse(jsonMessage);
-            var date = new Date(message.CreateTime * 1000); // 乘以 1000 將秒轉換為毫秒    
-            var dateString = date.toISOString().replace("T", " ").substr(0, 19); //格式為 yyyy-MM-ddTHH:mm:ss
+            // 6-3. 將資料時間轉為可讀格式 格式為 yyyy-MM-ddTHH:mm:ss
+            var date = new Date(message.CreateTime * 1000); //※乘以 1000 將秒轉換為毫秒    
+            var dateString = date.toISOString().replace("T", " ").substr(0, 19);
             updateContainer.innerHTML += `<p>[站點${message.SiteValues} ${dateString}] ${message.UserName}：${message.Message}</p>`;
         });
 
