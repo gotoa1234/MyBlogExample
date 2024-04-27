@@ -55,6 +55,7 @@ namespace SingalRWebsiteUseScaleOutAndBackPlateRedisExample.SignalR
         /// </summary>                
         public async Task SendMessage(string user, string message)
         {
+            //4. 將前端傳來的訊息轉為 Json
             var dataEntity = new SignalRMessagesEntity() {
                 Message = message,
                 SiteValues = _siteNumber,
@@ -64,10 +65,10 @@ namespace SingalRWebsiteUseScaleOutAndBackPlateRedisExample.SignalR
 
             var jsonData= JsonConvert.SerializeObject(dataEntity);
 
-            //3. 寫入資料庫 觸發SignalR 的 Database Backplane
+            //5. 寫入 Redis 保存資料
             await _redisService.GetDb(0).SortedSetAddAsync(_RedisKey, jsonData, dataEntity.CreateTime);
 
-            //4. 透過publish 到Redis上
+            //6. 這裡只要直接推播即可， Redis 的 Stack已經BackPlane 
             await Clients.All.SendAsync("ReceiveMessage", jsonData.ToString());
         } 
     }
