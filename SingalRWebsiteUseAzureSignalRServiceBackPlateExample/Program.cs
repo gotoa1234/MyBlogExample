@@ -1,7 +1,16 @@
+using SingalRWebsiteUseAzureSignalRServiceBackPlateExample.SignalR;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// 1. add azure signalr Service.
+var azureConnection = builder.Configuration["Azure:SignalR:ConnectionString"];
+builder.Services.AddSignalR().AddAzureSignalR(options =>
+{
+    options.ConnectionString = azureConnection;
+});
 
 var app = builder.Build();
 
@@ -13,12 +22,17 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    //2. °t¸m SignalR ¸ô¥Ñ
+    endpoints.MapHub<UpdateHub>("UpdateHub");
+});
 
 app.MapControllerRoute(
     name: "default",
