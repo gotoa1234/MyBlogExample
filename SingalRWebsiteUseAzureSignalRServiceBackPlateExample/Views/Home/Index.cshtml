@@ -4,11 +4,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <!--引用 SignalR 8.0.0-->
+    <!-- 1. 引用 SignalR 8.0.0-->
     <script src="~/js/signalr8.0.0.js" asp-append-version="true"></script>
 </head>
 <body>
-    <!-- 9. 設定dom元件 發送 & 接收內容 -->
+    <!-- 2. 設定dom元件 發送 & 接收內容 -->
     <input type="text" id="userInput" placeholder="姓名">
     <input type="text" id="messageInput" placeholder="發送訊息">
     <button onclick="sendMessage()">Send</button>
@@ -32,15 +32,9 @@
         });
 
         // 6. 訂閱可接收訊息
-        connection.on("ReceiveMessage", function (jsonMessage) {
-            console.log(jsonMessage);
-            //const updateContainer = document.getElementById("updateContainer");
-            //// 6-2. 接收到後端SignalR Server 回傳聊天室歷史訊息
-            //var message = JSON.parse(jsonMessage);
-            //// 6-3. 將資料時間轉為可讀格式 格式為 yyyy-MM-ddTHH:mm:ss
-            //var date = new Date(message.CreateTime * 1000); //※乘以 1000 將秒轉換為毫秒
-            //var dateString = date.toISOString().replace("T", " ").substr(0, 19);
-            //updateContainer.innerHTML += `<p>[站點${message.SiteValues} ${dateString}] ${message.UserName}：${message.Message}</p>`;
+        connection.on("ReceiveMessage", function (message) {            
+            const updateContainer = document.getElementById("updateContainer");
+            updateContainer.innerHTML += `<p>${message}</p>`;            
         });
 
         // 7. 啟動

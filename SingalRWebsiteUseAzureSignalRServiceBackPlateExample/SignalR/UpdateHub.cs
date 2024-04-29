@@ -24,7 +24,11 @@ namespace SingalRWebsiteUseAzureSignalRServiceBackPlateExample.SignalR
         /// <returns></returns>
         public override async Task OnConnectedAsync()
         {
-            await Clients.Caller.SendAsync("ReceiveMessage", "Get history messages.");
+            var getData = FakeHistoryMessage();
+            foreach (var message in getData)
+            {
+                await Clients.Caller.SendAsync("ReceiveMessage", message);
+            }
             await base.OnConnectedAsync();
         }
 
@@ -39,7 +43,25 @@ namespace SingalRWebsiteUseAzureSignalRServiceBackPlateExample.SignalR
         /// </summary>                
         public async Task SendMessage(string user, string message)
         {
-            await Clients.All.SendAsync("ReceiveMessage", message);
+            var dateTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            var combineMessage = $@"[站點{_siteNumber} {dateTime}] {user}： {message}";
+            await Clients.All.SendAsync("ReceiveMessage", combineMessage);
+        }
+
+        /// <summary>
+        /// 偽造歷史資料 ※實務資料源可為 Redis / Mysql / SqlServer / MongoDB .....
+        /// </summary>        
+        private List<string> FakeHistoryMessage()
+        {
+            return new List<string>()
+            {
+                "[站點1 2024-4-29 05:32:35] Louis： 1",
+                "[站點2 2024-4-29 05:32:35] MilkTeaGreen： 2",
+                "[站點1 2024-4-29 05:33:17] Louis： 3",
+                "[站點2 2024-4-29 05:33:52] MilkTeaGreen： 4",
+                "[站點1 2024-4-29 05:34:12] Louis： 5",
+                "[站點2 2024-4-29 05:34:17] MilkTeaGreen： 6",
+            };
         }
     }
 }
