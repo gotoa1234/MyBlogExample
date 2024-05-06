@@ -1,0 +1,59 @@
+﻿@{
+    ViewData["Title"] = "SignalR連線測試頁面 (RabbitMQ BackPlane 模式)";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- 1. 引用 SignalR 8.0.0-->
+    <script src="~/js/signalr8.0.0.js" asp-append-version="true"></script>
+</head>
+<body>
+    <!-- 2. 設定dom元件 發送 & 接收內容 -->
+    <input type="text" id="userInput" placeholder="姓名">
+    <input type="text" id="messageInput" placeholder="發送訊息">
+    <button onclick="sendMessage()">Send</button>
+
+    <div id="updateContainer"></div>
+
+    <script>
+        // 3. 預設頁面值
+        var updateContainer = document.getElementById("updateContainer");
+        updateContainer.innerHTML = `<p>New update: 初始化 </p>`;
+
+        // 4. 創建 SignalR 連接
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("UpdateHub", { accessTokenFactory: () => "I am jwtToken" })
+            .build();
+
+        // 5. 訂閱可接收訊息
+        connection.on("ReceiveMessage", function (message) {            
+            const updateContainer = document.getElementById("updateContainer");
+            updateContainer.innerHTML += `<p>${message}</p>`;            
+        });
+
+        // 6. 啟動
+        connection.start()
+            .then(() => {
+                //7. 連接群組 "groupName"
+                connection.invoke("AddToGroup", "groupName").catch(function (err) {
+                      return console.error(err.toString());
+                });
+                console.log("連接 SignalR 成功");
+            })
+            .catch((error) => {
+                console.log("錯誤訊息：" + error);
+            });
+
+        // 8. 發送訊息到Hub 伺服器上
+        function sendMessage() {
+            var user = document.getElementById("userInput").value;
+            var message = document.getElementById("messageInput").value;
+            connection.invoke("SendMessage", user, message).catch(function (err) {
+                console.error("Error invoking SendMessage: " + err.toString());
+            });
+        }
+    </script>
+</body>
+
+</html>
+
