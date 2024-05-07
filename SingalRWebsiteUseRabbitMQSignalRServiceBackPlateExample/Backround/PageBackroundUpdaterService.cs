@@ -25,8 +25,9 @@ namespace SingalRWebsiteUseRabbitMQSignalRServiceBackPlateExample.Backround
             //2. 求出自己站點編號的 2 ^ (SiteNumber-1) 值 EX: 編號1=1 / 編號2=2 / 編號3=4
             _siteNumber = (int)Math.Pow(2, (_configure.GetValue("SiteNumber", 1) - 1));
 
-            //3. 設定RabbitMQ 消費者(Consumer)的工作
+            //3-1. 設定 RabbitMQ 消費者(Consumer)的工作
             _rabbitMqService.StartReceiving(publishMessage => {
+                //3-2. 從 RabbitMQ 收到訊息後，推播給自己 Server 下的所有用戶
                 Task.Run(() => _hubContext.Clients.Group("groupName").SendAsync("ReceiveMessage", publishMessage));
             });
         }

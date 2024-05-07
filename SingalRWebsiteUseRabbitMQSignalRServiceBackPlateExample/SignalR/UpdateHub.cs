@@ -60,12 +60,10 @@ namespace SingalRWebsiteUseRabbitMQSignalRServiceBackPlateExample.SignalR
         {
             return new List<string>()
             {
-                "[站點1 2024-4-29 05:32:35] Louis： 1",
-                "[站點2 2024-4-29 05:32:35] MilkTeaGreen： 2",
-                "[站點1 2024-4-29 05:33:17] Louis： 3",
-                "[站點2 2024-4-29 05:33:52] MilkTeaGreen： 4",
-                "[站點1 2024-4-29 05:34:12] Louis： 5",
-                "[站點2 2024-4-29 05:34:17] MilkTeaGreen： 6",
+                "[站點1 2024-6-16 05:32:35] Louis： History 1",
+                "[站點2 2024-6-16 05:32:35] MilkTeaGreen： History 2",
+                "[站點1 2024-6-16 05:33:17] Louis： History 3",
+                "[站點2 2024-6-16 05:33:52] MilkTeaGreen： History 4",
             };
         }
     }
