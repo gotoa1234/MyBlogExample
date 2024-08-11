@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generate WiFi QR Code</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+</head>
+<body>
+    <h1>WiFi QR Code Generator</h1>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        // WiFi 信息
+        const ssid = "Mesh_ChenFamily";
+        const password = "xxx";
+        const encryption = "WPA"; // WPA 或 WEP
+
+        // 创建WiFi QR Code数据
+        const wifiQRCodeData = `WIFI:T:${encryption};S:${ssid};P:${password};;`;
+
+        // 生成并显示QR Code
+        const canvas = document.getElementById("canvas");
+        QRCode.toCanvas(canvas, wifiQRCodeData, function (error) {
+            if (error) console.error(error);
+            console.log('QR Code 生成完成!');
+        });
+    </script>
+</body>
+</html>
