@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34728.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQLoadBalanceAspCoreWebExample", "RabbitMQLoadBalanceAspCoreWebExample.csproj", "{91C8ED67-21CB-47F2-9250-A26DE692BDDD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{91C8ED67-21CB-47F2-9250-A26DE692BDDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91C8ED67-21CB-47F2-9250-A26DE692BDDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91C8ED67-21CB-47F2-9250-A26DE692BDDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91C8ED67-21CB-47F2-9250-A26DE692BDDD}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9C894B6B-184D-449C-8B75-3DDDC57D666D}
+	EndGlobalSection
+EndGlobal
