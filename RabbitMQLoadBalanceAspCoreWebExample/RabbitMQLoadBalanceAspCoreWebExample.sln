@@ -5,6 +5,8 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RabbitMQLoadBalanceAspCoreWebExample", "RabbitMQLoadBalanceAspCoreWebExample.csproj", "{91C8ED67-21CB-47F2-9250-A26DE692BDDD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Example.Common", "..\Example.Common\Example.Common.csproj", "{A792829E-2914-49B1-99E4-5F2ADD34151E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{91C8ED67-21CB-47F2-9250-A26DE692BDDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91C8ED67-21CB-47F2-9250-A26DE692BDDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91C8ED67-21CB-47F2-9250-A26DE692BDDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A792829E-2914-49B1-99E4-5F2ADD34151E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A792829E-2914-49B1-99E4-5F2ADD34151E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A792829E-2914-49B1-99E4-5F2ADD34151E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A792829E-2914-49B1-99E4-5F2ADD34151E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

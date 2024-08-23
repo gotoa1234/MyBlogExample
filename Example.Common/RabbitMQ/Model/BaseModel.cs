@@ -15,6 +15,16 @@
         /// <summary>
         /// 密碼
         /// </summary>
-        public string Password { get; set; } = string.Empty;        
+        public string Password { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 交換機模式
+        /// </summary>
+        public string ExchangeType { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 交換機名稱
+        /// </summary>
+        public string ExchangeName { get; set; } = string.Empty;
     }
 }
