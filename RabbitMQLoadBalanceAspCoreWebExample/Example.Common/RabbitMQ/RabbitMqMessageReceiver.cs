@@ -16,6 +16,8 @@ namespace Example.Common.RabbitMQ
         protected bool _autoAck;
         protected string _exchangeType;
         protected string _exchangeName;
+        protected string _queueName;
+        protected string _routingKey;
     }
     
     public class RabbitMqMessageReceiver<TMessage> : BaseParameter, IDisposable
@@ -61,7 +63,7 @@ namespace Example.Common.RabbitMQ
             _channel.ExchangeDeclare(_exchangeName, _exchangeType.ToString().ToLower(), true, false, null);
 
             _consumer = new EventingBasicConsumer(_channel);
-            _consumer.Received += OnConsumerReceived;
+            //_consumer.Received += OnConsumerReceived;
         }
 
         private void Connection_ConnectionShutdown(object? sender, ShutdownEventArgs e)
@@ -75,6 +77,7 @@ namespace Example.Common.RabbitMQ
             catch (Exception ex)
             {
                 throw ex;
+                //TODO: Log
             }
 
             int tryTimes = 0;
@@ -83,20 +86,18 @@ namespace Example.Common.RabbitMQ
                 try
                 {
                     tryTimes++;
-                    Log.Information($"RabbitCommonReceiver try reconnect,TryTimes={tryTimes},ExchangeName={_exchangeName},Queue={_queueName}");
                     Connect();
                     AddQueue(_queueName, _routingKey);
-
                     break;
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"RabbitCommonReceiver reconnect error:{ex}");
+                     //TODO: Log
                 }
 
                 if (tryTimes > 100)
                 {
-                    Log.Error($"RabbitCommonReceiver reconnect tried {tryTimes} times,but failed.ExchangeName={_exchangeName}");
+                    //TODO: Log
                     break;
                 }
                 var sleepMs = 1000 * (tryTimes > 10 ? 10 : tryTimes);
@@ -104,7 +105,9 @@ namespace Example.Common.RabbitMQ
             }
         }
 
-
+        /// <summary>
+        /// 消費者接收器
+        /// </summary>
         public void OnConsumerReceived<T>(object sender, BasicDeliverEventArgs e)
         {
             try
@@ -118,6 +121,23 @@ namespace Example.Common.RabbitMQ
                 throw ex;
             }
         }
+
+        /// <summary>
+        /// 增加消費者訂閱的隊列
+        /// </summary>
+        public void AddQueue(string queueName, string routingKey)
+        {
+            _queueName = queueName;
+            _routingKey = routingKey;
+
+            _channel.QueueDeclare(queueName, true, false, false, null);
+            _channel.QueueBind(queueName, _exchangeName, routingKey, null);
+
+            _channel.BasicQos(0, (ushort)_concurrentCount, false);
+            _channel.BasicConsume(queueName, _autoAck, _consumer);
+        }
+
+        #region 解構式 - 釋放資源
 
         ~RabbitMqMessageReceiver()
         {
@@ -144,5 +164,9 @@ namespace Example.Common.RabbitMQ
             _connection?.Dispose();
             _disposed = true;
         }
+
+        #endregion
+
+
     }
 }
