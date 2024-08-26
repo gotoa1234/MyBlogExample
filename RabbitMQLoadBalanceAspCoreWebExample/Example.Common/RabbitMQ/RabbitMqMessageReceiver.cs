@@ -26,7 +26,7 @@ namespace Example.Common.RabbitMQ
         protected Action<TMessage, RabbitMqMessageReceiver<TMessage>, ulong, long> _receivedAction;
 
         public RabbitMqMessageReceiver(
-            BaseModel rabbitParameters, 
+            ExchangeModel rabbitParameters, 
             int concurrentCount, 
             Action<TMessage, RabbitMqMessageReceiver<TMessage>, ulong, long> action, 
             bool autoAck = false)
