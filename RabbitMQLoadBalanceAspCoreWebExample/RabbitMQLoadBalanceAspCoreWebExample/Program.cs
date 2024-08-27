@@ -1,11 +1,15 @@
-using Example.Common.RabbitMQ;
+using Example.Common.FakeDataBase;
 using Example.Common.RabbitMQ.Factory;
+using RabbitMQLoadBalanceAspCoreWebExample.RabbitMQ;
+using RabbitMQLoadBalanceAspCoreWebExample.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 // 1-1. ª`¤J¬Û¨Ì
 builder.Services.AddSingleton<IRabbitMqFactory, RabbitMqFactory>();
+builder.Services.AddSingleton<FakeDataBase>();
+builder.Services.AddScoped<IAccountTradeOrder, AccountTradeOrder>();
 
 // 1-2. ª`¤J RabbitMQ Subscriber
 builder.Services.AddRabbitMqSubscriber();

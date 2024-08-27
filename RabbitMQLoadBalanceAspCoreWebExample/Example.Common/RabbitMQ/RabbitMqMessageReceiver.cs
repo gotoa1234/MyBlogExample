@@ -1,114 +1,121 @@
-﻿using Example.Common.RabbitMQ.Model;
+﻿using Example.Common.RabbitMQ.Common;
+using Example.Common.RabbitMQ.Model;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
 
 namespace Example.Common.RabbitMQ
-{
-    public class BaseParameter
-    {
-        protected bool _disposed;
-        protected IModel _channel;
-        protected IConnection _connection;
-        protected EventingBasicConsumer _consumer;
-        protected int _concurrentCount;
-        protected bool _autoAck;
-        protected string _exchangeType;
-        protected string _exchangeName;
-        protected string _queueName;
-        protected string _routingKey;
-    }
-    
-    public class RabbitMqMessageReceiver<TMessage> : BaseParameter, IDisposable
+{ 
+    public class RabbitMqMessageReceiver<TMessage> : RabbitMQBaseParameterModel, IDisposable
     {
         protected ConnectionFactory _factory;
-        protected Action<TMessage, RabbitMqMessageReceiver<TMessage>, ulong, long> _receivedAction;
+        protected Action<TMessage, RabbitMqMessageReceiver<TMessage>, ulong, long> _receivedAction;        
 
+        /// <summary>
+        /// 接收器工廠
+        /// </summary>        
         public RabbitMqMessageReceiver(
             ExchangeModel rabbitParameters, 
             int concurrentCount, 
             Action<TMessage, RabbitMqMessageReceiver<TMessage>, ulong, long> action, 
             bool autoAck = false)
         {
-            _concurrentCount = concurrentCount;
-            _receivedAction = action;
-            _autoAck = autoAck;
-
-            _factory = new ConnectionFactory
-            {
-                HostName = rabbitParameters.HostName,
-                UserName = rabbitParameters.UserName,
-                Password = rabbitParameters.Password,
-
-                RequestedHeartbeat = TimeSpan.FromSeconds(30),
-                AutomaticRecoveryEnabled = true, // 自動重連
-                TopologyRecoveryEnabled = true, // 
-                NetworkRecoveryInterval = TimeSpan.FromSeconds(10)
-            };
-
-            _exchangeType = rabbitParameters.ExchangeType;
-            _exchangeName = rabbitParameters.ExchangeName;
-
+            SettingValue();
             Connect();
+
+            // 設定消費者接收器 - 基本設定
+            void SettingValue()
+            {
+                _concurrentCount = concurrentCount;
+                _receivedAction = action;
+                _autoAck = autoAck;
+                _factory = RabbitMQHelper.GetConstructFactory(rabbitParameters);
+                _exchangeType = rabbitParameters.ExchangeType;
+                _exchangeName = rabbitParameters.ExchangeName;
+            }
         }
 
+        #region 連線事件
+
+        /// <summary>
+        /// 設定消費者接收器 - 連線
+        /// </summary>
         public void Connect()
         {
-            _connection = _factory.CreateConnection();
-            _connection.ConnectionShutdown += Connection_ConnectionShutdown;
+            // 建立連線
+            _connection = _factory.CreateConnection();            
+            _connection.ConnectionShutdown += ConnectionForConnectionShutdown;
             _channel = _connection.CreateModel();
 
-            // 这个主要防止在先启动消费端时候找不到交换机的问题
+            // 宣告交換機 - 確保存在
             _channel.ExchangeDeclare(_exchangeName, _exchangeType.ToString().ToLower(), true, false, null);
 
+            // 消費者接收事件
             _consumer = new EventingBasicConsumer(_channel);
-            //_consumer.Received += OnConsumerReceived;
+            _consumer.Received += OnConsumerForReceived;
         }
 
-        private void Connection_ConnectionShutdown(object? sender, ShutdownEventArgs e)
-        {            
-            try
-            {
-                _consumer = null!;
-                _channel?.Dispose();
-                _connection?.Dispose();
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-                //TODO: Log
-            }
+        /// <summary>
+        /// 連線結束事件
+        /// </summary>        
+        private void ConnectionForConnectionShutdown(object? sender, ShutdownEventArgs e)
+        {
+            ReleaseResource();
+            RetryProcess();
 
-            int tryTimes = 0;
-            while (true)
+            // 釋出資源
+            void ReleaseResource()
             {
                 try
                 {
-                    tryTimes++;
-                    Connect();
-                    AddQueue(_queueName, _routingKey);
-                    break;
+                    _consumer = null!;
+                    _channel?.Dispose();
+                    _connection?.Dispose();
                 }
                 catch (Exception ex)
                 {
-                     //TODO: Log
+                    Console.Out.WriteLineAsync(ex.Message);
+                    throw;
+                }
+            }
+
+            // 重連機制
+            void RetryProcess()
+            {
+                var retryMaxTimes = 10;
+                var retryTimes = 0;
+                while (retryTimes <= retryMaxTimes)
+                {
+                    try
+                    {
+                        retryTimes++;
+                        Connect();
+                        AddQueue(_queueName, _routingKey);
+                        break;
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.Out.WriteLineAsync(ex.Message);
+                    }
+
+                    // 指數延遲 : 2 的 tryTimes 次方 最大 10 秒
+                    var delaySeconds = Math.Min(10000, 1000 * (int)Math.Pow(2, retryTimes));
+                    Task.Delay(delaySeconds);
                 }
 
-                if (tryTimes > 100)
+                // 避免無限循環
+                if (retryTimes > retryMaxTimes)
                 {
-                    //TODO: Log
-                    break;
+                    Console.Out.WriteLineAsync($@"Exceeded maximum {retryMaxTimes} retry attempts.");
                 }
-                var sleepMs = 1000 * (tryTimes > 10 ? 10 : tryTimes);
-                Thread.Sleep(sleepMs);
             }
         }
 
         /// <summary>
         /// 消費者接收器
         /// </summary>
-        public void OnConsumerReceived<T>(object sender, BasicDeliverEventArgs e)
+        public void OnConsumerForReceived(object sender, BasicDeliverEventArgs e)
         {
             try
             {
@@ -118,8 +125,9 @@ namespace Example.Common.RabbitMQ
             }
             catch (Exception ex)
             {
-                throw ex;
-            }
+                Console.Out.WriteLineAsync(ex.Message);
+                throw;
+            }            
         }
 
         /// <summary>
@@ -136,6 +144,30 @@ namespace Example.Common.RabbitMQ
             _channel.BasicQos(0, (ushort)_concurrentCount, false);
             _channel.BasicConsume(queueName, _autoAck, _consumer);
         }
+        #endregion
+
+        #region RabbitMQ 反饋 Ack 標記
+
+        /// <summary>
+        /// 標記訊息已處理
+        /// </summary>        
+        public async Task BasicAck(ulong deliveryTag)
+        {
+            try
+            {
+                if (!_autoAck)
+                {
+                    _channel.BasicAck(deliveryTag, false);
+                }
+            }
+            catch (Exception ex)
+            {
+                await Console.Out.WriteLineAsync($@"RabbitMqMessageReceiver BasicAck error:{ex}");
+                throw;
+            }
+        }
+
+        #endregion
 
         #region 解構式 - 釋放資源
 
@@ -158,15 +190,12 @@ namespace Example.Common.RabbitMQ
             }
             if (disposing)
             {
-                _factory = null!;
+                _channel?.Dispose();
+                _connection?.Dispose();
             }
-            _channel?.Dispose();
-            _connection?.Dispose();
             _disposed = true;
         }
 
         #endregion
-
-
     }
 }

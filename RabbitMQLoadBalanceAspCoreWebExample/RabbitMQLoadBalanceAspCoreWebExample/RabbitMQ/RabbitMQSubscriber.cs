@@ -1,11 +1,11 @@
 ﻿using Example.Common.RabbitMQ.Consts;
 using Example.Common.RabbitMQ.Model;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Example.Common.RabbitMQ;
 using RabbitMQ.Client;
+using RabbitMQLoadBalanceAspCoreWebExample.Service;
+using Example.Common.FakeDataBase.Model;
 
-namespace Example.Common.RabbitMQ
+namespace RabbitMQLoadBalanceAspCoreWebExample.RabbitMQ
 {
     public class RabbitMQSubscriber
     {
@@ -13,7 +13,7 @@ namespace Example.Common.RabbitMQ
         private readonly IConfiguration _configuration;
         private readonly IServiceProvider _serviceProvider;
         private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(5);
-        private RabbitMqMessageReceiver<string> _orderBatchSequenceReceiver = null!;
+        private RabbitMqMessageReceiver<AccountTradeOrderModel> _orderBatchSequenceReceiver = null!;
 
         /// <summary>
         /// 建構式
@@ -28,32 +28,33 @@ namespace Example.Common.RabbitMQ
             _serviceProvider = serviceProvider;
             _selfParameters.HostName = rabbitParam?.HostName ?? string.Empty;
             _selfParameters.UserName = rabbitParam?.UserName ?? string.Empty;
-            _selfParameters.Password = rabbitParam?.Password ?? string.Empty;            
+            _selfParameters.Password = rabbitParam?.Password ?? string.Empty;
         }
 
         /// <summary>
         /// 建立接收器
         /// </summary>
         public void BuildReceive()
-        {   
+        {
             // 建立批次訂單接收器
-            _orderBatchSequenceReceiver = new(new ExchangeModel
+            var initParameters = new ExchangeModel
             {
                 HostName = _selfParameters.HostName,
                 UserName = _selfParameters.UserName,
                 Password = _selfParameters.Password,
-                ExchangeName = RabbitMQConsts.MYEXCHANGENAME,
-                ExchangeType = ExchangeType.Direct
-            }, 5, OnBatchOrderReceived);
+                ExchangeType = ExchangeType.Direct,
+                ExchangeName = RabbitMQConsts.MYEXCHANGENAME
+            };
+            _orderBatchSequenceReceiver = new(initParameters, 5, OnBatchAccountOrderReceived);
 
-            // Direct 模式要帶Key
+            // Direct 模式要帶 Rounting Key
             _orderBatchSequenceReceiver.AddQueue(RabbitMQConsts.MYEXCHANGENAME, RabbitMQConsts.MYEXCHANGENAME);
         }
 
         /// <summary>
         /// 處理快捷下單區 - 批次處理
         /// </summary>    
-        private void OnBatchOrderReceived(string dto, RabbitMqMessageReceiver<string> receiver, ulong deliverTag, long timestamp)
+        private void OnBatchAccountOrderReceived(AccountTradeOrderModel dto, RabbitMqMessageReceiver<AccountTradeOrderModel> receiver, ulong deliverTag, long timestamp)
         {
             Task.Run(async () =>
             {
@@ -61,18 +62,18 @@ namespace Example.Common.RabbitMQ
                 {
                     using (var scope = _serviceProvider.CreateScope())
                     {
-                        //var orderBatchService = scope.ServiceProvider.GetService<ITradeOrderBatchSequenceService>();
+                        var orderBatchService = scope.ServiceProvider.GetRequiredService<IAccountTradeOrder>();
 
-                        //// 調用 ExecuteCmd 並等待其完成
-                        //await orderBatchService.MultiTradeOrderBatchProcess(dto.TradeOrderBatchSequenceId);
+                        // 調用 ExecuteCmd 並等待其完成
+                        await orderBatchService.FinishAccountTradeOrder(dto);
 
-                        // 完成後響應MQ - 回覆完成
-                        //receiver.BasicAck(deliverTag);
+                        //完成後響應MQ - 回覆完成
+                        await receiver.BasicAck(deliverTag);
                     }
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    // TODO: Logo
+                    Console.Out.WriteLine(ex);
                 }
             });
         }

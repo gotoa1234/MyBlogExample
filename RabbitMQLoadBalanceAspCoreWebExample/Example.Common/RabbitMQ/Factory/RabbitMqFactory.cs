@@ -13,47 +13,47 @@ namespace Example.Common.RabbitMQ.Factory
         public RabbitMqFactory(IConfiguration configuration)
         {
             _configuration = configuration;
-            //var rabbitParam = _configuration.GetSection("RabbitMQ").Get<BaseModel>();
-            //_rabbitMqHostName = rabbitParam.HostName;
-            //_rabbitMqUserName = rabbitParam.UserName;
-            //_rabbitMqPassword = rabbitParam.Password;
+            var rabbitParam = _configuration.GetSection("RabbitMQ").Get<RabbitMQConnectionModel> ();
+            _rabbitMqHostName = rabbitParam.HostName;
+            _rabbitMqUserName = rabbitParam.UserName;
+            _rabbitMqPassword = rabbitParam.Password;
         }
 
         private static readonly object _lockObj = new();
         private static readonly Dictionary<string, object> _lockObjDict = new();
-        private static readonly Dictionary<string, MqSender> _senderDict = new();
-        public MqSender Get(string mqExchangeName, string exchangeType = "Direct")
+        private static readonly Dictionary<string, RabbitMqMessagePublisher> _senderDict = new();
+        public RabbitMqMessagePublisher Get(string mqExchangeName, string exchangeType = "Direct")
         {
             var key = $"{_rabbitMqHostName}_{mqExchangeName}";
             var sender = GetSender(key, mqExchangeName, exchangeType);
             return sender;
         }
 
-        private MqSender GetSender(string key, string mqExchangeName, string exchangeType)
+        private RabbitMqMessagePublisher GetSender(string key, string mqExchangeName, string exchangeType)
         {
-            if (!_senderDict.TryGetValue(key, out var sender) || !sender.IsOpen)
+            if (!_senderDict.TryGetValue(key, out var publisher) || !publisher.IsOpen)
             {
                 var lockObj = GetLockObj(key);
                 lock (lockObj)
                 {
-                    if (!_senderDict.TryGetValue(key, out sender) || !sender.IsOpen)
+                    if (!_senderDict.TryGetValue(key, out publisher) || !publisher.IsOpen)
                     {
-                        sender?.Dispose();
+                        publisher?.Dispose();
 
-                        //sender = new MqSender(new BaseModel
-                        //{
-                        //    HostName = _rabbitMqHostName,
-                        //    UserName = _rabbitMqUserName,
-                        //    Password = _rabbitMqPassword,
-                        //    ExchangeName = mqExchangeName,
-                        //    ExchangeType = exchangeType
-                        //});
-                        _senderDict[key] = sender;
+                        publisher = new RabbitMqMessagePublisher(new ExchangeModel
+                        {
+                            HostName = _rabbitMqHostName,
+                            UserName = _rabbitMqUserName,
+                            Password = _rabbitMqPassword,
+                            ExchangeName = mqExchangeName,
+                            ExchangeType = exchangeType
+                        });
+                        _senderDict[key] = publisher;
                     }
                 }
             }
 
-            return sender;
+            return publisher;
         }
         private object GetLockObj(string key)
         {

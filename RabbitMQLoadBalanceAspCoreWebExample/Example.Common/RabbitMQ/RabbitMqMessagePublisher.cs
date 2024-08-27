@@ -1,26 +1,23 @@
-﻿using RabbitMQ.Client;
+﻿using Example.Common.RabbitMQ.Common;
+using Example.Common.RabbitMQ.Model;
+using RabbitMQ.Client;
 using System.Text;
 
-namespace Example.Common.RabbitMQ.Factory
+namespace Example.Common.RabbitMQ
 {
-    public class MqSender : IDisposable
+    public class RabbitMqMessagePublisher : RabbitMQBaseParameterModel, IDisposable
     {
-        private readonly IConnection _connection;
-        private readonly IModel _channel;
-        private readonly string _exchangeType;
-
-        //public MqSender(RabbitParameters rabbitParameters)
-        public MqSender()
+        public RabbitMqMessagePublisher(ExchangeModel rabbitParameters)
         {
-            //_connection = MqConnectionHelper.GetConnection(rabbitParameters.HostName, rabbitParameters.UserName, rabbitParameters.Password);
+            _connection = RabbitMQHelper.GetConnection(rabbitParameters);
 
-            //_channel = MqConnectionHelper.GetModel(_connection);
+            _channel = RabbitMQHelper.GetModel(_connection);
 
-            //_exchangeType = rabbitParameters.ExchangeType;
+            _exchangeType = rabbitParameters.ExchangeType;
 
-            //var exchangeName = rabbitParameters.ExchangeName;
+            var exchangeName = rabbitParameters.ExchangeName;
 
-            //_channel.ExchangeDeclare(exchangeName, rabbitParameters.ExchangeType.ToString().ToLower(), true, false, null);
+            _channel.ExchangeDeclare(exchangeName, rabbitParameters.ExchangeType.ToString().ToLower(), true, false, null);
         }
 
         /// <summary>
@@ -46,7 +43,7 @@ namespace Example.Common.RabbitMQ.Factory
         /// <summary>
         /// Destructor
         /// </summary>
-        ~MqSender()
+        ~RabbitMqMessagePublisher()
         {
             Dispose();
         }

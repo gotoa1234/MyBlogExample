@@ -2,6 +2,6 @@
 {
     public interface IRabbitMqFactory
     {
-        MqSender Get(string mqExchangeName, string exchangeType = "Direct");
+        RabbitMqMessagePublisher Get(string mqExchangeName, string exchangeType = "Direct");
     }
 }
