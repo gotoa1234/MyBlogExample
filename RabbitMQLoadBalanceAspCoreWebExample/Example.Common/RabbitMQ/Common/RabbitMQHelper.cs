@@ -5,6 +5,9 @@ namespace Example.Common.RabbitMQ.Common
 {
     public static class RabbitMQHelper
     {
+        /// <summary>
+        /// 建立 MQ 工廠
+        /// </summary>        
         public static ConnectionFactory GetConstructFactory(ExchangeModel parameters)
         {
             var factory = new ConnectionFactory
@@ -26,6 +29,9 @@ namespace Example.Common.RabbitMQ.Common
             return factory;
         }
 
+        /// <summary>
+        /// 建立連線
+        /// </summary>        
         public static IConnection GetConnection(ExchangeModel parameters)
         {
             var factory = GetConstructFactory(parameters);
@@ -33,6 +39,9 @@ namespace Example.Common.RabbitMQ.Common
             return connection;
         }
 
+        /// <summary>
+        /// 取得通道
+        /// </summary>        
         public static IModel GetModel(IConnection connection)
         {
             var channel = connection.CreateModel();

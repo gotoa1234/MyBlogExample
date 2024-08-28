@@ -8,16 +8,14 @@ using System.Text.Json;
 namespace RabbitMQLoadBalanceAspCoreWebExample.Service
 {
     public class AccountTradeOrder : IAccountTradeOrder
-    {
-        private ILogger<AccountTradeOrder> _logger;
+    {       
         private readonly IRabbitMqFactory _mqFactory;
         private readonly FakeDataBase _fakeDb;        
 
-        public AccountTradeOrder(ILogger<AccountTradeOrder> logger,
+        public AccountTradeOrder(
             IRabbitMqFactory mqFactory,
             FakeDataBase fakeDb)
         {
-            _logger = logger;
             _mqFactory = mqFactory;
             _fakeDb = fakeDb;
         }
@@ -77,8 +75,8 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Service
         private void SendToRabbitMQ(AccountTradeOrderModel tradeOrder)
         {
             var json = JsonSerializer.Serialize(tradeOrder);
-            var sender = _mqFactory.Get(RabbitMQConsts.MY_EXCHANGE_NAME);
-            sender.PblisherSend(json, RabbitMQConsts.MY_EXCHANGE_NAME, RabbitMQConsts.MY_ROUTING_KEY);
+            var publisher = _mqFactory.Get(RabbitMQConsts.MY_EXCHANGE_NAME);
+            publisher.PblisherSend(json, RabbitMQConsts.MY_EXCHANGE_NAME, RabbitMQConsts.MY_ROUTING_KEY);
         }
     }
 }

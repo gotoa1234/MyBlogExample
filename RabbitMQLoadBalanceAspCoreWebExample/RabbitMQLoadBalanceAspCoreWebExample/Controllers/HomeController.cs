@@ -4,14 +4,11 @@ using RabbitMQLoadBalanceAspCoreWebExample.Service;
 namespace RabbitMQLoadBalanceAspCoreWebExample.Controllers
 {
     public class HomeController : Controller
-    {
-        private readonly ILogger<HomeController> _logger;
+    {        
         private readonly IAccountTradeOrder _accountTradeOrder;
 
-        public HomeController(ILogger<HomeController> logger,
-            IAccountTradeOrder accountTradeOrder)
-        {
-            _logger = logger;
+        public HomeController(IAccountTradeOrder accountTradeOrder)
+        {            
             _accountTradeOrder = accountTradeOrder;
         }
 
