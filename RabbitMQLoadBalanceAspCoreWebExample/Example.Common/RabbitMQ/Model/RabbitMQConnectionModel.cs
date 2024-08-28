@@ -16,5 +16,10 @@
         /// 密碼
         /// </summary>
         public string Password { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 伺服器名稱
+        /// </summary>
+        public string ServerName { get; set; } = string.Empty;
     }
 }

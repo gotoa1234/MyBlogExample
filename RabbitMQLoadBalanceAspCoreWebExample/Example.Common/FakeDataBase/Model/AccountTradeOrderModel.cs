@@ -26,5 +26,10 @@
         /// 備註
         /// </summary>
         public string Remark { get; set; } = string.Empty;
+
+        /// <summary>
+        /// 機器名稱 - 消費者處理時才寫入
+        /// </summary>
+        public string MechineName { get; set; } = string.Empty;
     }
 }

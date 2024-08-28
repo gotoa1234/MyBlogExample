@@ -29,6 +29,9 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.RabbitMQ
             _selfParameters.HostName = rabbitParam?.HostName ?? string.Empty;
             _selfParameters.UserName = rabbitParam?.UserName ?? string.Empty;
             _selfParameters.Password = rabbitParam?.Password ?? string.Empty;
+
+            var serverName = _configuration.GetSection("ServreName").Get<string>();
+            _selfParameters.ServerName = serverName ?? string.Empty;
         }
 
         /// <summary>
@@ -65,6 +68,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.RabbitMQ
                         var orderBatchService = scope.ServiceProvider.GetRequiredService<IAccountTradeOrder>();
 
                         // 模擬調用消費者事件 - 完成此單
+                        dto.MechineName = _selfParameters.ServerName;
                         await orderBatchService.FinishAccountTradeOrder(dto);
 
                         // 完成後響應MQ - 回覆MQ完成

@@ -64,6 +64,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Service
         {
             // 模擬處理為成功
             tradeOrder.IsSuccessful = true;
+            tradeOrder.MechineName = tradeOrder.MechineName;//從消費者處理時才寫入
             // 更新至資料庫
             _fakeDb.AddOrUpdate(tradeOrder);
 
