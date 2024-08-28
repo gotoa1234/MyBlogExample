@@ -20,7 +20,7 @@
         /// <summary>
         /// 建立時間
         /// </summary>
-        public DateTime DateTimeValue { get; set;}
+        public DateTime DateTimeValue { get; set; }
 
         /// <summary>
         /// 備註

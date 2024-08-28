@@ -20,9 +20,9 @@ namespace Example.Common.RabbitMQ.Factory
         public RabbitMqFactory(IConfiguration configuration)
         {
             _configuration = configuration;
-            var rabbitParam = _configuration.GetSection("RabbitMQ").Get<RabbitMQConnectionModel> ();
+            var rabbitParam = _configuration.GetSection("RabbitMQ").Get<RabbitMQConnectionModel>();
             _rabbitMqHostName = rabbitParam?.HostName ?? string.Empty;
-            _rabbitMqUserName = rabbitParam?.UserName ?? string.Empty; 
+            _rabbitMqUserName = rabbitParam?.UserName ?? string.Empty;
             _rabbitMqPassword = rabbitParam?.Password ?? string.Empty;
         }
 
@@ -65,7 +65,7 @@ namespace Example.Common.RabbitMQ.Factory
                 }
                 return publisher;
             }
-        } 
+        }
 
         /// <summary>
         /// 取得鎖物件
@@ -99,7 +99,5 @@ namespace Example.Common.RabbitMQ.Factory
             _publisherDict.Clear();
         }
         #endregion
-
-
     }
 }

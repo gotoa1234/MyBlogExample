@@ -6,12 +6,12 @@ using RabbitMQLoadBalanceAspCoreWebExample.Service;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
-// 1-1. 注入相依
+// 1. 注入相依
 builder.Services.AddSingleton<IRabbitMqFactory, RabbitMqFactory>();
 builder.Services.AddSingleton<FakeDataBase>();
 builder.Services.AddScoped<IAccountTradeOrder, AccountTradeOrder>();
 
-// 1-2. 注入 RabbitMQ Subscriber
+// 2. 注入 RabbitMQ Subscriber
 builder.Services.AddRabbitMqSubscriber();
 
 var app = builder.Build();
@@ -31,6 +31,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+// 3. RabbitMQ Subscriber 啟用交換器
 app.InitMqSubscriber();
 
 app.Run();

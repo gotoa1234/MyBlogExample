@@ -12,7 +12,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.RabbitMQ
         private readonly RabbitMQConnectionModel _selfParameters = new RabbitMQConnectionModel();
         private readonly IConfiguration _configuration;
         private readonly IServiceProvider _serviceProvider;
-        private readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(5);
+        private SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(5);
         private RabbitMqMessageReceiver<AccountTradeOrderModel> _orderBatchSequenceReceiver = null!;
 
         /// <summary>
@@ -32,6 +32,15 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.RabbitMQ
 
             var serverName = _configuration.GetSection("ServreName").Get<string>();
             _selfParameters.ServerName = serverName ?? string.Empty;
+            DynamicLimitSet();
+
+            // 設置 SemaphoreSlim 限制
+            void DynamicLimitSet()
+            {
+                // 依照本機的 CPU 核心數量動態設定最大並行值 ※設太大會導致 CPU 過載，因此應該動態設定適當的值
+                int cpuCoreCount = Environment.ProcessorCount;
+                _semaphoreSlim = new SemaphoreSlim(Math.Max(1, cpuCoreCount - 1));
+            }
         }
 
         /// <summary>
@@ -59,6 +68,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.RabbitMQ
         /// </summary>    
         private void OnAccountTradeOrderReceived(AccountTradeOrderModel dto, RabbitMqMessageReceiver<AccountTradeOrderModel> receiver, ulong deliverTag, long timestamp)
         {
+            _semaphoreSlim.Wait();
             Task.Run(async () =>
             {
                 try
@@ -78,6 +88,10 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.RabbitMQ
                 catch (Exception ex)
                 {
                     Console.Out.WriteLine(ex);
+                }
+                finally
+                {
+                    _semaphoreSlim.Release();
                 }
             });
         }

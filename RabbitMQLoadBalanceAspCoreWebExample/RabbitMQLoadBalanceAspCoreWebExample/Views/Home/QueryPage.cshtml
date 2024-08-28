@@ -11,7 +11,7 @@
 <html>
 <body>
     <!-- 建立訂單按鈕 -->
-    <button id="buildTradeOrderBtn">建立假定單</button>
+    <button id="buildTradeOrderBtn">建立假訂單</button>
 
     <!-- 畫面顯示 -->
     <div id="resultMessage"></div>
@@ -22,15 +22,17 @@
     </div>
 </body>
 <script>
-    // 呼叫 API 事件 - 建立假定單
+    // 呼叫 API 事件 - 建立假訂單
     $(document).ready(function () {
         // 每3秒更新一次
         setInterval(queryPage, 3000);
 
+        // 按鈕事件
         $('#buildTradeOrderBtn').click(function () {
             updateTradeOrders();
         });
 
+        // 建立訂單
         function updateTradeOrders() {
             $.ajax({
                 url: '@Url.Action("BuildAccountTradeOrder", "Home")',
@@ -44,6 +46,7 @@
             });
         }
 
+        // 輪詢用 - 更新訂單資料
         function queryPage() {
             $.ajax({
                 url: '@Url.Action("QueryPagePartial", "Home")',
@@ -56,8 +59,6 @@
                 }
             });
         }
-        
-
     });
 </script>
 </html>

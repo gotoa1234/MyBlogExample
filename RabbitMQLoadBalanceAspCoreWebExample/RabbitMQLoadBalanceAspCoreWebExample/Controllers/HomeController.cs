@@ -4,21 +4,21 @@ using RabbitMQLoadBalanceAspCoreWebExample.Service;
 namespace RabbitMQLoadBalanceAspCoreWebExample.Controllers
 {
     public class HomeController : Controller
-    {        
+    {
         private readonly IAccountTradeOrder _accountTradeOrder;
 
         public HomeController(IAccountTradeOrder accountTradeOrder)
-        {            
+        {
             _accountTradeOrder = accountTradeOrder;
         }
 
         public IActionResult Index()
-        {                        
+        {
             return View();
         }
 
         /// <summary>
-        /// ミ安﹚虫 API
+        /// ミ安璹虫 API
         /// </summary>        
         [HttpGet]
         public IActionResult BuildAccountTradeOrder()
@@ -26,19 +26,19 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Controllers
             _accountTradeOrder.BuildAccountTradeOrder();
             var result = _accountTradeOrder.GetAccountTraderOrder();
             return PartialView("_AccountTradeOrderPartial", result);
-        }    
+        }
 
         /// <summary>
         /// 琩高
         /// </summary>        
         public IActionResult QueryPage()
         {
-            var result =  _accountTradeOrder.GetAccountTraderOrder();
+            var result = _accountTradeOrder.GetAccountTraderOrder();
             return View(result);
         }
 
         /// <summary>
-        /// 琩高
+        /// 琩高(穝Table)
         /// </summary>   
         [HttpGet]
         public IActionResult QueryPagePartial()
