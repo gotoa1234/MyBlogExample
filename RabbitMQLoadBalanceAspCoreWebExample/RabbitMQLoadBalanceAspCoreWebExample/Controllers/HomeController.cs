@@ -39,5 +39,15 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Controllers
             var result =  _accountTradeOrder.GetAccountTraderOrder();
             return View(result);
         }
+
+        /// <summary>
+        /// ¬d¸ß­¶­±
+        /// </summary>   
+        [HttpGet]
+        public IActionResult QueryPagePartial()
+        {
+            var result = _accountTradeOrder.GetAccountTraderOrder();
+            return PartialView("_AccountTradeOrderPartial", result);
+        }
     }
 }

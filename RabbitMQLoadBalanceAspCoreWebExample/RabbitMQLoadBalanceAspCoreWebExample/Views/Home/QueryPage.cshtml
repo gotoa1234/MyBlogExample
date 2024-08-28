@@ -24,7 +24,14 @@
 <script>
     // 呼叫 API 事件 - 建立假定單
     $(document).ready(function () {
+        // 每3秒更新一次
+        setInterval(queryPage, 3000);
+
         $('#buildTradeOrderBtn').click(function () {
+            updateTradeOrders();
+        });
+
+        function updateTradeOrders() {
             $.ajax({
                 url: '@Url.Action("BuildAccountTradeOrder", "Home")',
                 type: 'GET',
@@ -33,10 +40,24 @@
                 },
                 error: function () {
                     $('#resultMessage').text('Error occurred while processing the request.').css('color', 'red');
-
                 }
             });
-        });
+        }
+
+        function queryPage() {
+            $.ajax({
+                url: '@Url.Action("QueryPagePartial", "Home")',
+                type: 'GET',
+                success: function (response) {
+                    $('#tradeOrderContainer').html(response);
+                },
+                error: function () {
+                    $('#resultMessage').text('Error occurred while processing the request.').css('color', 'red');
+                }
+            });
+        }
+        
+
     });
 </script>
 </html>
