@@ -18,6 +18,11 @@
         public bool IsSuccessful { get; set; } = false;
 
         /// <summary>
+        /// 建立時間
+        /// </summary>
+        public DateTime DateTimeValue { get; set;}
+
+        /// <summary>
         /// 備註
         /// </summary>
         public string Remark { get; set; } = string.Empty;

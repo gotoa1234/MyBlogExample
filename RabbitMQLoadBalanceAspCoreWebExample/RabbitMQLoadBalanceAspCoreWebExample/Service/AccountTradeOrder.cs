@@ -14,9 +14,12 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Service
         private readonly FakeDataBase _fakeDb;        
 
         public AccountTradeOrder(ILogger<AccountTradeOrder> logger,
-            IRabbitMqFactory mqFactory)
+            IRabbitMqFactory mqFactory,
+            FakeDataBase fakeDb)
         {
             _logger = logger;
+            _mqFactory = mqFactory;
+            _fakeDb = fakeDb;
         }
 
         /// <summary>
@@ -36,14 +39,20 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Service
         {
             // Bogus 套件，目的是產生假資料
             var faker = new Faker("zh_CN");
+            var now = DateTime.Now;
             var newItem = new AccountTradeOrderModel()
             {
                 AccountName = faker.Name.FullName(),
                 AccountTradeOrderId = Guid.NewGuid().GetHashCode(),
                 IsSuccessful = false,
-                Remark = $@"建立時間 : {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}"
+                DateTimeValue = now,
+                Remark = $@"建立時間 : {now.ToString("yyyy-MM-dd HH:mm:ss")}"
             };
+            // 新增至資料庫
             _fakeDb.AddOrUpdate(newItem);
+
+            // 發送至 RabbitMQ
+            SendToRabbitMQ(newItem);
 
             return Task.CompletedTask;
         }
@@ -55,6 +64,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Service
         {
             // 模擬處理為成功
             tradeOrder.IsSuccessful = true;
+            // 更新至資料庫
             _fakeDb.AddOrUpdate(tradeOrder);
 
             return Task.CompletedTask;
@@ -66,8 +76,8 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Service
         private void SendToRabbitMQ(AccountTradeOrderModel tradeOrder)
         {
             var json = JsonSerializer.Serialize(tradeOrder);
-            var sender = _mqFactory.Get(RabbitMQConsts.MYEXCHANGENAME, RabbitMQConsts.MYEXCHANGENAME);
-            sender.Send(json, RabbitMQConsts.MYEXCHANGENAME, RabbitMQConsts.MYEXCHANGENAME);
+            var sender = _mqFactory.Get(RabbitMQConsts.MY_EXCHANGE_NAME);
+            sender.PblisherSend(json, RabbitMQConsts.MY_EXCHANGE_NAME, RabbitMQConsts.MY_ROUTING_KEY);
         }
     }
 }

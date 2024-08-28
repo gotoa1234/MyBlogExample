@@ -16,14 +16,28 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Controllers
         }
 
         public IActionResult Index()
-        {            
-            _accountTradeOrder.BuildAccountTradeOrder();
+        {                        
             return View();
         }
 
-        public IActionResult Privacy()
+        /// <summary>
+        /// 建立假定單 API
+        /// </summary>        
+        [HttpGet]
+        public IActionResult BuildAccountTradeOrder()
         {
-            return View();
+            _accountTradeOrder.BuildAccountTradeOrder();
+            var result = _accountTradeOrder.GetAccountTraderOrder();
+            return PartialView("_AccountTradeOrderPartial", result);
+        }    
+
+        /// <summary>
+        /// 查詢頁面
+        /// </summary>        
+        public IActionResult QueryPage()
+        {
+            var result =  _accountTradeOrder.GetAccountTraderOrder();
+            return View(result);
         }
     }
 }

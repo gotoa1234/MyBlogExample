@@ -6,19 +6,19 @@ using System.Text;
 using System.Text.Json;
 
 namespace Example.Common.RabbitMQ
-{ 
+{
     public class RabbitMqMessageReceiver<TMessage> : RabbitMQBaseParameterModel, IDisposable
     {
         protected ConnectionFactory _factory;
-        protected Action<TMessage, RabbitMqMessageReceiver<TMessage>, ulong, long> _receivedAction;        
+        protected Action<TMessage, RabbitMqMessageReceiver<TMessage>, ulong, long> _receivedAction;
 
         /// <summary>
-        /// 接收器工廠
+        /// 消費者接收器
         /// </summary>        
         public RabbitMqMessageReceiver(
-            ExchangeModel rabbitParameters, 
-            int concurrentCount, 
-            Action<TMessage, RabbitMqMessageReceiver<TMessage>, ulong, long> action, 
+            ExchangeModel rabbitParameters,
+            int concurrentCount,
+            Action<TMessage, RabbitMqMessageReceiver<TMessage>, ulong, long> action,
             bool autoAck = false)
         {
             SettingValue();
@@ -44,7 +44,7 @@ namespace Example.Common.RabbitMQ
         public void Connect()
         {
             // 建立連線
-            _connection = _factory.CreateConnection();            
+            _connection = _factory.CreateConnection();
             _connection.ConnectionShutdown += ConnectionForConnectionShutdown;
             _channel = _connection.CreateModel();
 
@@ -127,7 +127,7 @@ namespace Example.Common.RabbitMQ
             {
                 Console.Out.WriteLineAsync(ex.Message);
                 throw;
-            }            
+            }
         }
 
         /// <summary>
@@ -190,12 +190,14 @@ namespace Example.Common.RabbitMQ
             }
             if (disposing)
             {
-                _channel?.Dispose();
-                _connection?.Dispose();
+                {
+                    _channel?.Dispose();
+                    _connection?.Dispose();
+                }
+                _disposed = true;
             }
-            _disposed = true;
-        }
 
-        #endregion
+            #endregion
+        }
     }
 }

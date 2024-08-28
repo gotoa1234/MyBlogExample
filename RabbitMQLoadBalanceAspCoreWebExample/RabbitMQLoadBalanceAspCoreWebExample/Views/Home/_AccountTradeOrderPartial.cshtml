@@ -1,0 +1,25 @@
+﻿@model IEnumerable<Example.Common.FakeDataBase.Model.AccountTradeOrderModel>
+
+<div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>帳戶訂單編號</th>
+                <th>帳戶名稱</th>
+                <th>是否成功</th>                
+                <th>備註</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.AccountTradeOrderId</td>
+                    <td>@item.AccountName</td>
+                    <td>@item.IsSuccessful</td>
+                    <td>@item.Remark</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

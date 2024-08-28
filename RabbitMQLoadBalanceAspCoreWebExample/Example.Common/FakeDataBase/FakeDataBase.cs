@@ -14,7 +14,9 @@ namespace Example.Common.FakeDataBase
         /// </summary>
         public IReadOnlyDictionary<int, AccountTradeOrderModel> GetAccountTradeOrderAll()
         {
-            return _clientQuickPageDict;
+            var getResult = _clientQuickPageDict;
+            var sortResult = _clientQuickPageDict.OrderBy(item => item.Value.DateTimeValue).ToDictionary();
+            return sortResult;
         }
 
         /// <summary>

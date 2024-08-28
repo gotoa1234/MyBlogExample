@@ -7,61 +7,56 @@ namespace Example.Common.RabbitMQ
 {
     public class RabbitMqMessagePublisher : RabbitMQBaseParameterModel, IDisposable
     {
+        /// <summary>
+        /// 生產者
+        /// </summary>        
         public RabbitMqMessagePublisher(ExchangeModel rabbitParameters)
         {
-            _connection = RabbitMQHelper.GetConnection(rabbitParameters);
-
-            _channel = RabbitMQHelper.GetModel(_connection);
-
-            _exchangeType = rabbitParameters.ExchangeType;
-
-            var exchangeName = rabbitParameters.ExchangeName;
-
-            _channel.ExchangeDeclare(exchangeName, rabbitParameters.ExchangeType.ToString().ToLower(), true, false, null);
+            SettingValue();
+            
+            // 設定生產者 - 基本設定
+            void SettingValue()
+            {
+                _connection = RabbitMQHelper.GetConnection(rabbitParameters);
+                _channel = RabbitMQHelper.GetModel(_connection);
+                _exchangeType = rabbitParameters.ExchangeType;
+                _channel.ExchangeDeclare(rabbitParameters.ExchangeName, rabbitParameters.ExchangeType.ToString().ToLower(), true, false, null);
+            }
         }
 
         /// <summary>
-        /// Returns true if the connection is still in a state where it can be used.
+        /// 檢查 RabbitMQ 連線，確保當前連線是否開啟
         /// </summary>
         public bool IsOpen => _connection?.IsOpen == true;
 
         /// <summary>
-        /// Published a message.
+        /// 發送訊息
         /// </summary>        
-        public void Send(string message, string exchangeName, string routingKey)
+        public void PblisherSend(string message, string exchangeName, string routingKey)
         {
             var properties = _channel.CreateBasicProperties();
             properties.Timestamp = new AmqpTimestamp(DateTime.Now.Ticks);
-            properties.Persistent = true;
+            // 設定消息的持久性，確保 RabbitMQ 伺服器重啟後仍然存在
+            properties.Persistent = true; 
             _channel.BasicPublish(exchangeName, routingKey, false, properties, Encoding.UTF8.GetBytes(message));
         }
 
-        #region Disposing
-
-        private bool _disposed;
-
-        /// <summary>
-        /// Destructor
-        /// </summary>
+        #region 解構式 - 釋放資源
+        
         ~RabbitMqMessagePublisher()
         {
             Dispose();
         }
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
         public void Dispose()
         {
             if (_disposed)
             {
                 return;
             }
-
             _channel?.Dispose();
             _connection?.Dispose();
             _disposed = true;
-
             GC.SuppressFinalize(this);
         }
 

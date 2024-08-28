@@ -1,0 +1,42 @@
+﻿@model IEnumerable<Example.Common.FakeDataBase.Model.AccountTradeOrderModel>
+@{
+    ViewData["Title"] = "查詢畫面";
+}
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<html>
+<body>
+    <!-- 建立訂單按鈕 -->
+    <button id="buildTradeOrderBtn">建立假定單</button>
+
+    <!-- 畫面顯示 -->
+    <div id="resultMessage"></div>
+
+    <!-- 渲染 Partial View -->
+    <div id="tradeOrderContainer">
+        @await Html.PartialAsync("_AccountTradeOrderPartial", Model)
+    </div>
+</body>
+<script>
+    // 呼叫 API 事件 - 建立假定單
+    $(document).ready(function () {
+        $('#buildTradeOrderBtn').click(function () {
+            $.ajax({
+                url: '@Url.Action("BuildAccountTradeOrder", "Home")',
+                type: 'GET',
+                success: function (response) {
+                    $('#tradeOrderContainer').html(response);
+                },
+                error: function () {
+                    $('#resultMessage').text('Error occurred while processing the request.').css('color', 'red');
+
+                }
+            });
+        });
+    });
+</script>
+</html>
