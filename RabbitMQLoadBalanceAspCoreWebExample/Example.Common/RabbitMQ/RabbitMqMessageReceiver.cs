@@ -13,7 +13,7 @@ namespace Example.Common.RabbitMQ
         protected Action<TMessage, RabbitMqMessageReceiver<TMessage>, ulong, long> _receivedAction;
 
         /// <summary>
-        /// 1. 消費者接收器
+        /// 1. 建構式 - 消費者接收器
         /// </summary>        
         public RabbitMqMessageReceiver(
             ExchangeModel rabbitParameters,
