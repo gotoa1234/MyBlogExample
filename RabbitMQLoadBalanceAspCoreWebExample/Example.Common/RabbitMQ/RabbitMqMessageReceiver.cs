@@ -13,7 +13,7 @@ namespace Example.Common.RabbitMQ
         protected Action<TMessage, RabbitMqMessageReceiver<TMessage>, ulong, long> _receivedAction;
 
         /// <summary>
-        /// 消費者接收器
+        /// 1. 消費者接收器
         /// </summary>        
         public RabbitMqMessageReceiver(
             ExchangeModel rabbitParameters,
@@ -39,7 +39,7 @@ namespace Example.Common.RabbitMQ
         #region 連線事件
 
         /// <summary>
-        /// 設定消費者接收器 - 連線
+        /// 2. 設定消費者接收器 - 連線
         /// </summary>
         public void Connect()
         {
@@ -57,7 +57,7 @@ namespace Example.Common.RabbitMQ
         }
 
         /// <summary>
-        /// 連線結束事件
+        /// 3. 連線結束事件
         /// </summary>        
         private void ConnectionForConnectionShutdown(object? sender, ShutdownEventArgs e)
         {
@@ -113,7 +113,7 @@ namespace Example.Common.RabbitMQ
         }
 
         /// <summary>
-        /// 消費者接收器
+        /// 4. 消費者接收器
         /// </summary>
         public void OnConsumerForReceived(object sender, BasicDeliverEventArgs e)
         {
@@ -131,7 +131,7 @@ namespace Example.Common.RabbitMQ
         }
 
         /// <summary>
-        /// 增加消費者訂閱的隊列
+        /// 5. 增加消費者訂閱的隊列
         /// </summary>
         public void AddQueue(string queueName, string routingKey)
         {
@@ -149,7 +149,7 @@ namespace Example.Common.RabbitMQ
         #region RabbitMQ 反饋 Ack 標記
 
         /// <summary>
-        /// 標記訊息已處理
+        /// 6. 標記訊息已處理
         /// </summary>        
         public async Task BasicAck(ulong deliveryTag)
         {
@@ -169,7 +169,7 @@ namespace Example.Common.RabbitMQ
 
         #endregion
 
-        #region 解構式 - 釋放資源
+        #region 解構式 - 7. 釋放資源
 
         ~RabbitMqMessageReceiver()
         {

@@ -21,7 +21,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Service
         }
 
         /// <summary>
-        /// 查詢訂單
+        /// 1. 查詢訂單
         /// </summary>
         /// <returns></returns>
         public IEnumerable<AccountTradeOrderModel> GetAccountTraderOrder()
@@ -31,7 +31,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Service
         }
 
         /// <summary>
-        /// 建立訂單
+        /// 2-1. 建立訂單
         /// </summary>
         public Task BuildAccountTradeOrder()
         {
@@ -56,7 +56,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Service
         }
 
         /// <summary>
-        /// 更新訂單
+        /// 3. 更新訂單
         /// </summary>        
         public Task FinishAccountTradeOrder(AccountTradeOrderModel tradeOrder)
         {
@@ -70,7 +70,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Service
         }
 
         /// <summary>
-        /// 提交到 RabbitMQ 隊列
+        /// 2-2. 提交到 RabbitMQ 隊列
         /// </summary>
         private void SendToRabbitMQ(AccountTradeOrderModel tradeOrder)
         {

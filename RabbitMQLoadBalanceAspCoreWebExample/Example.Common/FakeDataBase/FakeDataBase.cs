@@ -5,12 +5,15 @@ namespace Example.Common.FakeDataBase
 {
     public class FakeDataBase
     {
+        /// <summary>
+        /// 1. 紀錄模擬帳戶系統查詢訂單 - 當前資料
+        /// </summary>
         protected readonly ConcurrentDictionary<int, AccountTradeOrderModel> _clientQuickPageDict = new();
 
         public IReadOnlyDictionary<int, AccountTradeOrderModel> ClientQuickPageDict => _clientQuickPageDict;
 
         /// <summary>
-        /// 模擬帳戶系統查詢訂單 - 當前資料
+        /// 2. 模擬帳戶系統查詢訂單 - 當前資料
         /// </summary>
         public IReadOnlyDictionary<int, AccountTradeOrderModel> GetAccountTradeOrderAll()
         {
@@ -20,7 +23,7 @@ namespace Example.Common.FakeDataBase
         }
 
         /// <summary>
-        /// 模擬帳戶建單 - 消費者 - 更新/插入資料
+        /// 3. 模擬帳戶建單 - 消費者 - 更新/插入資料
         /// </summary>
         public void AddOrUpdate(AccountTradeOrderModel insertItem)
         {

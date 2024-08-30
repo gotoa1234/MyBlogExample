@@ -16,7 +16,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.RabbitMQ
         private RabbitMqMessageReceiver<AccountTradeOrderModel> _orderBatchSequenceReceiver = null!;
 
         /// <summary>
-        /// 建構式
+        /// 1-1. 建構式
         /// </summary>        
         public RabbitMQSubscriber(
             IConfiguration configuration,
@@ -44,7 +44,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.RabbitMQ
         }
 
         /// <summary>
-        /// 建立接收器
+        /// 1-2. 建立接收器
         /// </summary>
         public void BuildReceive()
         {
@@ -64,7 +64,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.RabbitMQ
         }
 
         /// <summary>
-        /// 帳戶訂單接收事件
+        /// 1-3. 帳戶訂單接收事件
         /// </summary>    
         private void OnAccountTradeOrderReceived(AccountTradeOrderModel dto, RabbitMqMessageReceiver<AccountTradeOrderModel> receiver, ulong deliverTag, long timestamp)
         {
@@ -99,7 +99,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.RabbitMQ
     }
 
     /// <summary>
-    /// 注入
+    /// 2. 注入
     /// </summary>
     public static class MqSubscriberServiceCollectionExtensions
     {
@@ -110,7 +110,8 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.RabbitMQ
     }
 
     /// <summary>
-    /// 初始化配置 - 缺少就不能保持 MQ 背景運行
+    /// 3. 初始化配置 - 缺少就不能保持 MQ 背景運行 
+    /// (延遲初始化，確保 Singleton 已完成才執行)
     /// </summary>
     public static class MqSubscriberHostExtensions
     {

@@ -18,7 +18,16 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Controllers
         }
 
         /// <summary>
-        /// ミ安璹虫 API
+        /// 1. 琩高
+        /// </summary>        
+        public IActionResult QueryPage()
+        {
+            var result = _accountTradeOrder.GetAccountTraderOrder();
+            return View(result);
+        }
+
+        /// <summary>
+        /// 2. ミ安璹虫 API
         /// </summary>        
         [HttpGet]
         public IActionResult BuildAccountTradeOrder()
@@ -29,16 +38,7 @@ namespace RabbitMQLoadBalanceAspCoreWebExample.Controllers
         }
 
         /// <summary>
-        /// 琩高
-        /// </summary>        
-        public IActionResult QueryPage()
-        {
-            var result = _accountTradeOrder.GetAccountTraderOrder();
-            return View(result);
-        }
-
-        /// <summary>
-        /// 琩高(穝Table)
+        /// 3. 琩高(穝Table)
         /// </summary>   
         [HttpGet]
         public IActionResult QueryPagePartial()
