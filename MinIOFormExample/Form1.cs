@@ -143,11 +143,11 @@ namespace MinIOFormExample
                     string objectName = "test.txt";
 
                     // 下載該檔案
-                    string downloadFilePath = textBox_downloadPathFile.Text + objectName;
+                    string downloadFilePath = textBox_downloadPathFile.Text + "\\" + objectName;
                     var getObjectArgs = new GetObjectArgs()
                                         .WithBucket(_bucketName)
                                         .WithObject(objectName)
-                                        .WithFile(downloadFilePath);
+                                        .WithFile(downloadFilePath);                    
                     await minio.GetObjectAsync(getObjectArgs);
                     await ShowMessageAsync($@"下載成功! 檔案路徑:{downloadFilePath}");
 
