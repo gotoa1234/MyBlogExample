@@ -10,6 +10,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<IMinIOClientFactory, MinIOClientFactory>();
 builder.Services.AddSingleton<FakeDataBase>();
 builder.Services.AddScoped<ITeacherManageService, TeacherManageService>();
+builder.Services.AddSingleton<MinIOClientInstance>();
 
 var app = builder.Build();
 

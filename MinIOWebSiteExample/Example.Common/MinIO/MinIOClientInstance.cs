@@ -16,7 +16,7 @@ namespace Example.Common.MinIO
 
         public MinIOClientInstance(MinIOConnectionModel param)
         {
-            _minIOClientSelf = _minioClientFactory.CreateClient(param);            
+            _minIOClientSelf = _minioClientFactory.CreateClient(param);
         }
 
         public async Task GetBucketList(string bucketName)
