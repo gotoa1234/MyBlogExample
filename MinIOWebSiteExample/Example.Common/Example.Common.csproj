@@ -9,7 +9,6 @@
   <ItemGroup>
     <Folder Include="MinIO\Common\" />
     <Folder Include="MinIO\Consts\" />
-    <Folder Include="MinIO\Util\" />
   </ItemGroup>
 
   <ItemGroup>

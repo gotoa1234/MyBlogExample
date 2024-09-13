@@ -54,16 +54,16 @@ namespace RabbitMqRecive
             //建立MQ連線基本資訊
             var factory = new ConnectionFactory()
             {
-                HostName = "localhost",
-                UserName = "guest",
-                Password = "guest"
+                HostName = "192.168.51.28",
+                UserName = "admin",
+                Password = "admin"
             };
             //開啟連線
             var connection = factory.CreateConnection();
             var channel = connection.CreateModel();
 
             //Queue基本設置
-            channel.QueueDeclare(queue: "我是Queue的Key",
+            channel.QueueDeclare(queue: "Louis Test 生產者",
                                  durable: false,
                                  exclusive: false,
                                  autoDelete: false,
@@ -79,7 +79,7 @@ namespace RabbitMqRecive
                 RabbitMQThread = new Thread(threadParameters);
                 RabbitMQThread.Start();
             };
-            channel.BasicConsume(queue: "我是Queue的Key",
+            channel.BasicConsume(queue: "Louis Test 生產者",
                                  autoAck: true,
                                  consumer: consumer);
 

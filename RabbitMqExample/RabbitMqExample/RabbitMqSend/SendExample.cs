@@ -31,9 +31,9 @@ namespace RabbitMqSend
             //建立MQ連線基本資訊
             var factory = new ConnectionFactory()
             {
-                HostName = "localhost",
-                UserName = "guest",
-                Password = "guest"
+                HostName = "192.168.51.93",
+                UserName = "admin",
+                Password = "admin"
             };
 
             //傳送資訊(生產者)
@@ -41,7 +41,7 @@ namespace RabbitMqSend
             using (var channel = connection.CreateModel())
             {
                 //Queue基本設置
-                channel.QueueDeclare(queue: "我是Queue的Key",
+                channel.QueueDeclare(queue: "Louis Test 生產者",
                                      durable: false,
                                      exclusive: false,
                                      autoDelete: false,
@@ -52,7 +52,7 @@ namespace RabbitMqSend
                 var body = Encoding.UTF8.GetBytes(message);
 
                 channel.BasicPublish(exchange: "",
-                                     routingKey: "我是Queue的Key",
+                                     routingKey: "Louis Test 生產者",
                                      basicProperties: null,
                                      body: body);
                 sendTextBox.AppendText($@"[傳送] {message} {Environment.NewLine}");

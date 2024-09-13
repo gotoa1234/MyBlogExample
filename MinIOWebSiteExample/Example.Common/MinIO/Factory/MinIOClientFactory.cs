@@ -1,4 +1,5 @@
 ﻿using Example.Common.MinIO.Model;
+using Example.Common.MinIO.Util;
 using Microsoft.Extensions.Configuration;
 using Minio;
 using System.Collections.Concurrent;
@@ -6,8 +7,7 @@ using System.Collections.Concurrent;
 namespace Example.Common.MinIO.Factory
 {
     public class MinIOClientFactory : IMinIOClientFactory, IDisposable
-    {
-        private readonly IConfiguration _configuration;
+    {       
         private static readonly ConcurrentDictionary<string, IMinioClient> _minIOClientDict = new();
         private static readonly object _lockObject = new();
         private static readonly ConcurrentDictionary<string, object> _lockObjectDict = new();
@@ -15,13 +15,7 @@ namespace Example.Common.MinIO.Factory
 
         public MinIOClientFactory(IConfiguration configuration)
         {
-            _configuration = configuration;
-            var minIOParam = _configuration.GetSection("MinIO").Get<MinIOConnectionModel>();
-            _ConnectionItem = new MinIOConnectionModel();
-            _ConnectionItem.Host = minIOParam?.Host ?? string.Empty;
-            _ConnectionItem.Port = minIOParam?.Port ?? default(int);
-            _ConnectionItem.AccessKey = minIOParam?.AccessKey ?? string.Empty;
-            _ConnectionItem.SecretKey = minIOParam?.SecretKey ?? string.Empty;            
+            _ConnectionItem = MinIOUtil.GetConfigureSetting(configuration);
         }
 
         public IMinioClient CreateClient(MinIOConnectionModel param)

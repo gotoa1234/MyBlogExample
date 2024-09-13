@@ -27,7 +27,7 @@ namespace MinIOWebSiteExample.Service
             {
                 return _dataBase.GetTeachers();
             });
-            await _minIOClientInstance.GetBucketList("my-buckets");
+            await _minIOClientInstance.GetBucketList("my-bucket");
             return result;
         }
     }

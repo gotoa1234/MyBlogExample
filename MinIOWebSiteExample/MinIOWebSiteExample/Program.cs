@@ -1,6 +1,7 @@
 using Example.Common.FakeDataBase;
 using Example.Common.MinIO;
 using Example.Common.MinIO.Factory;
+using Example.Common.MinIO.Model;
 using MinIOWebSiteExample.Service;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +12,7 @@ builder.Services.AddSingleton<IMinIOClientFactory, MinIOClientFactory>();
 builder.Services.AddSingleton<FakeDataBase>();
 builder.Services.AddScoped<ITeacherManageService, TeacherManageService>();
 builder.Services.AddSingleton<MinIOClientInstance>();
+builder.Services.AddSingleton<MinIOConnectionModel>();
 
 var app = builder.Build();
 
