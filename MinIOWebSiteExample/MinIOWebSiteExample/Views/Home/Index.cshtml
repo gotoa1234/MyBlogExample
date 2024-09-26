@@ -6,3 +6,69 @@
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
+
+<!-- Views/FileUpload/Index.cshtml -->
+@{
+    ViewData["Title"] = "File Upload";
+}
+
+<h2>File Upload</h2>
+
+<form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" id="fileInput" name="file" />
+    <button type="submit">Upload</button>
+</form>
+
+<div id="uploadResult"></div>
+
+<!-- 下載按鈕 -->
+<button id="downloadButton" onclick="downloadFile()">Download File</button>
+
+
+@section Scripts {
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
+
+            const formData = new FormData();
+            const fileInput = document.getElementById('fileInput');
+            formData.append('file', fileInput.files[0]);
+            formData.append('bucketName', "ttt");
+
+            const response = await fetch('/Home/UploadFile', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+            document.getElementById('uploadResult').innerText = `File uploaded to: ${result.filePath}`;
+        });
+
+        function downloadFile() {
+            const fileName = 'MyTestIcon.png';//document.getElementById('fileName').value;
+            const bucketName = 'ttt';
+            // 呼叫 API 下載文件
+            fetch(`/Home/downloadfile?fileName=${encodeURIComponent(fileName)}&bucketName=${encodeURIComponent(bucketName)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('File not found or server error.');
+                    }
+                    return response.blob();  // 轉換為 Blob 形式
+                })
+                .then(blob => {
+                    // 創建一個隱藏的 <a> 元素來下載文件
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName; // 設置下載的文件名
+                    document.body.appendChild(a);
+                    a.click(); // 模擬點擊下載
+                    a.remove(); // 下載完成後移除 <a> 元素
+                })
+                .catch(error => {
+                    console.error('Download error:', error);
+                    alert('Error downloading file: ' + error.message);
+                });
+        }
+    </script>
+}
