@@ -5,12 +5,8 @@ using Example.Common.MinIO.Util;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Minio;
-using Minio.ApiEndpoints;
-using Minio.DataModel;
 using Minio.DataModel.Args;
 using Minio.Exceptions;
-using System.IO;
-using System.Security.AccessControl;
 
 namespace Example.Common.MinIO
 {
@@ -197,13 +193,38 @@ namespace Example.Common.MinIO
             {
                 Console.WriteLine($"[DeleteBucket]  Exception: {e}");
             }
+        }
+
+        /// <summary>
+        /// 刪除單一檔案
+        /// </summary>                
+        public async Task DeleteFile(string fileName, string bucketName)
+        {
+            try
+            {
+                // 取得是否存在               
+                var isExist = await IsExistBucket(bucketName);
+
+                // 不存在 - 退出
+                if (!isExist)
+                    return;
+
+                // 刪除指定物件                                
+                await _minIOClientSelf.RemoveObjectAsync(new RemoveObjectArgs()
+                        .WithBucket(bucketName)
+                        .WithObject(fileName));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"[DeleteFile]  Exception: {e}");
+            }
 
         }
 
         /// <summary>
         /// 是否存在指定 Bucket
         /// </summary>
-        private async Task<bool> IsExistBucket(string bucketName)
+        public async Task<bool> IsExistBucket(string bucketName)
         {
             try
             {

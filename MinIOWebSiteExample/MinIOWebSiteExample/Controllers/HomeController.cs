@@ -1,7 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Minio.DataModel.Args;
 using MinIOWebSiteExample.Service;
-using System.Security.AccessControl;
 
 namespace MinIOWebSiteExample.Controllers
 {
@@ -16,12 +14,18 @@ namespace MinIOWebSiteExample.Controllers
             _teacherManageService = teacherManageService;
         }
 
+        /// <summary>
+        /// 頁面資料
+        /// </summary>
         public IActionResult Index()
         {
             var getResult = (_teacherManageService.GetTeachers()).Result;
-            return View();
+            return View(getResult);
         }
 
+        /// <summary>
+        /// 上傳單一檔案
+        /// </summary>        
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile file, string bucketName)
         {
@@ -29,6 +33,9 @@ namespace MinIOWebSiteExample.Controllers
             return Ok("上傳成功");
         }
 
+        /// <summary>
+        /// 下載單一檔案
+        /// </summary>        
         [HttpGet]
         public async Task<IActionResult> DownloadFile(string fileName, string bucketName)
         {
@@ -44,9 +51,34 @@ namespace MinIOWebSiteExample.Controllers
             return BadRequest(new { message = $@"Cannot download file {fileName}." });
         }
 
-        public IActionResult Privacy()
+        /// <summary>
+        /// 刪除單一檔案
+        /// </summary>        
+        [HttpGet]
+        public async Task<IActionResult> DeleteFile(string fileName, string bucketName)
         {
-            return View();
+            await _teacherManageService.DeleteFile(fileName, bucketName);
+            return Ok($@"{fileName} 已刪除");
+        }
+
+        /// <summary>
+        /// 刪除帳號
+        /// </summary>        
+        [HttpGet]
+        public async Task<IActionResult> DeleteAccount(long Id)
+        {
+            await _teacherManageService.DeleteAccount(Id);
+            return Ok(new { message = $@"教師已刪除 ID：{Id}" });
+        }
+
+        /// <summary>
+        /// 新建帳號
+        /// </summary>        
+        [HttpGet]
+        public async Task<IActionResult> CreateAccount()
+        {
+            var createdId = await _teacherManageService.CreateAccount();
+            return Ok(new { message = $@"教師帳號已建立 ID:{createdId}" });
         }
     }
 }

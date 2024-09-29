@@ -9,5 +9,11 @@ namespace MinIOWebSiteExample.Service
         Task<MemoryStream> DownloadFile(string fileName, string bucketName);
 
         Task UploadFile(IFormFile file, string bucketName);
+
+        Task DeleteFile(string fileName, string bucketName);
+
+        Task<long> CreateAccount();
+
+        Task DeleteAccount(long id);
     }
 }

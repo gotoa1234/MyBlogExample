@@ -5,14 +5,16 @@ using Example.Common.MinIO.Model;
 using MinIOWebSiteExample.Service;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// 1. 注入相依 - MinIO 皆為單例
 builder.Services.AddSingleton<IMinIOClientFactory, MinIOClientFactory>();
 builder.Services.AddSingleton<FakeDataBase>();
-builder.Services.AddScoped<ITeacherManageService, TeacherManageService>();
 builder.Services.AddSingleton<MinIOClientInstance>();
 builder.Services.AddSingleton<MinIOConnectionModel>();
+
+// 2. 注入相依 - Service 為 Scoped
+builder.Services.AddScoped<ITeacherManageService, TeacherManageService>();
 
 var app = builder.Build();
 

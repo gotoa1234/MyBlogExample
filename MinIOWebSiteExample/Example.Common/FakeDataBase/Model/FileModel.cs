@@ -5,7 +5,7 @@
         /// <summary>
         /// 桶名稱
         /// </summary>
-        public string BucketName { get; set; }
+        public string BucketName { get; set; } = string.Empty;
 
         /// <summary>
         /// 檔案清單
@@ -18,7 +18,7 @@
         /// <summary>
         /// 檔案名稱
         /// </summary>
-        public string FileName { get; set; }
+        public string FileName { get; set; } = string.Empty;
 
         /// <summary>
         /// 檔案大小
@@ -59,6 +59,6 @@
         /// <summary>
         /// 副檔名
         /// </summary>
-        public string FileExtension { get; set; }
+        public string FileExtension { get; set; } = string.Empty;
     }
 }

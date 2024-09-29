@@ -1,73 +1,114 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-}
-
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
-
-<!-- Views/FileUpload/Index.cshtml -->
+﻿@model IEnumerable<Example.Common.FakeDataBase.Model.TeacherModel>
 @{
-    ViewData["Title"] = "File Upload";
+    ViewData["Title"] = "MinIO CRUD Example Page";
 }
 
-<h2>File Upload</h2>
-
-<form id="uploadForm" enctype="multipart/form-data">
-    <input type="file" id="fileInput" name="file" />
-    <button type="submit">Upload</button>
-</form>
-
-<div id="uploadResult"></div>
-
-<!-- 下載按鈕 -->
-<button id="downloadButton" onclick="downloadFile()">Download File</button>
-
+<div id="teachersContainer">
+    @await Html.PartialAsync("_TeachersPartial", Model)
+</div>
 
 @section Scripts {
     <script>
-        document.getElementById('uploadForm').addEventListener('submit', async function (event) {
-            event.preventDefault();
+        // 1. Upload File
+        document.querySelectorAll('.uploadForm').forEach(function (form) 
+        {
+            form.addEventListener('submit', async function (event) {
+                event.preventDefault();
+                debugger;
+                const formData = new FormData(form);
+                const bucketName = form.getAttribute('data-bucket');
+                formData.append('bucketName', bucketName);
 
-            const formData = new FormData();
-            const fileInput = document.getElementById('fileInput');
-            formData.append('file', fileInput.files[0]);
-            formData.append('bucketName', "ttt");
+                try {
+                    const response = await fetch('/Home/UploadFile', {
+                        method: 'POST',
+                        body: formData
+                    });
 
-            const response = await fetch('/Home/UploadFile', {
-                method: 'POST',
-                body: formData
+                    if (!response.ok) {
+                        throw new Error('上傳失敗');
+                    }
+                    alert("上傳成功");
+                    location.reload();
+                } catch (error) {
+                    const uploadResultDiv = form.nextElementSibling;
+                    uploadResultDiv.innerText = `上傳時發生錯誤: ${error.message}`;
+                }
             });
-
-            const result = await response.json();
-            document.getElementById('uploadResult').innerText = `File uploaded to: ${result.filePath}`;
         });
 
-        function downloadFile() {
-            const fileName = 'MyTestIcon.png';//document.getElementById('fileName').value;
-            const bucketName = 'ttt';
+        // 2. Download File
+        function downloadFile(bucketName, fileName) {            
             // 呼叫 API 下載文件
             fetch(`/Home/downloadfile?fileName=${encodeURIComponent(fileName)}&bucketName=${encodeURIComponent(bucketName)}`)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('File not found or server error.');
                     }
-                    return response.blob();  // 轉換為 Blob 形式
+                    return response.blob();// 轉換為 Blob 形式
                 })
                 .then(blob => {
                     // 創建一個隱藏的 <a> 元素來下載文件
                     const url = window.URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = fileName; // 設置下載的文件名
-                    document.body.appendChild(a);
-                    a.click(); // 模擬點擊下載
-                    a.remove(); // 下載完成後移除 <a> 元素
+                    const aDom = document.createElement('a');
+                    aDom.href = url;
+                    aDom.download = fileName;// 設置下載的文件名
+                    document.body.appendChild(aDom);
+                    aDom.click();//  模擬點擊下載
+                    aDom.remove();// 下載完成後移除 <a> 元素
                 })
                 .catch(error => {
                     console.error('Download error:', error);
                     alert('Error downloading file: ' + error.message);
+                });
+        }
+
+        // 3. Delete File
+        function deleteFile(bucketName, fileName) {
+            fetch(`/Home/DeleteFile?fileName=${encodeURIComponent(fileName)}&bucketName=${encodeURIComponent(bucketName)}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('File not found or server error.');
+                    }
+                    // 刷新頁面
+                    alert(fileName + ' 刪除成功!');
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Delete error:', error);
+                    alert('Delete file Error: ' + error.message);
+                });
+        }
+
+        // 4. Delete Account
+        function deleteAccount(Id) {            
+            fetch(`/Home/DeleteAccount?Id=${encodeURIComponent(Id)}`)
+                .then(response => {                                        
+                    return response.json();
+                })
+                .then(data => {                    
+                    alert(data.message);
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Delete Account error:', error);
+                    alert('Delete Account Error: ' + error.message);
+                });
+        }
+
+        // 5. Create Account
+        function createAccount() {            
+            fetch(`/Home/CreateAccount`)
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {                    
+                    alert(data.message);
+                    location.reload();
+                })
+                .catch(error => {
+                    console.error('Create Account error:', error);
+                    alert('Create Account Error: ' + error.message);
                 });
         }
     </script>

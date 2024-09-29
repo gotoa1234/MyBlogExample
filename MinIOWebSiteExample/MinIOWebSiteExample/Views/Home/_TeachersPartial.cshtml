@@ -1,0 +1,74 @@
+﻿@model IEnumerable<Example.Common.FakeDataBase.Model.TeacherModel>
+
+<div>
+    <div>
+        <button id="createAccountButton" onclick="createAccount()">新增帳號</button>
+    </div>
+    @foreach (var item in Model)
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>姓名</th>
+                    <th>上傳操作</th>
+                    <th>刪除帳號</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>@item.Id</td>
+                    <td>@item.Name</td>
+                    <td>
+                        <!-- 上傳表單 -->
+                        <form class="uploadForm" enctype="multipart/form-data" data-bucket="@item.Id">
+                            <input type="file" name="file" required />
+                            <button type="submit">執行上傳</button>
+                        </form>
+                        <div class="uploadResult"></div>
+                    </td>
+                    <td>
+                        <button id="deleteAccountButton_@item.Id" onclick="deleteAccount('@item.Id')">刪除帳號</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>檔案名稱</th>
+                                    <th>檔案大小</th>
+                                    <th>副檔名</th>
+                                    <th>最後更新時間</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var file in item.MySelfFiles.Files)
+                                {
+                                    <tr>
+                                        <td>@file.FileName</td>
+                                        <td>@file.ShowSize</td>
+                                        <td>@file.FileExtension</td>
+                                        <td>@file.LastUpdateTime</td>
+                                        <td>
+                                            <!-- 下載按鈕 -->
+                                            <button id="downloadButton_@file.FileName" onclick="downloadFile('@item.Id', '@file.FileName')">下載</button>
+                                            <!-- 刪除按鈕 -->
+                                            <button id="deleteButton_@file.FileName" onclick="deleteFile('@item.Id', '@file.FileName')">刪除</button>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+    }
+</div>

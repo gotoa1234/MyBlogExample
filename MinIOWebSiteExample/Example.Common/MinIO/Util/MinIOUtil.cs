@@ -15,6 +15,5 @@ namespace Example.Common.MinIO.Util
             result.SecretKey = minIOParam?.SecretKey ?? string.Empty;
             return result;
         }   
-
     }
 }
