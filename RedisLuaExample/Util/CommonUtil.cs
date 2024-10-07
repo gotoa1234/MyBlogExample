@@ -1,7 +1,1807 @@
-﻿namespace RedisLuaExample.Util
+﻿using System.IO.Compression;
+using System.Text;
+
+namespace RedisLuaExample.Util
 {
     public static class CommonUtil
     {
+        /// <summary>
+        /// 壓縮 Json 工具
+        /// </summary>
+        public static byte[] Compress(string str)
+        {
+            var bytes = Encoding.UTF8.GetBytes(str);
+            using (var msi = new MemoryStream(bytes))
+            using (var mso = new MemoryStream())
+            {
+                using (var gs = new GZipStream(mso, CompressionMode.Compress))
+                {
+                    msi.CopyTo(gs);
+                }
+                return mso.ToArray();
+            }
+        }
+
+        public static string GetFormalJson = """
+{
+  "Data": {
+  "Level": 0,
+  "IsReadOnly": true,
+  "IsAllowPause": true,
+  "IsAllowSell": false,
+  "IsAllowOuterSell": true,
+  "HoldSellMoney": 0,
+  "HandicapIds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
+  "ProxyList": [
+    {
+      "Key": 2001,
+      "Value": "company1"
+    },
+    {
+      "Key": 2002,
+      "Value": "company2"
+    },
+    {
+      "Key": 2013,
+      "Value": "mimir0"
+    },
+    {
+      "Key": 2016,
+      "Value": "rickco2"
+    },
+    {
+      "Key": 2018,
+      "Value": "rockycom1"
+    },
+    {
+      "Key": 2019,
+      "Value": "james99"
+    },
+    {
+      "Key": 2026,
+      "Value": "rickyco1"
+    },
+    {
+      "Key": 2036,
+      "Value": "blueco1"
+    },
+    {
+      "Key": 2048,
+      "Value": "henrycom33"
+    },
+    {
+      "Key": 2049,
+      "Value": "henrycom88"
+    },
+    {
+      "Key": 2056,
+      "Value": "samt1"
+    },
+    {
+      "Key": 2057,
+      "Value": "samt2"
+    },
+    {
+      "Key": 2062,
+      "Value": "maxcom01"
+    },
+    {
+      "Key": 2068,
+      "Value": "peterchiu11"
+    },
+    {
+      "Key": 2072,
+      "Value": "ppp001"
+    },
+    {
+      "Key": 2074,
+      "Value": "joy01"
+    },
+    {
+      "Key": 2075,
+      "Value": "rockycom2"
+    },
+    {
+      "Key": 2101,
+      "Value": "rockycomp3"
+    },
+    {
+      "Key": 2107,
+      "Value": "sc000"
+    },
+    {
+      "Key": 2115,
+      "Value": "neilc01"
+    },
+    {
+      "Key": 2118,
+      "Value": "zc001"
+    },
+    {
+      "Key": 2138,
+      "Value": "peterchiu12"
+    },
+    {
+      "Key": 2139,
+      "Value": "joy02"
+    },
+    {
+      "Key": 2151,
+      "Value": "bluev2co1"
+    },
+    {
+      "Key": 2157,
+      "Value": "rex_lv1"
+    },
+    {
+      "Key": 2161,
+      "Value": "petertest1"
+    },
+    {
+      "Key": 2167,
+      "Value": "louistestc1"
+    },
+    {
+      "Key": 2169,
+      "Value": "companyv2"
+    },
+    {
+      "Key": 2195,
+      "Value": "xer_lv1"
+    },
+    {
+      "Key": 2199,
+      "Value": "louistest04"
+    },
+    {
+      "Key": 2200,
+      "Value": "louistest005"
+    },
+    {
+      "Key": 2201,
+      "Value": "nbackend01"
+    },
+    {
+      "Key": 2203,
+      "Value": "louistest006"
+    },
+    {
+      "Key": 2204,
+      "Value": "louistest007"
+    },
+    {
+      "Key": 2206,
+      "Value": "louistest008"
+    },
+    {
+      "Key": 2207,
+      "Value": "louistest009"
+    },
+    {
+      "Key": 2208,
+      "Value": "louistest010"
+    },
+    {
+      "Key": 2209,
+      "Value": "rickco3333"
+    },
+    {
+      "Key": 2210,
+      "Value": "rickco444"
+    },
+    {
+      "Key": 2211,
+      "Value": "rickco2221"
+    },
+    {
+      "Key": 2212,
+      "Value": "samt9"
+    },
+    {
+      "Key": 2215,
+      "Value": "joy03"
+    },
+    {
+      "Key": 2750,
+      "Value": "joy04"
+    },
+    {
+      "Key": 2752,
+      "Value": "peterchiu999"
+    },
+    {
+      "Key": 2753,
+      "Value": "jtest099"
+    },
+    {
+      "Key": 2754,
+      "Value": "rickco222"
+    },
+    {
+      "Key": 2777,
+      "Value": "joy05"
+    },
+    {
+      "Key": 2788,
+      "Value": "peterchiu13"
+    },
+    {
+      "Key": 2847,
+      "Value": "maxcom02"
+    },
+    {
+      "Key": 2855,
+      "Value": "rickccc1"
+    },
+    {
+      "Key": 2866,
+      "Value": "louiscutest1"
+    },
+    {
+      "Key": 2867,
+      "Value": "louiscutest2"
+    },
+    {
+      "Key": 2869,
+      "Value": "louistest999"
+    },
+    {
+      "Key": 2871,
+      "Value": "jamesnew99"
+    },
+    {
+      "Key": 2876,
+      "Value": "evancomp011"
+    },
+    {
+      "Key": 2892,
+      "Value": "evancomp201"
+    },
+    {
+      "Key": 2894,
+      "Value": "sc000_c1"
+    },
+    {
+      "Key": 2903,
+      "Value": "neilc02"
+    },
+    {
+      "Key": 2907,
+      "Value": "rickmcom1"
+    },
+    {
+      "Key": 2927,
+      "Value": "rickcom41"
+    },
+    {
+      "Key": 2928,
+      "Value": "rickcom411"
+    },
+    {
+      "Key": 2929,
+      "Value": "neilc03"
+    },
+    {
+      "Key": 2942,
+      "Value": "sc000_c2"
+    },
+    {
+      "Key": 2950,
+      "Value": "rockycom4"
+    },
+    {
+      "Key": 2963,
+      "Value": "rickcu2"
+    },
+    {
+      "Key": 2974,
+      "Value": "ricocom4"
+    },
+    {
+      "Key": 2978,
+      "Value": "rickcom21"
+    },
+    {
+      "Key": 3028,
+      "Value": "neilc05"
+    },
+    {
+      "Key": 3065,
+      "Value": "joy06"
+    },
+    {
+      "Key": 3080,
+      "Value": "tommy1"
+    },
+    {
+      "Key": 3214,
+      "Value": "marcus_co1"
+    },
+    {
+      "Key": 3217,
+      "Value": "t1company"
+    },
+    {
+      "Key": 3233,
+      "Value": "test0001"
+    },
+    {
+      "Key": 3234,
+      "Value": "test0002"
+    },
+    {
+      "Key": 3274,
+      "Value": "tt888"
+    },
+    {
+      "Key": 3280,
+      "Value": "tt999"
+    },
+    {
+      "Key": 3281,
+      "Value": "tt777"
+    },
+    {
+      "Key": 3282,
+      "Value": "tt666"
+    },
+    {
+      "Key": 3283,
+      "Value": "tt555"
+    },
+    {
+      "Key": 3284,
+      "Value": "tt444"
+    },
+    {
+      "Key": 3285,
+      "Value": "tt333"
+    },
+    {
+      "Key": 3286,
+      "Value": "tt222"
+    },
+    {
+      "Key": 3290,
+      "Value": "tt111"
+    },
+    {
+      "Key": 3291,
+      "Value": "hank01"
+    },
+    {
+      "Key": 3295,
+      "Value": "louistest011"
+    },
+    {
+      "Key": 3296,
+      "Value": "louistest012"
+    },
+    {
+      "Key": 3297,
+      "Value": "louistest013"
+    },
+    {
+      "Key": 3298,
+      "Value": "louistest014"
+    }
+  ],
+  "MainData": {
+    "LastDrawPeriodNo": 20240926270,
+    "CurrentPeriod": {
+      "PeriodNo": 20240930274,
+      "PeriodStatus": 2,
+      "IsOpened": false,
+      "IsClosed": true,
+      "IsDrawed": false,
+      "IsSettled": false,
+      "StopCountDown": 0,
+      "CloseCountDown": 0,
+      "DrawCountDown": 0
+    },
+    "SumMoney": [
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0,
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ],
+      [
+        0
+      ]
+    ],
+    "TotalStatData": [
+      {
+        "BetNo": 1,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 2,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 3,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 4,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 5,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 6,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 7,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 8,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 9,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 10,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 11,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 12,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 13,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 14,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 15,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 16,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 17,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 18,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 19,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 20,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 21,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 22,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 23,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 24,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 25,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 26,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 27,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 28,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 29,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 30,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 31,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 32,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 33,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 34,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 35,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 36,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 37,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 38,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 39,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 40,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 41,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 42,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 43,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 44,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 45,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 46,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 47,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 48,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      },
+      {
+        "BetNo": 49,
+        "HoldMoney": 0,
+        "MaxLose": 0,
+        "SellMoney": 0
+      }
+    ],
+    "OddsData": [
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 1,
+        "BetNo": 171101,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 2,
+        "BetNo": 171102,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 3,
+        "BetNo": 171103,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 4,
+        "BetNo": 171104,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 5,
+        "BetNo": 171105,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 6,
+        "BetNo": 171106,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 7,
+        "BetNo": 171107,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 8,
+        "BetNo": 171108,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 9,
+        "BetNo": 171109,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 10,
+        "BetNo": 171110,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 11,
+        "BetNo": 171111,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 12,
+        "BetNo": 171112,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 13,
+        "BetNo": 171113,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 14,
+        "BetNo": 171114,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 15,
+        "BetNo": 171115,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 16,
+        "BetNo": 171116,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 17,
+        "BetNo": 171117,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 18,
+        "BetNo": 171118,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 19,
+        "BetNo": 171119,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 20,
+        "BetNo": 171120,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 21,
+        "BetNo": 171121,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 22,
+        "BetNo": 171122,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 23,
+        "BetNo": 171123,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 24,
+        "BetNo": 171124,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 25,
+        "BetNo": 171125,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 26,
+        "BetNo": 171126,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 27,
+        "BetNo": 171127,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 28,
+        "BetNo": 171128,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 29,
+        "BetNo": 171129,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 30,
+        "BetNo": 171130,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 31,
+        "BetNo": 171131,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 32,
+        "BetNo": 171132,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 33,
+        "BetNo": 171133,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 34,
+        "BetNo": 171134,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 35,
+        "BetNo": 171135,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 36,
+        "BetNo": 171136,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 37,
+        "BetNo": 171137,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 38,
+        "BetNo": 171138,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 39,
+        "BetNo": 171139,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 40,
+        "BetNo": 171140,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 41,
+        "BetNo": 171141,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 42,
+        "BetNo": 171142,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 43,
+        "BetNo": 171143,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 44,
+        "BetNo": 171144,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 45,
+        "BetNo": 171145,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 46,
+        "BetNo": 171146,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 47,
+        "BetNo": 171147,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 48,
+        "BetNo": 171148,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1711,
+        "BetItemId": 49,
+        "BetNo": 171149,
+        "IsPaused": false,
+        "Odds1": 42.45,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1720,
+        "BetItemId": 1,
+        "BetNo": 172001,
+        "IsPaused": false,
+        "Odds1": 1.989,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1720,
+        "BetItemId": 2,
+        "BetNo": 172002,
+        "IsPaused": false,
+        "Odds1": 1.989,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1730,
+        "BetItemId": 1,
+        "BetNo": 173001,
+        "IsPaused": false,
+        "Odds1": 1.989,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1730,
+        "BetItemId": 2,
+        "BetNo": 173002,
+        "IsPaused": false,
+        "Odds1": 1.989,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1740,
+        "BetItemId": 1,
+        "BetNo": 174001,
+        "IsPaused": false,
+        "Odds1": 1.989,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1740,
+        "BetItemId": 2,
+        "BetNo": 174002,
+        "IsPaused": false,
+        "Odds1": 1.989,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1750,
+        "BetItemId": 1,
+        "BetNo": 175001,
+        "IsPaused": false,
+        "Odds1": 2.857,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1750,
+        "BetItemId": 2,
+        "BetNo": 175002,
+        "IsPaused": false,
+        "Odds1": 3.041,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1750,
+        "BetItemId": 3,
+        "BetNo": 175003,
+        "IsPaused": false,
+        "Odds1": 3.041,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1760,
+        "BetItemId": 1,
+        "BetNo": 176001,
+        "IsPaused": false,
+        "Odds1": 1.989,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1760,
+        "BetItemId": 2,
+        "BetNo": 176002,
+        "IsPaused": false,
+        "Odds1": 1.989,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1770,
+        "BetItemId": 1,
+        "BetNo": 177001,
+        "IsPaused": false,
+        "Odds1": 12.16,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1770,
+        "BetItemId": 2,
+        "BetNo": 177002,
+        "IsPaused": false,
+        "Odds1": 12.16,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1770,
+        "BetItemId": 3,
+        "BetNo": 177003,
+        "IsPaused": false,
+        "Odds1": 12.16,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1770,
+        "BetItemId": 4,
+        "BetNo": 177004,
+        "IsPaused": false,
+        "Odds1": 12.16,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1770,
+        "BetItemId": 5,
+        "BetNo": 177005,
+        "IsPaused": false,
+        "Odds1": 9.72,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1770,
+        "BetItemId": 6,
+        "BetNo": 177006,
+        "IsPaused": false,
+        "Odds1": 12.16,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1770,
+        "BetItemId": 7,
+        "BetNo": 177007,
+        "IsPaused": false,
+        "Odds1": 12.16,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1770,
+        "BetItemId": 8,
+        "BetNo": 177008,
+        "IsPaused": false,
+        "Odds1": 12.16,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1770,
+        "BetItemId": 9,
+        "BetNo": 177009,
+        "IsPaused": false,
+        "Odds1": 12.16,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1770,
+        "BetItemId": 10,
+        "BetNo": 177010,
+        "IsPaused": false,
+        "Odds1": 12.16,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1770,
+        "BetItemId": 11,
+        "BetNo": 177011,
+        "IsPaused": false,
+        "Odds1": 12.16,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      },
+      {
+        "BetTypeId": 1770,
+        "BetItemId": 12,
+        "BetNo": 177012,
+        "IsPaused": false,
+        "Odds1": 12.16,
+        "Odds2": null,
+        "HoldMoney": 0,
+        "MaxLoss": 0,
+        "CompanyOdds1": 0,
+        "CompanyOdds2": null,
+        "SellMoney": 0,
+        "LimitMoney": 5000
+      }
+    ],
+    "PausedStatus": {
+      "IsPausedSpecialStatus": true,
+      "IsPausedNonSpecialStatus": true,
+      "PausedBetTypeIds": []
+    },
+    "OthersData": {
+      "Level": 0,
+      "IsAllowSell": false,
+      "IsAllowOuterSell": false,
+      "Datas": null,
+      "PageIndex": 1,
+      "PageSize": 30,
+      "RecordCount": 0,
+      "PageCount": 1
+    },
+    "InnerSellBetStatus": null
+  }
+},
+  "Status": 1
+}
+""";
+
+
         public static string GetTestJSon = $@"
 {{
   ""tribe"": ""raw"",
