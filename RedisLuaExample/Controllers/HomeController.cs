@@ -2,11 +2,20 @@ using Microsoft.AspNetCore.Mvc;
 using RedisLuaExample.Util;
 using StackExchange.Redis;
 using System.Diagnostics;
+using System.Net.Http.Headers;
+using System.Net;
+using System.Text;
+using OpenQA.Selenium.Chrome;
+using OpenQA.Selenium;
+using OpenQA.Selenium.BiDi.Modules.Network;
 
 namespace RedisLuaExample.Controllers
 {
     public class HomeController : Controller
     {
+      
+
+
         private readonly ILogger<HomeController> _logger;
         private readonly IConnectionMultiplexer _redis;
 
@@ -17,11 +26,15 @@ namespace RedisLuaExample.Controllers
             _redis = redisDb;
         }
 
-        public IActionResult Index()
+        /// <summary>
+        /// 頁面資料
+        /// </summary>
+        public async Task<IActionResult> Index()
         {
-            MultiExecExample();
+            MultiExecTrancationExample();
             return View();
-        }  
+        }
+        
 
         private void LuaExample()
         {
@@ -29,7 +42,40 @@ namespace RedisLuaExample.Controllers
 
         }
 
-        private void MultiExecExample()
+        private void MultiExecPipelineExample()
+        {
+            var db = _redis.GetDatabase();
+
+            var insertDatas = GenerateMillionDatas(1000);
+            var sw = new Stopwatch();
+
+            try
+            {
+                sw.Start();
+                var batchSize = 100;
+                for (int i = 0; i < insertDatas.Count(); i += batchSize)
+                {
+                    var transaction = db.CreateTransaction();
+                    var batch = insertDatas.Skip(i).Take(batchSize);
+                    foreach (var item in batch)
+                    {
+                        transaction.HashSetAsync(item.RedisKey, item.HashKey, item.Data);
+                    }
+                    // 提交事務
+                    bool committed = transaction.Execute();
+                    Console.WriteLine(committed ? $"Batch starting at {i} committed." : $"Batch starting at {i} failed.");
+                }
+                sw.Stop();
+                var timeMessage = $@"[Pipeline] {insertDatas.Count()} 筆資料 - 總計花費時間：{sw.Elapsed.TotalSeconds} 秒";
+                Console.WriteLine(timeMessage);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void MultiExecTrancationExample()
         { 
             var db = _redis.GetDatabase();
 
@@ -77,7 +123,7 @@ namespace RedisLuaExample.Controllers
                     {
                         HashKey = $@"{index}",
                         RedisKey = redisKey,
-                        Data = CommonUtil.GetTestJSon
+                        Data = "{ 'louis': 123}"// CommonUtil.GetTestJSon
                     });
                 }
             }
