@@ -1,22 +1,25 @@
-using StackExchange.Redis;
+using MySql.Data.MySqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. [¥[¤Jµ²ºc¤Æ¡B­p¶q¡B°lÂÜ] Aspire ­n¯à¥iÆ[¹î¦¹±M®×¡A»İ­n¼W¥[¥H¤UªA°È
+// 1. [åŠ å…¥çµæ§‹åŒ–ã€è¨ˆé‡ã€è¿½è¹¤] Aspire è¦èƒ½å¯è§€å¯Ÿæ­¤å°ˆæ¡ˆï¼Œéœ€è¦å¢åŠ ä»¥ä¸‹æœå‹™
 builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// ª`¤JRedis³s±µ¦r²Å¦ê
-var redisConnectionString = builder.Configuration.GetSection("ConnectionStrings:RedisDb").Value;
-
-builder.Services.AddSingleton<IConnectionMultiplexer>(provider =>
-{        
-    return ConnectionMultiplexer.Connect(ConfigurationOptions.Parse(redisConnectionString));
+// ä¾è³´æ³¨å…¥ MySQL é€£ç·šæœå‹™
+builder.Services.AddTransient<MySqlConnection>(sp =>
+{
+    // è®€å– ConnectionStringï¼Œä¸¦è¨­å®š MySQL DbContext
+    var connectionString = builder.Configuration.GetConnectionString("MySqlConnection");
+    return new MySqlConnection(connectionString);
 });
 
 var app = builder.Build();
+
+// 2. [åŠ å…¥çµæ§‹åŒ–ã€è¨ˆé‡ã€è¿½è¹¤] Aspire è¦èƒ½å¯è§€å¯Ÿæ­¤å°ˆæ¡ˆï¼Œéœ€è¦å¢åŠ ä»¥ä¸‹æœå‹™
+app.MapDefaultEndpoints();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -37,9 +40,4 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// 2. [¥[¤Jµ²ºc¤Æ¡B­p¶q¡B°lÂÜ] Aspire ­n¯à¥iÆ[¹î¦¹±M®×¡A»İ­n¼W¥[¥H¤UªA°È
-app.MapDefaultEndpoints();
-
 app.Run();
-
-

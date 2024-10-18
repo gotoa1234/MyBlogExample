@@ -3,56 +3,81 @@ using Microsoft.Extensions.Hosting;
 
 var builder = DistributedApplication.CreateBuilder(args);
 
-// 1. ¨ú±oªA°È±Ò°Ê³]©w
+// 1. å–å¾—æœå‹™å•Ÿå‹•è¨­å®š
 var serviceSettings = builder.Configuration
     .GetSection("ServiceSettings")
     .Get<Dictionary<string, bool>>();
 
-// ­YµL°t¸mÀÉ®× - ¥iª½±µÃö³¬
+// è‹¥ç„¡é…ç½®æª”æ¡ˆ - å¯ç›´æ¥é—œé–‰
 if (serviceSettings == null)
     return;
 
-#region 2. ¨Ì·Ó³]©w±Ò°ÊªA°È - ¨Ã¥BºÊ±±
+#region 2. ä¾ç…§è¨­å®šå•Ÿå‹•æœå‹™ - ä¸¦ä¸”ç›£æ§
 
-// ¤èªk³B²z MinIO ªA°È
+// æ–¹æ³•è™•ç† MinIO æœå‹™
 HandleMinIOForm(builder, serviceSettings);
 
-// ¤èªk³B²z Redis ªA°È
+// æ–¹æ³•è™•ç† Redis æœå‹™
 HandleRedisConnection(builder, serviceSettings);
 
 #endregion 
 
+builder.AddProject<Projects.MysqlConnectionExample>("mysqlconnectionexample");
+
 builder.Build().Run();
 
 
-// ¤èªk¡G2-1. ³B²z MinIO ªí³æ
+// æ–¹æ³•ï¼š2-1. è™•ç† MinIO è¡¨å–®
 void HandleMinIOForm(IDistributedApplicationBuilder builder, Dictionary<string, bool> settings)
 {
-    // Åv­­¶}±Ò¤~±Ò°ÊÆ[¹î
+    // æ¬Šé™é–‹å•Ÿæ‰å•Ÿå‹•è§€å¯Ÿ
     if (settings.TryGetValue("MinIOFormExample", out bool startMinIO) && startMinIO)
     {       
         builder.AddProject<Projects.MinIOFormExample>("minioformexample");
     }
 }
 
-// ¤èªk¡G2-2. ³B²z Redis ³s±µ
+// æ–¹æ³•ï¼š2-2. è™•ç† Redis é€£æ¥
 void HandleRedisConnection(IDistributedApplicationBuilder builder, Dictionary<string, bool> settings)
 {
-    // Åv­­¶}±Ò¤~±Ò°ÊÆ[¹î
+    // æ¬Šé™é–‹å•Ÿæ‰å•Ÿå‹•è§€å¯Ÿ
     if (settings.TryGetValue("StartRedisConnectionExample", out bool startRedis) && startRedis)
     {
-        // ¥Ü·N - ­YÀô¹Ò¬° Development ®É¡A±Ò°Ê¶}µoÀô¹Òªº Redis ³s±µ
-        if (builder.Environment.IsDevelopment())
+        // ç¤ºæ„ - è‹¥ç’°å¢ƒç‚º Development æ™‚ï¼Œå•Ÿå‹•é–‹ç™¼ç’°å¢ƒçš„ Redis é€£æ¥
+        if (!builder.Environment.IsDevelopment())
         {
             var redis = builder.AddConnectionString("RedisDb");
             builder.AddProject<Projects.RedisConnectionExample>("redisconnectionexample")
                    .WithReference(redis);
         }
-        else// ¥Ü·N - ­Y¨ä¥L±¡ªp¤U¡A¥i¥H¨Ï¥Î®e¾¹¤Æªº Redis ³s±µ
+        else// ç¤ºæ„ - è‹¥å…¶ä»–æƒ…æ³ä¸‹ï¼Œå¯ä»¥ä½¿ç”¨å®¹å™¨åŒ–çš„ Redis é€£æ¥
         {
             var redis = builder.AddRedis("RedisDb");
             builder.AddProject<Projects.RedisConnectionExample>("redisconnectionexample")
                    .WithReference(redis);
+        }
+    }
+}
+
+
+// æ–¹æ³•ï¼š2-3. è™•ç† Mysql é€£æ¥
+void HandleMysqlConnection(IDistributedApplicationBuilder builder, Dictionary<string, bool> settings)
+{
+    // æ¬Šé™é–‹å•Ÿæ‰å•Ÿå‹•è§€å¯Ÿ
+    if (settings.TryGetValue("StartMysqlConnectionExample", out bool startRedis) && startRedis)
+    {
+        // ç¤ºæ„ - è‹¥ç’°å¢ƒç‚º Development æ™‚ï¼Œå•Ÿå‹•é–‹ç™¼ç’°å¢ƒçš„ Mysql é€£æ¥
+        if (!builder.Environment.IsDevelopment())
+        {
+            var mysql = builder.AddConnectionString("MySqlConnection");
+            builder.AddProject<Projects.MysqlConnectionExample>("mysqlconnectionexample")
+                   .WithReference(mysql);
+        }
+        else// ç¤ºæ„ - è‹¥å…¶ä»–æƒ…æ³ä¸‹ï¼Œå¯ä»¥ä½¿ç”¨å®¹å™¨åŒ–çš„ Mysql é€£æ¥
+        {
+            var mysql = builder.AddMySql("MySqlConnection");
+            builder.AddProject<Projects.MysqlConnectionExample>("mysqlconnectionexample")
+                   .WithReference(mysql);
         }
     }
 }

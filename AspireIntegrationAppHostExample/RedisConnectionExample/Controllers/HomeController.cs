@@ -75,5 +75,23 @@ namespace RedisConnectionExample.Controllers
             _logger.LogDebug(message);
             return message;
         }
+        
+        /// <summary>
+        /// 追蹤 - 測試 HttpGet
+        /// </summary>        
+        [HttpGet]
+        public IActionResult GetRedisConnection(string inputStr)
+        {
+            return Ok($@"{RedisConnection()} 傳入參數 : {inputStr}");
+        }
+
+        /// <summary>
+        /// 追蹤 - 測試拋錯
+        /// </summary>
+        [HttpGet]
+        public IActionResult GetTestThrowException()
+        {
+            throw new Exception("測試例外");            
+        }
     }
 }
