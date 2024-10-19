@@ -37,7 +37,7 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// 2. [加入結構化、計量、追蹤] Aspire 要能可觀察此專案，需要增加以下服務
+//// 2. [加入結構化、計量、追蹤] Aspire 要能可觀察此專案，需要增加以下服務
 app.MapDefaultEndpoints();
 
 app.Run();

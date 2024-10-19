@@ -17,15 +17,15 @@ if (serviceSettings == null)
 // 方法處理 MinIO 服務
 HandleMinIOForm(builder, serviceSettings);
 
-// 方法處理 Redis 服務
+// 方法處理 Redis Web測試網站
 HandleRedisConnection(builder, serviceSettings);
 
+// 方法處理 Mysql Web測試網站
+HandleMysqlConnection(builder, serviceSettings);
+    
 #endregion 
 
-builder.AddProject<Projects.MysqlConnectionExample>("mysqlconnectionexample");
-
 builder.Build().Run();
-
 
 // 方法：2-1. 處理 MinIO 表單
 void HandleMinIOForm(IDistributedApplicationBuilder builder, Dictionary<string, bool> settings)
@@ -44,21 +44,20 @@ void HandleRedisConnection(IDistributedApplicationBuilder builder, Dictionary<st
     if (settings.TryGetValue("StartRedisConnectionExample", out bool startRedis) && startRedis)
     {
         // 示意 - 若環境為 Development 時，啟動開發環境的 Redis 連接
-        if (!builder.Environment.IsDevelopment())
+        if (builder.Environment.IsDevelopment())
         {
             var redis = builder.AddConnectionString("RedisDb");
-            builder.AddProject<Projects.RedisConnectionExample>("redisconnectionexample")
+            builder.AddProject<Projects.RedisConnectionWebExample>("redisconnectionexample")
                    .WithReference(redis);
         }
         else// 示意 - 若其他情況下，可以使用容器化的 Redis 連接
         {
             var redis = builder.AddRedis("RedisDb");
-            builder.AddProject<Projects.RedisConnectionExample>("redisconnectionexample")
+            builder.AddProject<Projects.RedisConnectionWebExample>("redisconnectionexample")
                    .WithReference(redis);
         }
     }
 }
-
 
 // 方法：2-3. 處理 Mysql 連接
 void HandleMysqlConnection(IDistributedApplicationBuilder builder, Dictionary<string, bool> settings)
@@ -67,16 +66,16 @@ void HandleMysqlConnection(IDistributedApplicationBuilder builder, Dictionary<st
     if (settings.TryGetValue("StartMysqlConnectionExample", out bool startRedis) && startRedis)
     {
         // 示意 - 若環境為 Development 時，啟動開發環境的 Mysql 連接
-        if (!builder.Environment.IsDevelopment())
-        {
-            var mysql = builder.AddConnectionString("MySqlConnection");
-            builder.AddProject<Projects.MysqlConnectionExample>("mysqlconnectionexample")
-                   .WithReference(mysql);
-        }
-        else// 示意 - 若其他情況下，可以使用容器化的 Mysql 連接
+        //if (builder.Environment.IsDevelopment())
+        //{
+        //    var mysql = builder.AddConnectionString("MySqlConnection");
+        //    builder.AddProject<Projects.MysqlConnectionWebExample>("mysqlconnectionexample")
+        //           .WithReference(mysql);
+        //}
+        //else// 示意 - 若其他情況下，可以使用容器化的 Mysql 連接
         {
             var mysql = builder.AddMySql("MySqlConnection");
-            builder.AddProject<Projects.MysqlConnectionExample>("mysqlconnectionexample")
+            builder.AddProject<Projects.MysqlConnectionWebExample>("mysqlconnectionexample")
                    .WithReference(mysql);
         }
     }

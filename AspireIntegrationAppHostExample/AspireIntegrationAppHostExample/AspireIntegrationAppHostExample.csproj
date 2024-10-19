@@ -17,8 +17,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\MinIOFormExample\MinIOFormExample.csproj" />
-    <ProjectReference Include="..\MysqlConnectionExample\MysqlConnectionExample.csproj" />
-    <ProjectReference Include="..\RedisConnectionExample\RedisConnectionExample.csproj" />
+    <ProjectReference Include="..\MysqlConnectionExample\MysqlConnectionWebExample.csproj" />
+    <ProjectReference Include="..\RedisConnectionExample\RedisConnectionWebExample.csproj" />
   </ItemGroup>
 
 </Project>

@@ -7,11 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AspireIntegrationAppHostExa
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MinIOFormExample", "..\MinIOFormExample\MinIOFormExample.csproj", "{BFDABB78-E0B6-4D81-A011-1B1D89C4D8C5}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedisConnectionExample", "..\RedisConnectionExample\RedisConnectionExample.csproj", "{0018D3A0-D50F-45D6-8F9C-0803AE43A63B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RedisConnectionWebExample", "..\RedisConnectionExample\RedisConnectionWebExample.csproj", "{0018D3A0-D50F-45D6-8F9C-0803AE43A63B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyAspireTelemetryDefaults", "..\MyAspireTelemetryDefaults\MyAspireTelemetryDefaults.csproj", "{BD4D6D04-5400-465F-8B67-5CB97301F713}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyAspireTelemetryDefaults", "..\MyAspireTelemetryDefaults\MyAspireTelemetryDefaults.csproj", "{BD4D6D04-5400-465F-8B67-5CB97301F713}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MysqlConnectionExample", "..\MysqlConnectionExample\MysqlConnectionExample.csproj", "{99743ABA-5809-44CA-92E3-BA309E125106}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MysqlConnectionWebExample", "..\MysqlConnectionExample\MysqlConnectionWebExample.csproj", "{99743ABA-5809-44CA-92E3-BA309E125106}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

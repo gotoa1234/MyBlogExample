@@ -36,14 +36,15 @@ namespace MysqlConnectionExample.Controllers
         }
 
         /// <summary>
-        /// 3. 獲取連線狀態
+        /// 3. 獲取連線資料
         /// </summary>        
         private string MysqlGetTableData()
         {
             var message = string.Empty;
-            _mySqlConnection.Open();
+            
             try
             {
+                _mySqlConnection.Open();
                 var collectionData = new List<TestAspireTable>();
                 var command = new MySqlCommand("SELECT SeqNo, Comment FROM testaspiretable", _mySqlConnection);
                 using (var reader = command.ExecuteReader())
@@ -57,6 +58,9 @@ namespace MysqlConnectionExample.Controllers
                         collectionData.Add(newItem);
                     }
                 }
+                // 關閉連接
+                _mySqlConnection.Close();
+               
                 // Json 序列化參數
                 var options = new JsonSerializerOptions
                 {
@@ -69,14 +73,6 @@ namespace MysqlConnectionExample.Controllers
             catch (Exception ex)
             {
                 message = "發生錯誤：" + ex.Message;
-            }
-            finally
-            {
-                // 關閉連接
-                if (_mySqlConnection != null)
-                {
-                    _mySqlConnection.Close();
-                }
             }
             _logger.LogDebug(message);
             return message;
