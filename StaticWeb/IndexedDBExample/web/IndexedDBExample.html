@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <button id="createDataBaseButton">1. 建立資料庫</button><br /><br />
+  <button id="createIndexStructButton" style=" pointer-events: none; opacity: 0.5;">2.
+    建立資料庫索引(在建立資料庫時觸發)</button><br /><br />
+  <button id="insertRowdataButton">3-1. 新增、修改資料與查詢 - 新增資料</button><br /><br />
+  <button id="updateRowdataButton">3-2. 新增、修改資料與查詢 - 修改資料</button><br /><br />
+  <button id="queryRowdataButton">3-3. 新增、修改資料與查詢 - 查詢資料</button><br /><br />
+  <button id="deleteRowdataButton">3-4. 新增、修改資料與查詢 - 刪除資料</button><br /><br />
+  <button id="emptyDatabaseButton">4. 刪除資料庫</button><br /><br />
+  <hr />
+  <p id="messageText"></p>
+</body>
+
+
+</html>
+
+<script>
+
+  const databaseName = "myDatabase";
+  // 1. 建立資料庫
+  function createDataBase() {
+    // 打開資料庫
+    var request = indexedDB.open(databaseName, 1);
+    document.getElementById('messageText').innerHTML += "1. 資料庫已建立" + '<br />';      
+    // 資料庫版本升級處理
+    request.onupgradeneeded = function (event) {
+      var db = event.target.result;
+      createIndexStruct(db);
+    };
+
+    // 資料庫打開成功處理
+    request.onsuccess = function (event) {
+    };
+  }
+
+  // 2. 建立資料庫索引
+  function createIndexStruct(db) {
+    // autoIncrement: true  表示自動新增ID
+    var objectStore = db.createObjectStore("customers", { autoIncrement: true });
+    objectStore.createIndex("name", "name", { unique: false });
+    document.getElementById('messageText').innerHTML += "2. 索引已建立" +'<br /><br />';      
+  }
+
+  // 3. 新增、修改資料與查詢
+  function insertRowdata() {
+    // 連線資料庫、開啟
+    var request = indexedDB.open(databaseName, 1);
+    request.onsuccess = function (event) {
+      var db = event.target.result;
+      // 創建事務並獲取物件存儲區
+      var transaction = db.transaction("customers", "readwrite");
+      var objectStore = transaction.objectStore("customers");
+      // 新增資料      
+      var name = 'John';
+      var email = "john@example.com";
+      var request = objectStore.add({ name: name, email: email });
+      request.onsuccess = function (event) {
+        document.getElementById('messageText').innerHTML += "3.1 新增資料成功! 資料=> " + '<br />' + "name:" + name  + '<br />' + '   email:' + email  + '<br /><br />';
+      };
+    };
+
+  }
+
+  function updateRowdata() {
+  // 連線資料庫、開啟
+  var request = indexedDB.open(databaseName, 1);
+  request.onsuccess = function (event) {
+    var db = event.target.result;
+    // 創建事務並獲取物件存儲區
+    var transaction = db.transaction("customers", "readwrite");
+    var objectStore = transaction.objectStore("customers");
+
+    // 取得要修改的資料 - Id = 1的資料
+     var getRequest = objectStore.get(1); // 修改此處變數名稱    
+    getRequest.onsuccess = function (event) {
+      var data = event.target.result;
+      if (data) {
+        // 修改資料        
+        var tempData = data;
+        tempData.name = "John Doe";
+
+        // 刪除舊的資料
+        objectStore.delete(1);
+        var putRequest = objectStore.put(tempData);
+        
+        putRequest.onsuccess = function (event) {
+          document.getElementById('messageText').innerHTML += "3.2 修改資料成功! 修改的資料=> " + '<br />' + " name:" + data.name  + '<br /><br />';
+        };
+      }
+    };
+  }
+}
+
+      function queryRowdata() {
+        // 連線資料庫、開啟
+        var request = indexedDB.open(databaseName, 1);
+        request.onsuccess = function (event) {
+          var db = event.target.result;
+
+          // 創建讀取事務並獲取物件存儲區
+          var transaction = db.transaction(["customers"], "readonly");
+          var objectStore = transaction.objectStore("customers");
+
+          // 取得資料 - 所有資料的取法
+          var requestGet = objectStore.getAll();
+
+          // 查詢資料
+          requestGet.onsuccess = function (event) {
+            var customers = event.target.result;
+            document.getElementById('messageText').innerHTML += "3.3 查詢結果："+ '<br />' ;
+            if (customers && customers.length > 0) {
+              customers.forEach(function (customer) {
+                document.getElementById('messageText').innerHTML += "name:" + customer.name  + '<br />' + '   email:' + customer.email + '<br /><br />';
+              });
+            } else {
+            document.getElementById('messageText').innerHTML += "查無資料" + '<br /><br />';
+          }
+        };
+      }
+    }
+
+  function deleteRowdata() {
+    // 打開數據庫連接
+    var request = indexedDB.open(databaseName, 1);
+
+    request.onsuccess = function (event) {
+      var db = event.target.result;
+
+      // 創建讀取事務並獲取物件存儲區
+      var transaction = db.transaction("customers", "readwrite");
+      var objectStore = transaction.objectStore("customers");
+      
+      // 刪除資料 - 示意用：因為修改後，會產生一筆資料因此要刪除2
+      var requestDelete = objectStore.delete(2);
+      requestDelete.onsuccess = function (event) {
+        document.getElementById('messageText').innerHTML += "3.4 刪除1筆資料成功!"  + '<br /><br />';
+      };
+    };     
+  }
+
+  //4. 刪除資料庫
+  function emptyDatabase() {      
+    var deleteRequest = indexedDB.deleteDatabase(databaseName);
+    deleteRequest.onsuccess = function () {
+      document.getElementById('messageText').innerHTML += "4. 資料庫已刪除" + '<br /><br />';      
+    };
+    deleteRequest.onerror = function () {
+      document.getElementById('messageText').innerHTML += "4. 資料庫無法刪除" + '<br /><br />';      
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+
+    // 1. 建立資料庫
+    var createDataBaseButton = document.getElementById("createDataBaseButton");
+    createDataBaseButton.addEventListener("click", createDataBase);
+
+    // 2. 建立資料庫索引 (在建立資料庫時觸發)    
+
+    // 3. 新增、修改資料與查詢
+    var insertRowdataButton = document.getElementById("insertRowdataButton");
+    insertRowdataButton.addEventListener("click", insertRowdata);
+
+    var updateRowdataButton = document.getElementById("updateRowdataButton");
+    updateRowdataButton.addEventListener("click", updateRowdata);
+    
+    var queryRowdataButton = document.getElementById("queryRowdataButton");
+    queryRowdataButton.addEventListener("click", queryRowdata);
+    
+    var deleteRowdataButton = document.getElementById("deleteRowdataButton");
+    deleteRowdataButton.addEventListener("click", deleteRowdata);
+
+    // 4. 刪除資料庫
+    var emptyDatabaseButton = document.getElementById("emptyDatabaseButton");
+    emptyDatabaseButton.addEventListener("click", emptyDatabase);
+  });
+
+</script>

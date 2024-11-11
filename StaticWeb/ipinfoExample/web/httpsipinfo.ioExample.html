@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ipinfo.io Example</title>
+</head>
+<body>
+
+<table border="1">
+    <tr>
+	    <th>中文屬性(Chinese Property)</th>
+        <th>屬性(Property)</th>
+        <th>值(Value)</th>
+    </tr>
+</table>
+
+<script>
+    // 使用 Fetch API 向 ipinfo.io 發送請求
+    fetch('https://ipinfo.io/json')
+        .then(response => response.json())
+        .then(data => {
+            // data 包含了用戶的 IP 地址相關信息
+            displayInfo('IP地址', 'IP Address', data.ip);
+            displayInfo('主機名稱','Hostname', data.hostname);
+            displayInfo('城市', 'City', data.city);
+            displayInfo('地區', 'Region', data.region);
+            displayInfo('國家', 'Country', data.country);
+            displayInfo('經緯度', 'Loc', data.loc);            
+            displayInfo('互聯網服務提供商', 'ISP', data.org);
+            displayInfo('所在時區', 'Timezone', data.timezone);
+        })
+        .catch(error => {
+            console.error('Error fetching IP info:', error);
+        });
+
+    function displayInfo(chProperty, property, value) {
+        // 在表格中插入一行
+        var table = document.querySelector('table');
+        var row = table.insertRow(-1);
+
+        // 插入單元格
+        var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+		var cell3 = row.insertCell(2);
+
+        // 設置單元格的內容
+        cell1.textContent = chProperty;
+        cell2.textContent = property;
+		cell3.textContent = value;
+    }
+</script>
+
+</body>
+</html>

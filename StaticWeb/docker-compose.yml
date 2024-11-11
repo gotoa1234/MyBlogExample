@@ -1,0 +1,33 @@
+version: '3'
+
+services:
+  fingerprintjsexample:
+    build:
+      context: ./fingerprintjsExample
+      dockerfile: Dockerfile
+    ports:
+      - "8091:80"
+    networks:
+      - webnet
+
+  indexeddbexample:
+    build:
+      context: ./IndexedDBExample
+      dockerfile: Dockerfile
+    ports:
+      - "8092:80"
+    networks:
+      - webnet
+
+  ipinfoexample:
+    build:
+      context: ./ipinfoExample
+      dockerfile: Dockerfile
+    ports:
+      - "8093:80"
+    networks:
+      - webnet
+
+networks:
+  webnet:
+    driver: bridge

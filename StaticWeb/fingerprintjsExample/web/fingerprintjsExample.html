@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fingerprintjs Example</title>    
+</head>
+<body>
+    <h1 id="myTitle">Fingerprintjs version：</h1>
+
+	<br/>
+	<H2>基本資訊</H2>
+    <table border="1">
+        <thead>
+            <tr style="text-align:left">
+                <th>參數名稱</th>
+                <th>數值</th>
+            </tr>
+        </thead>
+        <tbody id="fingerprintTableBody"></tbody>
+    </table>
+	
+	<br/>
+	<H2>身分價值</H2>
+    <table border="1">
+        <thead>
+            <tr style="text-align:left">
+                <th>參數名稱</th>
+                <th>數值</th>
+            </tr>
+        </thead>
+        <tbody id="fingerprintTableBodyConfidence"></tbody>
+    </table>
+	
+	<br/>
+	<H2>參考係數 (共39種)</H2>
+    <table border="1">
+        <thead>
+            <tr style="text-align:left">			    
+                <th>參數名稱</th>
+                <th>細項參數</th>
+				<th>數值</th>
+            </tr>
+        </thead>
+        <tbody id="fingerprintTableBodyComponents"></tbody>
+    </table>
+	
+<script>
+
+
+  const fpPromise = import('https://openfpcdn.io/fingerprintjs/v4')
+    .then(FingerprintJS => FingerprintJS.load())
+  
+  fpPromise    
+	.then(fp => fp.get({ 
+	  extendedResult: true,
+	//以下為所有可用的組件 (v4.2.1版本)
+  }))
+    .then(result => {
+   
+      //DeleteComponents(result);
+   
+	  getBaseInfo(result);
+      getConfidence(result);
+	  getComponents(result);
+	  
+      return fpPromise.then(fp => fp.get());
+    })  
+	.then(result => {
+    const visitorId2 = result.visitorId;
+    console.log(visitorId2);  // 移除所有组件后的 visitorId
+    })
+	
+	function getBaseInfo(result)
+	{
+		var tableBody = document.getElementById('fingerprintTableBody');
+		//取得 Id
+		var row = tableBody.insertRow();
+		var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+		cell1.innerHTML = "visitorId"
+        cell2.innerHTML = result.visitorId;
+		//取得Version
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell1.innerHTML = "version"
+        cell2.innerHTML = result.version;
+		
+		var myTitleText = document.getElementById('myTitle');
+		myTitleText.innerText = 'Fingerprintjs version：' + result.version;
+	}
+	
+	function getConfidence(result)
+	{
+		var tableBody = document.getElementById('fingerprintTableBodyConfidence');
+		//取得score
+		var row = tableBody.insertRow();
+		var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+		cell1.innerHTML = "score"
+        cell2.innerHTML = result.confidence.score;
+		//取得comment
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell1.innerHTML = "comment"
+        cell2.innerHTML = result.confidence.comment;
+	}
+	
+	function getComponents(result)
+	{
+		var tableBody = document.getElementById('fingerprintTableBodyComponents');
+		//取得fonts
+		var row = tableBody.insertRow();
+		var cell1 = row.insertCell(0);
+        var cell2 = row.insertCell(1);
+		var cell3 = row.insertCell(2);
+		cell1.innerHTML = "fonts";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = result.components.fonts.value;
+		
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);	
+		cell1.innerHTML = "fonts";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = result.components.fonts.duration;
+		
+		//取得domBlockers
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "domBlockers";
+        cell2.innerHTML = "duration";
+		cell3.innerHTML = result.components.domBlockers.duration;
+		
+		//取得 fontPreferences
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "fontPreferences";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.fontPreferences.value);
+		
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "fontPreferences";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = result.components.fontPreferences.duration;
+		
+		//取得 audio
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "audio";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.audio.value);
+		
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "audio";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.audio.duration);
+		
+		//取得 screenFrame
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "screenFrame";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.screenFrame.value);
+		
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "screenFrame";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.screenFrame.duration);
+		
+		//取得 canvas
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "canvas";
+		cell2.innerHTML = "value";
+		cell3.innerHTML = JSON.stringify(result.components.canvas.value);
+        //cell3.innerHTML = result.components.canvas.value;//資料太多省略顯示
+		
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "canvas";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.canvas.duration);
+						
+		//取得 osCpu
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "osCpu";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.osCpu.duration);
+
+		//取得 languages
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "languages";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.languages.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "languages";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.languages.duration);
+		
+		//取得 colorDepth
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "colorDepth";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.colorDepth.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "colorDepth";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.colorDepth.duration);
+		
+		//取得 deviceMemory
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "deviceMemory";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.deviceMemory.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "deviceMemory";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.deviceMemory.duration);
+		
+		//取得 screenResolution
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "screenResolution";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.screenResolution.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "screenResolution";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.screenResolution.duration);
+		
+	    //取得 hardwareConcurrency
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "hardwareConcurrency";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.hardwareConcurrency.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "hardwareConcurrency";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.hardwareConcurrency.duration);
+		
+		//取得 timezone
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "timezone";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.timezone.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "timezone";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.timezone.duration);
+		
+		//取得 sessionStorage
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "sessionStorage";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.sessionStorage.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "sessionStorage";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.sessionStorage.duration);
+		
+		//取得 localStorage
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "localStorage";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.localStorage.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "localStorage";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.localStorage.duration);
+		
+		//取得 indexedDB
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "indexedDB";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.indexedDB.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "indexedDB";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.indexedDB.duration);
+		
+		//取得 openDatabase
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "openDatabase";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.openDatabase.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "openDatabase";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.openDatabase.duration);
+		
+		//取得 cpuClass
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "cpuClass";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.cpuClass.duration);
+
+		//取得 platform
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "platform";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.platform.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "platform";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.platform.duration);
+		
+		//取得 plugins
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "plugins";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.plugins.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "plugins";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.plugins.duration);
+		
+		//取得 touchSupport
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "touchSupport";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.touchSupport.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "touchSupport";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.touchSupport.duration);
+		
+		//取得 vendor
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "vendor";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.vendor.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "vendor";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.vendor.duration);
+		
+		//取得 vendorFlavors
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "vendorFlavors";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.vendorFlavors.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "vendorFlavors";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.vendorFlavors.duration);
+		
+		//取得 cookiesEnabled
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "cookiesEnabled";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.cookiesEnabled.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "cookiesEnabled";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.cookiesEnabled.duration);
+		
+		//取得 colorGamut
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "colorGamut";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.colorGamut.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "colorGamut";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.colorGamut.duration);
+		
+		//取得 invertedColors
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "invertedColors";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.invertedColors.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "invertedColors";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.invertedColors.duration);
+		
+		//取得 forcedColors
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "forcedColors";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.forcedColors.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "forcedColors";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.forcedColors.duration);
+		
+		//取得 contrast
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "contrast";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.contrast.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "contrast";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.contrast.duration);
+		
+		//取得 reducedMotion
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "reducedMotion";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.reducedMotion.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "reducedMotion";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.reducedMotion.duration);
+		
+		//取得 reducedTransparency
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "reducedTransparency";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.reducedTransparency.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "reducedTransparency";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.reducedTransparency.duration);
+		
+		//取得 hdr
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "hdr";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.hdr.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "hdr";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.hdr.duration);
+		
+		//取得 math
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "math";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.math.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "math";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.math.duration);
+		
+		//取得 pdfViewerEnabled
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "pdfViewerEnabled";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.pdfViewerEnabled.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "pdfViewerEnabled";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.pdfViewerEnabled.duration);
+		
+		//取得 architecture
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "architecture";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.architecture.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "architecture";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.architecture.duration);
+		
+		//取得 forcedColors
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "forcedColors";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.forcedColors.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "forcedColors";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.forcedColors.duration);
+		
+		//取得 applePay
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "applePay";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.applePay.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "applePay";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.applePay.duration);
+		
+		//取得 privateClickMeasurement
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "privateClickMeasurement";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.privateClickMeasurement.duration);
+		
+		//取得 webGlBasics
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "webGlBasics";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.webGlBasics.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "webGlBasics";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.webGlBasics.duration);
+		
+		//取得 webGlExtensions
+		row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "webGlExtensions";
+		cell2.innerHTML = "value";
+        cell3.innerHTML = JSON.stringify(result.components.webGlExtensions.value);
+
+	    row = tableBody.insertRow();
+		cell1 = row.insertCell(0);
+		cell2 = row.insertCell(1);	
+		cell3 = row.insertCell(2);
+		cell1.innerHTML = "webGlExtensions";
+		cell2.innerHTML = "duration";
+        cell3.innerHTML = JSON.stringify(result.components.webGlExtensions.duration);
+		
+		var innertHtmlMsg = '';
+		var currentColor = 'Cyan';
+		for(var i = 0 ; i < tableBody.rows.length; i++)
+		{
+		   if(tableBody.rows[i].cells[0].innerHTML != innertHtmlMsg)
+		   {		       
+		       if(currentColor == '')
+			      currentColor = 'Cyan';
+			   else
+			      currentColor = '';
+		   }
+		   tableBody.rows[i].style.backgroundColor = currentColor;		
+           innertHtmlMsg = tableBody.rows[i].cells[0].innerHTML;
+		}
+		
+	}
+	
+	function DeleteComponents(result)
+	{
+	   // 删除指定组件
+       delete result.components.applePay;
+       delete result.components.architecture;
+       delete result.components.canvas;
+       delete result.components.colorDepth;
+       delete result.components.colorGamut;
+       delete result.components.contrast;
+       delete result.components.cookiesEnabled;
+       delete result.components.cpuClass;
+       delete result.components.deviceMemory;
+       delete result.components.domBlockers;
+       delete result.components.fontPreferences;
+       delete result.components.fonts;
+       delete result.components.forcedColors;
+       delete result.components.hardwareConcurrency;
+       delete result.components.hdr;
+       delete result.components.indexedDB;
+       delete result.components.invertedColors;
+       delete result.components.languages;
+       delete result.components.localStorage;
+       delete result.components.math;
+       delete result.components.monochrome;
+       delete result.components.openDatabase;
+       delete result.components.osCpu;
+       delete result.components.plugins;
+	}
+	
+</script>
+</body>
+</html>
