@@ -8,6 +8,11 @@
 
   <ItemGroup>
     <Folder Include="Models\" />
+    <Folder Include="IService\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="StackExchange.Redis" Version="2.8.22" />
   </ItemGroup>
 
 </Project>

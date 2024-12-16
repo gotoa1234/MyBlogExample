@@ -1,7 +1,15 @@
+using RedisProducerAndComsumerForPubAndSubExample.Background;
+using RedisProducerAndComsumerForPubAndSubExample.Service;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// 1. 依賴注入 Redis 生產者 ( 127.0.0.1:6379 是本地的 Redis)
+builder.Services.AddSingleton(new RedisPubSubService("127.0.0.1:6379"));
+// 2. 依賴注入 Redis 消費者背景服務
+builder.Services.AddHostedService<RedisConsumerService>();
 
 var app = builder.Build();
 
