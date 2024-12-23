@@ -1,0 +1,7 @@
+* text=auto
+*.cs text=auto
+*.sln text=auto
+*.csproj text=auto
+*.json text=auto
+*.config text=auto
+*.yml text=auto
