@@ -48,7 +48,7 @@ namespace MinIOWebSiteExample.Controllers
                 };
             }
 
-            return BadRequest(new { message = $@"Cannot download file {fileName}." });
+            return BadRequest(new { message = $"Cannot download file {fileName}." });
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace MinIOWebSiteExample.Controllers
         public async Task<IActionResult> DeleteFile(string fileName, string bucketName)
         {
             await _teacherManageService.DeleteFile(fileName, bucketName);
-            return Ok($@"{fileName} 已刪除");
+            return Ok($"{fileName} 已刪除");
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace MinIOWebSiteExample.Controllers
         public async Task<IActionResult> DeleteAccount(long Id)
         {
             await _teacherManageService.DeleteAccount(Id);
-            return Ok(new { message = $@"教師已刪除 ID：{Id}" });
+            return Ok(new { message = $"教師已刪除 ID：{Id}" });
         }
 
         /// <summary>
@@ -78,7 +78,7 @@ namespace MinIOWebSiteExample.Controllers
         public async Task<IActionResult> CreateAccount()
         {
             var createdId = await _teacherManageService.CreateAccount();
-            return Ok(new { message = $@"教師帳號已建立 ID:{createdId}" });
+            return Ok(new { message = $"教師帳號已建立 ID:{createdId}" });
         }
     }
 }
