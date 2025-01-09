@@ -1,0 +1,72 @@
+﻿@{
+    ViewData["Title"] = "零停機部署範例 (1. 自動 SignalR 重連 / 2. 防止 Session 丟失 / 3. 防止中斷重連異常)";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <!--引用 SignalR 8.0.0-->
+    <script src="~/js/signalr8.0.0.js" asp-append-version="true"></script>
+</head>
+<body>
+    <!-- 設定dom元件 發送 & 接收內容 -->
+    <input type="text" id="userInput" placeholder="姓名">
+    <input type="text" id="messageInput" placeholder="發送訊息">
+    <button onclick="sendMessage()">Send</button>
+
+    <div id="updateContainer"></div>
+
+    <script>
+        // 預設頁面值
+        var updateContainer = document.getElementById("updateContainer");
+        updateContainer.innerHTML = `<p>New update: 初始化 </p>`;
+
+        // 1. 創建 SignalR 連接
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("UpdateHub", { accessTokenFactory: () => "I am jwtToken" })
+            .withAutomaticReconnect([0, 2000, 10000, 30000]) // 2. 建立重試間隔時間（毫秒）
+            .build();
+
+        // 3. 監聽重連事件
+        connection.onreconnecting((error) => {
+            console.log("正在重新連接:", error);
+        });
+
+        // 4. 監聽連結成功事件
+        connection.onreconnected((connectionId) => {
+            console.log("重新連接成功:", connectionId);
+        });
+
+
+        connection.on("SendUpdate", (message) => {
+            const updateContainer = document.getElementById("updateContainer");
+            updateContainer.innerHTML += `<p>${message.message}</p>`;
+        });
+        connection.on("ReceiveMessage", function (jsonMessage) {
+            const updateContainer = document.getElementById("updateContainer");
+            var message = JSON.parse(jsonMessage);
+            var date = new Date(message.CreateTime * 1000);
+            var dateString = date.toISOString().replace("T", " ").substr(0, 19);
+            updateContainer.innerHTML += `<p>[站點${message.SiteName} ${dateString}] ${message.UserName}：${message.Message}</p>`;
+        });
+        
+        connection.start()
+            .then(() => {
+                console.log("連接 SignalR 成功");
+            })
+            .catch((error) => {
+                console.log("錯誤訊息：" + error);
+            });
+
+        // 5. 發送訊息到Hub 伺服器上
+        function sendMessage() {
+            var user = document.getElementById("userInput").value;
+            var message = document.getElementById("messageInput").value;
+            connection.invoke("SendMessage", user, message).catch(function (err) {
+                console.error("Error invoking SendMessage: " + err.toString());
+            });
+        }
+    </script>
+</body>
+
+</html>
+
