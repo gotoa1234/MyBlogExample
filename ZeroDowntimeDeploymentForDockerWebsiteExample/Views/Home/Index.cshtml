@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "零停機部署範例 (1. 自動 SignalR 重連 / 2. 防止 Session 丟失 / 3. 防止中斷重連異常)";
+    ViewData["Title"] = "零停機部署範例 (1. 自動 SignalR 重連(防止中斷重連異常))";
 }
 <!DOCTYPE html>
 <html>
@@ -22,7 +22,7 @@
 
         // 1. 創建 SignalR 連接
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("UpdateHub", { accessTokenFactory: () => "I am jwtToken" })
+            .withUrl("/UpdateHub", { accessTokenFactory: () => "I am jwtToken" })
             .withAutomaticReconnect([0, 2000, 10000, 30000]) // 2. 建立重試間隔時間（毫秒）
             .build();
 
@@ -45,7 +45,7 @@
             const updateContainer = document.getElementById("updateContainer");
             var message = JSON.parse(jsonMessage);
             var date = new Date(message.CreateTime * 1000);
-            var dateString = date.toISOString().replace("T", " ").substr(0, 19);
+            var dateString = date.toISOString().replace("T", " ").substr(0, 19);            
             updateContainer.innerHTML += `<p>[站點${message.SiteName} ${dateString}] ${message.UserName}：${message.Message}</p>`;
         });
         

@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using ZeroDowntimeDeploymentForDockerWebsiteExample.CustomerAttribute;
 using ZeroDowntimeDeploymentForDockerWebsiteExample.Models;
 
 namespace ZeroDowntimeDeploymentForDockerWebsiteExample.Controllers
 {
+    [CustomAuthorizeAttribute]
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -12,13 +14,8 @@ namespace ZeroDowntimeDeploymentForDockerWebsiteExample.Controllers
         {
             _logger = logger;
         }
-
+        
         public IActionResult Index()
-        {
-            return View();
-        }
-
-        public IActionResult Privacy()
         {
             return View();
         }
