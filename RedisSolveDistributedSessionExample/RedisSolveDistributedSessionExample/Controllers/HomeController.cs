@@ -1,6 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using RedisSolveDistributedSessionExample.Models;
-using System.Diagnostics;
 
 namespace RedisSolveDistributedSessionExample.Controllers
 {
