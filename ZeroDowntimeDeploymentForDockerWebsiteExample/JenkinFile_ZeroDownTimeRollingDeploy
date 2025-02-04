@@ -1,0 +1,282 @@
+pipeline {
+  agent any
+  
+  // 環境變數
+  environment {       
+		PORT_HTTP = "8080"   // 對應宿主機  Http Port號		
+        PROJECT_NAME = "ZeroDowntimeDeploymentForDockerWebsiteExample"// 專案名稱
+		PROJECT_NAME_FOR_DOCKER = "zerodowntimedeploymentfordockerwebsiteexample"// DockerName 強制小寫
+		GIT_SOURCE_REPOSITORY = "https://github.com/gotoa1234/MyBlogExample.git"// 專案來源
+		TARGET_MACHINE_IP = "192.168.51.93"// 對應的部署機器IP
+		TARGET_MACHINE_CREDENTIAL = "DeployMechineUbuntu"// 對應部署機器的SSH Server Name
+  }  
+  
+  // 定義單一建置時可異動參數
+  parameters {
+        string(name: 'GIT_HASH_TAG', defaultValue: '', description: '指定發布的GIT Hash 標籤(雜湊版號)，預設 head 表示更新最新代碼')
+  }
+  
+  stages {
+      
+    // step 1. start
+    stage('Checkout') {
+       steps {
+            checkout([$class: 'GitSCM', 
+                branches: [[name: "remotes/origin/main"]],
+                userRemoteConfigs: [[url: "${env.GIT_SOURCE_REPOSITORY}"]]
+            ])
+
+            sh """
+                git pull origin main
+            """
+        }
+     }
+    // step 1. end
+
+    // step 2. start
+    stage('Building') {
+      steps {
+        script {
+                    sh """
+                      dotnet publish ${PROJECT_NAME}/${PROJECT_NAME}.csproj -c Release -o publish/${PROJECT_NAME} --disable-build-servers
+                    """
+                }
+      }
+    }
+    // step 2. end
+    
+    // step 3. start
+    stage('Publish Main Host') {
+	  steps {
+	      sshPublisher(publishers: 
+	             [sshPublisherDesc(configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+	                                transfers: [
+	                                    sshTransfer(cleanRemote: true, 
+	                                                   excludes: '', 
+	                                                execCommand: '', 
+	                                                execTimeout: 120000, 
+	                                                    flatten: false, 
+	                                              makeEmptyDirs: false, 
+	                                          noDefaultExcludes: false, 
+	                                           patternSeparator: '[, ]+', 
+	                                            remoteDirectory: "var\\dockerbuildimage\\${PROJECT_NAME}\\publish", 
+	                                         remoteDirectorySDF: false, 
+	                                               removePrefix: "publish\\${PROJECT_NAME}", 
+	                                                sourceFiles: "publish\\${PROJECT_NAME}\\**")],
+	                     usePromotionTimestamp: false, 
+	                   useWorkspaceInPromotion: false, 
+	                                   verbose: false)
+	             ])
+	  }
+    }
+    // step 3. end
+    
+	// step 4. start
+    stage('Publish DockerFile') {
+	  steps {
+	      sshPublisher(publishers: 
+		         [sshPublisherDesc(configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+				                    transfers: [
+									    sshTransfer(cleanRemote: false, 
+										               excludes: '', 
+													execCommand: '', 
+													execTimeout: 120000, 
+													    flatten: false, 
+												  makeEmptyDirs: false, 
+											  noDefaultExcludes: false, 
+											   patternSeparator: '[, ]+', 
+											    remoteDirectory: "var\\dockerbuildimage\\${PROJECT_NAME}", 
+											 remoteDirectorySDF: false, 
+											       removePrefix: "${PROJECT_NAME}", 
+												    sourceFiles: "${PROJECT_NAME}\\Dockerfile")], 
+					   usePromotionTimestamp: false, 
+					 useWorkspaceInPromotion: false, 
+					                 verbose: false)
+				])
+	  }
+    }
+    // step 4. end
+	
+	// step 5. start
+    stage('Build Image Remotely') {
+      steps {
+	    sh """
+		   echo cd /var/dockerbuildimage/${env.PROJECT_NAME} 
+		   echo docker build --no-cache -t ${env.PROJECT_NAME_FOR_DOCKER} .
+		   echo docker tag ${env.PROJECT_NAME_FOR_DOCKER}:latest ${env.PROJECT_NAME_FOR_DOCKER}:hash_${params.GIT_HASH_TAG}
+		   """
+	  
+        sshPublisher(
+            failOnError: true,
+            publishers: [sshPublisherDesc(
+            configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+            transfers: [sshTransfer(
+                excludes: '', 
+                execCommand: "cd /var/dockerbuildimage/${env.PROJECT_NAME} && \
+                              docker build --no-cache -t ${env.PROJECT_NAME_FOR_DOCKER} . && \
+                              docker tag ${env.PROJECT_NAME_FOR_DOCKER}:latest ${env.PROJECT_NAME_FOR_DOCKER}:hash_${params.GIT_HASH_TAG}", 
+                execTimeout: 120000, 
+                patternSeparator: '[, ]+')], 
+            verbose: false)])
+      }
+    }
+	// step 5. end
+	
+    // step 6. start 新增加
+    stage('Close Container A') {
+      steps {
+        sshPublisher(
+                 failOnError: true,
+                 publishers: [sshPublisherDesc(
+                 configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+                 transfers: [sshTransfer(
+                     excludes: '', 
+                     execCommand: '''
+                                  sed -i "s/server 127.0.0.1:8090;/server 127.0.0.1:8090 down;/" /etc/nginx/conf.d/zerodowntime_upstream.conf
+                                  nginx -s reload
+                                  ''', 
+                     execTimeout: 120000, 
+                     patternSeparator: '[, ]+')], 
+                 verbose: true)])
+         }
+     }
+    // step 6. end 新增加 
+	
+	// step 7. start
+    stage('ReConstruct Container A') {
+      steps {
+        sshPublisher(
+            failOnError: true,
+            publishers: [sshPublisherDesc(
+            configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+            transfers: [sshTransfer(
+                excludes: '', 
+                execCommand: "sudo docker stop ${env.PROJECT_NAME_FOR_DOCKER}_A && \
+                                  docker rm ${env.PROJECT_NAME_FOR_DOCKER}_A || true && \
+                                  docker run -e ASPNETCORE_ENVIRONMENT=Development --name ${env.PROJECT_NAME_FOR_DOCKER}_A -d -p 8090:8080 -p 8190:8081 \
+                                  --mount type=bind,source=/var/dockervolumes/${env.PROJECT_NAME}/appsettings.json,target=/app/appsettings.json \
+                                  --mount type=bind,source=/var/dockervolumes/${env.PROJECT_NAME}/appsettings.Development.json,target=/app/appsettings.Development.json \
+                                  ${env.PROJECT_NAME_FOR_DOCKER}:latest", 
+                execTimeout: 120000, 
+                patternSeparator: '[, ]+')], 
+            verbose: false)])
+      }
+    }   
+
+    // step 7. end
+
+	// step 8. start 新增加
+	stage('Health Check A') {
+      steps {
+        sshPublisher(
+            failOnError: true,
+            publishers: [sshPublisherDesc(
+            configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+            transfers: [sshTransfer(
+                excludes: '', 
+                execCommand: "/var/dockerbuildimage/ZeroDowntimeDeploymentForDockerWebsiteExample/health-check-container.sh ${env.PROJECT_NAME_FOR_DOCKER}_A", 
+                execTimeout: 120000, 
+                patternSeparator: '[, ]+')], 
+            verbose: false)])
+      }
+    }
+	// step 8. end 新增加
+
+    // step 9. start 新增加
+    stage('Open A AND Close B') {
+      steps {
+        sshPublisher(
+                 failOnError: true,
+                 publishers: [sshPublisherDesc(
+                 configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+                 transfers: [sshTransfer(
+                     excludes: '', 
+                     execCommand: '''
+                                  sed -i "s/server 127.0.0.1:8090 down;/server 127.0.0.1:8090;/" /etc/nginx/conf.d/zerodowntime_upstream.conf
+								  sed -i "s/server 127.0.0.1:8091;/server 127.0.0.1:8091 down;/" /etc/nginx/conf.d/zerodowntime_upstream.conf
+                                  nginx -s reload
+                                  ''', 
+                     execTimeout: 120000, 
+                     patternSeparator: '[, ]+')], 
+                 verbose: true)])
+         }
+     }
+    // step 9. end 新增加 
+	
+	// step 10. start
+    stage('ReConstruct Container B') {
+      steps {
+        sshPublisher(
+            failOnError: true,
+            publishers: [sshPublisherDesc(
+            configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+            transfers: [sshTransfer(
+                excludes: '', 
+                execCommand: "sudo docker stop ${env.PROJECT_NAME_FOR_DOCKER}_B && \
+                                  docker rm ${env.PROJECT_NAME_FOR_DOCKER}_B || true && \
+                                  docker run -e ASPNETCORE_ENVIRONMENT=Development --name ${env.PROJECT_NAME_FOR_DOCKER}_B -d -p 8091:8080 -p 8191:8081 \
+                                  --mount type=bind,source=/var/dockervolumes/${env.PROJECT_NAME}/appsettings.json,target=/app/appsettings.json \
+                                  --mount type=bind,source=/var/dockervolumes/${env.PROJECT_NAME}/appsettings.Development.json,target=/app/appsettings.Development.json \
+                                  ${env.PROJECT_NAME_FOR_DOCKER}:latest", 
+                execTimeout: 120000, 
+                patternSeparator: '[, ]+')], 
+            verbose: false)])
+      }
+    } 	
+	// step 10. end
+	
+	// step 11. start 新增加
+	stage('Health Check B') {
+      steps {
+        sshPublisher(
+            failOnError: true,
+            publishers: [sshPublisherDesc(
+            configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+            transfers: [sshTransfer(
+                excludes: '', 
+                execCommand: "/var/dockerbuildimage/ZeroDowntimeDeploymentForDockerWebsiteExample/health-check-container.sh ${env.PROJECT_NAME_FOR_DOCKER}_A", 
+                execTimeout: 120000, 
+                patternSeparator: '[, ]+')], 
+            verbose: false)])
+      }
+    }
+	// step 11. end 新增加
+
+    // step 12. start 新增加
+    stage('Open B') {
+      steps {
+        sshPublisher(
+                 failOnError: true,
+                 publishers: [sshPublisherDesc(
+                 configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+                 transfers: [sshTransfer(
+                     excludes: '', 
+                     execCommand: '''                                  
+								  sed -i "s/server 127.0.0.1:8091 down;/server 127.0.0.1:8091;/" /etc/nginx/conf.d/zerodowntime_upstream.conf
+                                  nginx -s reload
+                                  ''', 
+                     execTimeout: 120000, 
+                     patternSeparator: '[, ]+')], 
+                 verbose: true)])
+         }
+     }
+    // step 12. end 新增加 
+	
+	// step 13. start
+    stage('Image Purne') {
+      steps {
+         sshPublisher(
+             failOnError: true,
+             publishers: [sshPublisherDesc(
+             configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+             transfers: [sshTransfer(
+                 excludes: '', 
+                 execCommand: "docker image prune -f", 
+                 execTimeout: 120000, 
+                 patternSeparator: '[, ]+')], 
+             verbose: false)])
+      }
+    }
+	// step 13. end
+  }
+}
