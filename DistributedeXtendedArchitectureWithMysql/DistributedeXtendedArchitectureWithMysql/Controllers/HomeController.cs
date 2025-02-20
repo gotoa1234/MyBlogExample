@@ -21,19 +21,22 @@ namespace DistributedeXtendedArchitectureWithMysql.Controllers
         }
 
         /// <summary>
-        /// [使用] XA 的 API
-        /// </summary>        
+        /// 1. [不使用] XA 的 API 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<TransferResult>> TransferWithXA()
+        public async Task<ActionResult<TransferResult>> TransferWithoutXA()
         {
+            // Step 1. 準備資料， A庫 寫進 B庫
             var request = new TransferRequest()
             {
                 Amount = 10000,
-                FromAccount = "X",
-                ToAccount = "Y",
+                FromAccount = "A_Louis",
+                ToAccount = "B_Louis",
             };
 
-            var result = await _transferService.TransferWithXAAsync(request);
+            // Step 2. 進行單庫寫入 (不使用XA)
+            var result = await _transferService.TransferWithoutXAAsync(request);
             if (!result.Success)
                 return BadRequest(result);
 
@@ -41,25 +44,25 @@ namespace DistributedeXtendedArchitectureWithMysql.Controllers
         }
 
         /// <summary>
-        /// [不使用] XA 的 API 
-        /// </summary>
-        /// <returns></returns>
+        /// 2. [使用] XA 的 API
+        /// </summary>        
         [HttpGet]
-        public async Task<ActionResult<TransferResult>> TransferWithoutXA()
+        public async Task<ActionResult<TransferResult>> TransferWithXA()
         {
+            // Step1. 準備資料， A庫 寫進 B庫
             var request = new TransferRequest()
             {
                 Amount = 10000,
-                FromAccount = "X",
-                ToAccount = "Y",
+                FromAccount = "A_Louis",
+                ToAccount = "B_Louis",
             };
 
-            var result = await _transferService.TransferWithoutXAAsync(request);
+            // Step 2. 進行雙庫寫入 (使用XA)
+            var result = await _transferService.TransferWithXAAsync(request);
             if (!result.Success)
                 return BadRequest(result);
 
             return Ok(result);
         }
-      
     }
 }

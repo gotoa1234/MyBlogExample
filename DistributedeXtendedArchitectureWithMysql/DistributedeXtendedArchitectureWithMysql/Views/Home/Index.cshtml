@@ -6,12 +6,12 @@
     <h1 class="display-4">XA test page.</h1>
     <div class="row mb-4">
         <div class="col">
-            <button class="btn btn-primary" type="button" id="uselessXA">Useless XA Test</button>
+            <button class="btn btn-primary" type="button" id="uselessXA">1. 不使用 XA</button>
         </div>
     </div>
     <div class="row mb-4">
         <div class="col">
-             <button class="btn btn-primary" type="button" id="useXA">Use XA Test</button>
+             <button class="btn btn-primary" type="button" id="useXA">2. 使用 XA</button>
         </div>
     </div>
 </div>
@@ -31,7 +31,7 @@
             });
         });
 
-        // [不使用] XA API
+        // 1. [不使用] XA API
         function callTransferWithoutXA() {
             $.ajax({
                 url: '@Url.Action("TransferWithoutXA", "Home")',
@@ -44,7 +44,7 @@
             });
         }
 
-        // [使用] XA API
+        // 2. [使用] XA API
         function callTransferWithXA() {
             $.ajax({
                 url: '@Url.Action("TransferWithXA", "Home")',
@@ -56,7 +56,5 @@
                 }
             });
         }
-
-       
     </script>
 }

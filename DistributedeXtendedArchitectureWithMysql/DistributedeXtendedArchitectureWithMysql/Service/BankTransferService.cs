@@ -17,8 +17,8 @@ namespace DistributedeXtendedArchitectureWithMysql.Service
             _logger = logger;
         }
 
-        /// <summary>
-        /// 不使用 XA 的轉賬方法 - 可能出現的問題：
+        /// <summary>        
+        /// 一、不使用 XA 的轉賬方法 - 可能出現的問題：
         /// 1. 當 Bank_A 扣款成功，但 Bank_B 加款失敗時，資金會丟失
         /// 2. 系統崩潰或網絡中斷時，無法確保數據一致性
         /// 3. 無法進行有效的回滾操作
@@ -27,15 +27,18 @@ namespace DistributedeXtendedArchitectureWithMysql.Service
         {
             try
             {
-                // 步驟1: 從 Bank_A 扣款
+                // Step 1-1 : 從 Bank_A 扣款
                 using (var connA = new MySqlConnection(_connectionStringBankA))
                 {
                     await connA.OpenAsync();
                     using (var cmd = connA.CreateCommand())
                     {
-                        cmd.CommandText = "UPDATE accounts " +
-                            "                 SET balance = balance - @amount " +
-                            "               WHERE account_number = @account";
+                        var sql = $@"
+UPDATE accounts
+   SET balance = balance - @amount
+ WHERE account_number = @account
+";
+                        cmd.CommandText = sql;
                         cmd.Parameters.AddWithValue("@amount", request.Amount);
                         cmd.Parameters.AddWithValue("@account", request.FromAccount);
                         await cmd.ExecuteNonQueryAsync();
@@ -46,15 +49,18 @@ namespace DistributedeXtendedArchitectureWithMysql.Service
                 // Bank_A 的錢已經扣除，但 Bank_B 還沒收到
                 // 這時資金就會丟失，而且無法自動恢復
 
-                // 步驟2: 在 Bank_B 增加餘額
+                // Step 1-2 : 在 Bank_B 增加餘額
                 using (var connB = new MySqlConnection(_connectionStringBankB))
                 {
                     await connB.OpenAsync();
                     using (var cmd = connB.CreateCommand())
                     {
-                        cmd.CommandText = $@"UPDATE accounts
-                                                SET balance = balance + @amount
-                                              WHERE account_number = @account";
+                        var sql = $@"
+UPDATE accounts
+   SET balance = balance + @amount
+ WHERE account_number = @account
+";
+                        cmd.CommandText = sql;
                         cmd.Parameters.AddWithValue("@amount", request.Amount);
                         cmd.Parameters.AddWithValue("@account", request.ToAccount);
                         await cmd.ExecuteNonQueryAsync();
@@ -75,6 +81,8 @@ namespace DistributedeXtendedArchitectureWithMysql.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Transfer failed without XA");
+
+                // Step 2: 回滾階段
                 // 危險點3：即使捕獲到異常，我們也無法確保能夠正確地回滾之前的操作
                 // 可能會導致數據不一致
                 return new TransferResult
@@ -87,13 +95,14 @@ namespace DistributedeXtendedArchitectureWithMysql.Service
         }
 
         /// <summary>
-        /// 使用 XA 的轉賬方法 - 解決的問題：
+        /// 二、使用 XA 的轉賬方法 - 解決的問題：
         /// 1. 確保轉賬的原子性：要麼全部成功，要麼全部失敗
         /// 2. 支持分布式事務回滾：出錯時可以安全回滾
         /// 3. 保證跨庫數據一致性：兩個銀行的數據始終保持一致
         /// </summary>
         public async Task<TransferResult> TransferWithXAAsync(TransferRequest request)
         {
+            // Step 1. 產生本次 XA 的唯一碼
             string xaId = Guid.NewGuid().ToString();
             MySqlConnection connA = null;
             MySqlConnection connB = null;
@@ -102,38 +111,36 @@ namespace DistributedeXtendedArchitectureWithMysql.Service
             {
                 _logger.LogInformation($"Starting XA transaction {xaId}");
 
-                // 同時打開兩個連接
+                // Step 2-1. 同時打開兩個連接
                 connA = new MySqlConnection(_connectionStringBankA);
                 connB = new MySqlConnection(_connectionStringBankB);
                 await connA.OpenAsync();
                 await connB.OpenAsync();
 
-                // 安全點1：開始 XA 事務
-                // 這確保了後續的所有操作都在一個分布式事務中
+                // Step 2-2：開始 XA 事務
+                // 說明：這確保了後續的所有操作都在一個分布式事務中
                 await ExecuteXaCommandAsync(connA, $"XA START '{xaId}'");
                 await ExecuteXaCommandAsync(connB, $"XA START '{xaId}'");
 
-                // 安全點2：檢查餘額
-                // 如果餘額不足，整個事務會被回滾
-                if (!await CheckBalanceAsync(connA, request.FromAccount, request.Amount))
-                {
-                    throw new InvalidOperationException("Insufficient funds");
-                }
+                // Step 2-3：行鎖
+                // 說明：將此帳號鎖定，避免同時間被異動
+                await ForUpdateAccount(connA, request.FromAccount);
+                await ForUpdateAccount(connB, request.ToAccount);
 
-                // 安全點3：執行轉賬操作
-                // 這些操作要麼全部成功，要麼全部失敗
-                await ExecuteTransferAsync(connA, request.FromAccount, -request.Amount);
-                await ExecuteTransferAsync(connB, request.ToAccount, request.Amount);
+                // Step 2-4：執行轉賬操作(業務邏輯)
+                // 說明：這些操作要麼全部成功，要麼全部失敗
+                await ExecuteTransferAsync(connA, request.FromAccount, -request.Amount);//A 扣款
+                await ExecuteTransferAsync(connB, request.ToAccount, request.Amount);//B 增加餘額
 
-                // 安全點4：準備階段
-                // 確保所有參與者都準備好提交
+                // Step 2-5：準備階段
+                // 說明：確保所有參與者都準備好提交
                 await ExecuteXaCommandAsync(connA, $"XA END '{xaId}'");
                 await ExecuteXaCommandAsync(connB, $"XA END '{xaId}'");
                 await ExecuteXaCommandAsync(connA, $"XA PREPARE '{xaId}'");
                 await ExecuteXaCommandAsync(connB, $"XA PREPARE '{xaId}'");
 
-                // 安全點5：提交階段
-                // 只有當所有準備工作都成功後才提交
+                // Step 2-6：提交階段
+                // 說明：只有當所有準備工作都成功後才提交
                 await ExecuteXaCommandAsync(connA, $"XA COMMIT '{xaId}'");
                 await ExecuteXaCommandAsync(connB, $"XA COMMIT '{xaId}'");
 
@@ -152,7 +159,7 @@ namespace DistributedeXtendedArchitectureWithMysql.Service
 
                 try
                 {
-                    // 安全點6：錯誤回滾
+                    // Step 3：回滾階段
                     // XA 確保了即使在錯誤情況下也能正確回滾
                     if (connA?.State == System.Data.ConnectionState.Open)
                         await ExecuteXaCommandAsync(connA, $"XA ROLLBACK '{xaId}'");
@@ -176,129 +183,91 @@ namespace DistributedeXtendedArchitectureWithMysql.Service
                 await connA?.CloseAsync();
                 await connB?.CloseAsync();
             }
-        }
 
-        #region 私有方法
+            #region [閉包] 私有方法
 
-        /// <summary>
-        /// 執行 XA 事務相關命令
-        /// </summary>
-        private async Task ExecuteXaCommandAsync(MySqlConnection connection, string command)
-        {
-            try
+            /// <summary>
+            /// 執行 XA 事務相關命令
+            /// </summary>
+            async Task ExecuteXaCommandAsync(MySqlConnection connection, string command)
             {
-                using var cmd = connection.CreateCommand();
-                cmd.CommandText = command;
-                cmd.CommandTimeout = 30; // 設置超時時間
-                _logger.LogDebug($"Executing XA command: {command}");
-                await cmd.ExecuteNonQueryAsync();
+                try
+                {
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandText = command;
+                    cmd.CommandTimeout = 30; // 設置超時時間
+                    _logger.LogDebug($"Executing XA command: {command}");
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                catch (MySqlException ex)
+                {
+                    _logger.LogError(ex, $"Error executing XA command: {command}");
+                    throw new Exception($"XA command failed: {command}", ex);
+                }
             }
-            catch (MySqlException ex)
-            {
-                _logger.LogError(ex, $"Error executing XA command: {command}");
-                throw new Exception($"XA command failed: {command}", ex);
-            }
-        }
 
-        /// <summary>
-        /// 檢查賬戶餘額是否足夠
-        /// </summary>
-        private async Task<bool> CheckBalanceAsync(MySqlConnection connection, string accountNumber, decimal amount)
-        {
-            try
+            /// <summary>
+            /// 鎖定行防止併發修改
+            /// </summary>
+            async Task ForUpdateAccount(MySqlConnection connection, string accountNumber)
             {
-                using var cmd = connection.CreateCommand();
-                cmd.CommandText = @"
+                try
+                {
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandText = @"
                 SELECT balance 
                   FROM accounts 
                  WHERE account_number = @account
                    FOR UPDATE";  // 鎖定行防止並發修改
 
-                cmd.Parameters.AddWithValue("@account", accountNumber);
+                    cmd.Parameters.AddWithValue("@account", accountNumber);
 
-                using var reader = await cmd.ExecuteReaderAsync();
-                if (!await reader.ReadAsync())
-                {
-                    throw new Exception($"Account not found: {accountNumber}");
-                }
-
-                decimal balance = reader.GetDecimal(0);
-                _logger.LogInformation($"Current balance for {accountNumber}: {balance}");
-
-                return balance >= amount;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error checking balance for account: {accountNumber}");
-                throw new Exception($"Balance check failed for account: {accountNumber}", ex);
-            }
-        }
-
-        /// <summary>
-        /// 執行轉賬操作
-        /// </summary>
-        private async Task ExecuteTransferAsync(MySqlConnection connection, string accountNumber, decimal amount)
-        {
-            try
-            {
-                using var cmd = connection.CreateCommand();
-                cmd.CommandText = @"
-                UPDATE accounts 
-                SET balance = balance + @amount,
-                    last_updated = CURRENT_TIMESTAMP
-                WHERE account_number = @account";
-
-                cmd.Parameters.AddWithValue("@amount", amount);
-                cmd.Parameters.AddWithValue("@account", accountNumber);
-
-                int rowsAffected = await cmd.ExecuteNonQueryAsync();
-
-                if (rowsAffected == 0)
-                {
-                    throw new Exception($"Account not found or update failed: {accountNumber}");
-                }
-
-                _logger.LogInformation($"Transfer completed for account {accountNumber}: {amount}");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error executing transfer for account: {accountNumber}");
-                throw new Exception($"Transfer failed for account: {accountNumber}", ex);
-            }
-        }
-
-        /// <summary>
-        /// 檢查 XA 事務狀態
-        /// </summary>
-        private async Task<string> CheckXaTransactionStatusAsync(MySqlConnection connection, string xaId)
-        {
-            try
-            {
-                using var cmd = connection.CreateCommand();
-                cmd.CommandText = "XA RECOVER";
-
-                using var reader = await cmd.ExecuteReaderAsync();
-                while (await reader.ReadAsync())
-                {
-                    string formatId = reader.GetString(0);
-                    string gtrid = reader.GetString(1);
-                    string bqual = reader.GetString(2);
-
-                    if (gtrid == xaId)
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    if (!await reader.ReadAsync())
                     {
-                        return "PREPARED"; // 事務在準備狀態
+                        throw new Exception($"Account not found: {accountNumber}");
                     }
                 }
-
-                return "COMPLETED"; // 事務已完成
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error ForUpdateAccount for account: {accountNumber}");
+                    throw new Exception($"ForUpdateAccount failed for account: {accountNumber}", ex);
+                }
             }
-            catch (Exception ex)
+
+            /// <summary>
+            /// 執行轉賬操作
+            /// </summary>
+            async Task ExecuteTransferAsync(MySqlConnection connection, string accountNumber, decimal amount)
             {
-                _logger.LogError(ex, $"Error checking XA transaction status: {xaId}");
-                throw new Exception($"Failed to check XA transaction status: {xaId}", ex);
-            }
-        }
+                try
+                {
+                    using var cmd = connection.CreateCommand();
+                    cmd.CommandText = @"
+                UPDATE accounts 
+                   SET balance = balance + @amount
+                 WHERE account_number = @account";
 
-        #endregion
+                    cmd.Parameters.AddWithValue("@amount", amount);
+                    cmd.Parameters.AddWithValue("@account", accountNumber);
+
+                    int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                    if (rowsAffected == 0)
+                    {
+                        throw new Exception($"Account not found or update failed: {accountNumber}");
+                    }
+
+                    _logger.LogInformation($"Transfer completed for account {accountNumber}: {amount}");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, $"Error executing transfer for account: {accountNumber}");
+                    throw new Exception($"Transfer failed for account: {accountNumber}", ex);
+                }
+            }
+
+            #endregion
+        }
     }
 }
