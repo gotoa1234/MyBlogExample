@@ -45,7 +45,7 @@ namespace KafkaAspCoreWebExample.Services.Background
                     RetryBackoffMs = 1000
                 };
 
-                // 2-2. 無法連接時，直接結束方法，不進入迴圈 (這篇範例一定要 Kafka Server 正常)
+                // 2-2. 無法連接時，直接結束方法，不進入迴圈 (這篇範例假定 Kafka Server 是正常運行，不做其他例外處理)
                 try
                 {
                     _consumer = new ConsumerBuilder<string, string>(consumerConfig).Build();
@@ -129,7 +129,7 @@ namespace KafkaAspCoreWebExample.Services.Background
         }
 
         /// <summary>
-        /// 三、停止背景服務時 EX: 關閉、停用
+        /// 二、停止背景服務時 EX: 關閉、停用
         /// </summary>        
         public override Task StopAsync(CancellationToken stoppingToken)
         {

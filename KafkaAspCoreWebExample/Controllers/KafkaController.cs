@@ -21,7 +21,7 @@ namespace KafkaAspCoreWebExample.Controllers
         }
 
         /// <summary>
-        /// Partial View 頁面 - 生產者的資訊 (發送資料)
+        /// View 頁面 - 生產者的資訊 (發送資料)
         /// </summary>        
         public IActionResult Produce()
         {
@@ -55,11 +55,11 @@ namespace KafkaAspCoreWebExample.Controllers
         }
 
         /// <summary>
-        /// Partial View 頁面 - 消費者的資訊 (當前收到的資料)
+        /// View 頁面 - 消費者的資訊 (當前收到的資料)
         /// </summary>   
         public IActionResult Consume()
         {
-            // 1. 取得此 AP 上發送過的 Kafka 資料 (這篇簡單示範，還有其他持久化消費對列的方式)
+            // 1. 取得發送過的 Kafka 資料 (這篇簡單示範，還有其他持久化消費對列的方式)
             var receivedMessages = _consumerService.GetReceivedMessages();
             return View(receivedMessages);
         }
