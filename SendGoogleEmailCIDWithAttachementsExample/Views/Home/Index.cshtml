@@ -1,8 +1,118 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model SendGoogleEmailCIDWithAttachementsExample.Models.EmailViewModel
+@{
+    ViewData["Title"] = "發送郵件範例";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center">發送郵件</h3>
+                </div>
+                <div class="card-body">
+                    <form id="emailForm">
+                        <div class="mb-3">
+                            <label for="smtpServer" class="form-label">SMTP 伺服器</label>
+                            <input type="text" class="form-control" id="smtpServer" name="SmtpServer" value="smtp.gmail.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="smtpPort" class="form-label">SMTP 連接埠</label>
+                            <input type="number" class="form-control" id="smtpPort" name="SmtpPort" value="587" required>
+                            <small class="text-muted">常用連接埠: 465 (SSL) / 587 (TLS)</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="senderEmail" class="form-label">寄件者信箱</label>
+                            <input type="email" class="form-control" id="senderEmail" name="SenderEmail" value="cap8826@gmail.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="senderPassword" class="form-label">寄件者密碼</label>
+                            <input type="password" class="form-control" id="senderPassword" name="SenderPassword" value="1234567890" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recipientEmail" class="form-label">收件者信箱</label>
+                            <input type="email" class="form-control" id="recipientEmail" name="RecipientEmail" value="cap8825@gmail.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">郵件主旨</label>
+                            <input type="text" class="form-control" id="subject" value="個人資料 - 附帶圖片" name="Subject" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="button" id="sendButton" class="btn btn-primary">發送郵件</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- 顯示結果的模態框 -->
+<div class="modal fade" id="resultModal" tabindex="-1" aria-labelledby="resultModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="resultModalLabel">郵件發送結果</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="resultMessage">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">關閉</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#sendButton').on('click', function () {
+                // 顯示載入中的按鈕狀態
+                const button = $(this);
+                const originalText = button.text();
+                button.prop('disabled', true);
+                button.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 處理中...');
+
+                // 獲取表單數據
+                const formData = {
+                    smtpServer: $('#smtpServer').val(),
+                    smtpPort: parseInt($('#smtpPort').val()),
+                    senderEmail: $('#senderEmail').val(),
+                    senderPassword: $('#senderPassword').val(),
+                    recipientEmail: $('#recipientEmail').val(),
+                    subject: $('#subject').val(),
+                    body: $('#body').val()
+                };
+
+                // 呼叫後端 API
+                $.ajax({
+                    url: '/api/Email/Send',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function (response) {
+                        $('#resultMessage').html('<div class="alert alert-success">郵件發送成功!</div>');
+                        $('#resultModal').modal('show');
+                        // 清空表單的主旨和內容
+                        $('#subject').val('');
+                        $('#body').val('');
+                    },
+                    error: function (xhr, status, error) {
+                        let errorMessage = '郵件發送失敗。';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage += '<br>詳細錯誤: ' + xhr.responseJSON.message;
+                        }
+                        $('#resultMessage').html('<div class="alert alert-danger">' + errorMessage + '</div>');
+                        $('#resultModal').modal('show');
+                    },
+                    complete: function () {
+                        // 恢復按鈕狀態
+                        button.prop('disabled', false);
+                        button.text(originalText);
+                    }
+                });
+            });
+        });
+    </script>
+}
