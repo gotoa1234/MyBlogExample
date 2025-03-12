@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "XA 測試頁面";
+}
+
+<div class="text-center">
+    <h1 class="display-4">XA test page.</h1>
+    <div class="row mb-4">
+        <div class="col">
+            <button class="btn btn-primary" type="button" id="uselessXA">1. 不使用 XA</button>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col">
+             <button class="btn btn-primary" type="button" id="useXA">2. 使用 XA</button>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+
+            $("#uselessXA").click(function () {
+                callTransferWithoutXA();
+            });
+
+            $("#useXA").click(function () {
+                callTransferWithXA();
+            });
+        });
+
+        // 1. [不使用] XA API
+        function callTransferWithoutXA() {
+            $.ajax({
+                url: '@Url.Action("TransferWithoutXA", "Home")',
+                type: 'GET',
+                data: null,
+                success: function (response) {
+                },
+                error: function () {
+                }
+            });
+        }
+
+        // 2. [使用] XA API
+        function callTransferWithXA() {
+            $.ajax({
+                url: '@Url.Action("TransferWithXA", "Home")',
+                type: 'GET',
+                data: null,
+                success: function (response) {
+                },
+                error: function () {                    
+                }
+            });
+        }
+    </script>
+}

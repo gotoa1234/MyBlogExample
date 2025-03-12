@@ -23,15 +23,23 @@ namespace RedisProducerAndComsumerForPubAndSubExample.Controllers
 
 
         /// <summary>
-        /// 2. 實現生產者推送訊息
+        /// 2. 實現 Pub/Sub 生產者推送訊息
         /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
         [HttpPost]
-        public IActionResult ProduceMessage(string message)
+        public IActionResult ProduceMessage([FromBody] MessageRequest request)
         {
-            _pubSubService.Publish("myChannel", message);
-            return Ok("Message sent: " + message);
+            if (string.IsNullOrEmpty(request.Message))
+            {
+                return BadRequest("Message is required.");
+            }
+
+            _pubSubService.Publish("myChannel", request.Message);
+            return Ok(new { message = "Message sent: " + request.Message });
+        }
+
+        public class MessageRequest
+        {
+            public string Message { get; set; }
         }
     }
 }

@@ -25,17 +25,17 @@ namespace MinIOWebSiteExample.Controllers
 
         /// <summary>
         /// 上傳單一檔案
-        /// </summary>        
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile file, string bucketName)
         {
             await _teacherManageService.UploadFile(file, bucketName);
-            return Ok("上傳成功");
+            return Ok("Upload Success!");
         }
 
         /// <summary>
         /// 下載單一檔案
-        /// </summary>        
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> DownloadFile(string fileName, string bucketName)
         {
@@ -48,37 +48,37 @@ namespace MinIOWebSiteExample.Controllers
                 };
             }
 
-            return BadRequest(new { message = $@"Cannot download file {fileName}." });
+            return BadRequest(new { message = $"Cannot download file {fileName}." });
         }
 
         /// <summary>
         /// 刪除單一檔案
-        /// </summary>        
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> DeleteFile(string fileName, string bucketName)
         {
             await _teacherManageService.DeleteFile(fileName, bucketName);
-            return Ok($@"{fileName} 已刪除");
+            return Ok($"{fileName} Has been remove.");
         }
 
         /// <summary>
         /// 刪除帳號
-        /// </summary>        
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> DeleteAccount(long Id)
         {
             await _teacherManageService.DeleteAccount(Id);
-            return Ok(new { message = $@"教師已刪除 ID：{Id}" });
+            return Ok(new { message = $"Teacher has been remove ID：{Id}" });
         }
 
         /// <summary>
         /// 新建帳號
-        /// </summary>        
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> CreateAccount()
         {
             var createdId = await _teacherManageService.CreateAccount();
-            return Ok(new { message = $@"教師帳號已建立 ID:{createdId}" });
+            return Ok(new { message = $"Teacher account has been create ID:{createdId}" });
         }
     }
 }

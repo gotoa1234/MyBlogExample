@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  mysql-bank-a:
+    image: mysql:8.0
+    container_name: mysql-bank-a
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: Bank_A
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql-bank-a-data:/var/lib/mysql
+      - ./init-bank-a.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --default-authentication-plugin=mysql_native_password
+            --innodb_lock_wait_timeout=120
+            --max_connections=1000
+    networks:
+      xa-network:
+        ipv4_address: 172.20.0.2
+
+  mysql-bank-b:
+    image: mysql:8.0
+    container_name: mysql-bank-b
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: Bank_B
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql-bank-b-data:/var/lib/mysql
+      - ./init-bank-b.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --default-authentication-plugin=mysql_native_password
+            --innodb_lock_wait_timeout=120
+            --max_connections=1000
+    networks:
+      xa-network:
+        ipv4_address: 172.20.0.3
+
+networks:
+  xa-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

@@ -3,6 +3,36 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">List Redis 範例說明</h1>
+    <input type="button" value="點擊送出生產者資料" onclick="ClickButtonMethod()" />
+
 </div>
+
+<script>
+    // 1. 呼叫 API 生產資料
+    function ClickButtonMethod() {
+        fetch('/Home/ProduceMessage', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: 'List Redis 範例說明' })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // 錯誤處理：檢查非 2xx 狀態碼
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json(); // 確保響應是 JSON 格式
+            })
+            .then(data => {
+                alert(data.message);
+                location.reload();
+            })
+            .catch(error => {
+                console.error('error:', error);
+                alert('Error: ' + error.message);
+            });
+    }
+</script>
+

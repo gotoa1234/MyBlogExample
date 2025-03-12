@@ -1,0 +1,82 @@
+﻿@{
+    ViewData["Title"] = "Session 持久化";
+}
+
+<!DOCTYPE html>
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header">
+            <h3>用戶餘額管理</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col">
+                    <h4>當前餘額：<span id="currentBalance">0</span></h4>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <div class="input-group mb-3">
+                        <input type="number" id="amountInput" class="form-control" placeholder="請輸入金額">
+                        <button class="btn btn-primary" type="button" id="updateBtn">更新金額</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // 載入時取得當前餘額
+            getBalance();
+
+            // 更新按鈕點擊事件
+            $("#updateBtn").click(function () {
+                const amount = $("#amountInput").val();
+                if (!amount) {
+                    alert("請輸入金額");
+                    return;
+                }
+
+                // 呼叫更新金額 API
+                updateBalance(parseFloat(amount));
+            });
+        });
+
+        // 取得餘額
+        function getBalance() {
+            $.ajax({
+                url: '@Url.Action("GetBalance", "Balance")',
+                type: 'GET',
+                data: { amount: 0 },
+                success: function (response) {
+                    $("#currentBalance").text(response);
+                },
+                error: function () {
+                    alert("取得餘額失敗");
+                }
+            });
+        }
+
+        // 更新餘額
+        function updateBalance(amount) {
+            $.ajax({
+                url: '@Url.Action("UpdateBalance", "Balance")',
+                type: 'GET',
+                data: { amount: amount },
+                success: function () {
+                    alert("更新成功");
+                    getBalance(); // 重新取得餘額
+                    $("#amountInput").val(''); // 清空輸入框
+                },
+                error: function () {
+                    alert("更新失敗");
+                }
+            });
+        }
+    </script>
+}
+

@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Kafka 示範";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Kafka ASP.NET Core 整合示範</h1>
+    <p>選擇您想要執行的操作：</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>發送訊息</h5>
+                </div>
+                <div class="card-body">
+                    <p>發送訊息到 Kafka 主題</p>
+                    <a asp-action="Produce" class="btn btn-primary">前往發送頁面</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>接收訊息</h5>
+                </div>
+                <div class="card-body">
+                    <p>查看從 Kafka 接收的訊息</p>
+                    <a asp-action="Consume" class="btn btn-success">前往接收頁面</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

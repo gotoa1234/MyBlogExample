@@ -31,7 +31,7 @@ namespace MinIOWebSiteExample.Service
             });
             foreach (var item in result)
             {
-                var bucketName = $@"{item.Id}";
+                var bucketName = $"{item.Id}";
                 // 不存在就建立 Bucket
                 if (!await _minIOClientInstance.IsExistBucket(bucketName))
                 {
@@ -87,7 +87,7 @@ namespace MinIOWebSiteExample.Service
         public async Task<long> CreateAccount()
         {
             var createdId = _dataBase.CreateTeacher();
-            var bucketName = $@"{createdId}";
+            var bucketName = $"{createdId}";
             // 不存在就建立 Bucket
             if (!await _minIOClientInstance.IsExistBucket(bucketName))
             {
@@ -103,7 +103,7 @@ namespace MinIOWebSiteExample.Service
         {
             _dataBase.DeleteTeacher(id);
 
-            var bucketName = $@"{id}";
+            var bucketName = $"{id}";
             await _minIOClientInstance.DeleteBucket(bucketName);
         }
 

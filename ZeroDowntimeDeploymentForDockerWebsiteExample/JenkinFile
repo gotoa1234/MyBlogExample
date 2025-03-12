@@ -1,0 +1,168 @@
+pipeline {
+  agent any
+  
+  // 1. 環境變數 - 配置
+  environment {       
+		PORT_HTTP = "8080" // 1-1. 對應宿主機 Http Port 
+        PROJECT_NAME = "ZeroDowntimeDeploymentForDockerWebsiteExample"           // 1-2. 專案名稱
+		PROJECT_NAME_FOR_DOCKER = "zerodowntimedeploymentfordockerwebsiteexample"// 1-3. DockerName 強制小寫
+		GIT_SOURCE_REPOSITORY = "https://github.com/gotoa1234/MyBlogExample.git" // 1-4. 專案來源
+		TARGET_MACHINE_IP = "192.168.51.93"// 1-5. 對應的部署機器IP (會知道 CD 最終位置)
+		TARGET_MACHINE_CREDENTIAL = "DeployMechineUbuntu"// 1-6. 對應部署機器的SSH Server Name (應自己從 Jenkins Manager System 配置)
+  }  
+  
+  // 2. 定義單一建置時可異動參數
+  parameters {
+        string(name: 'GIT_HASH_TAG', defaultValue: '', description: '指定發布的GIT Hash 標籤(雜湊版號)，預設 head 表示更新最新代碼')
+  }
+  
+  stages {
+      
+    // step 1. start - 取得 Source Code
+    stage('Checkout') {
+       steps {
+            checkout([$class: 'GitSCM', 
+                branches: [[name: "remotes/origin/main"]],
+                userRemoteConfigs: [[url: "${env.GIT_SOURCE_REPOSITORY}"]]
+            ])
+
+            sh """
+                git pull origin main
+            """
+
+            sh """
+                git checkout ${params.GIT_HASH_TAG}
+            """
+        }
+     }
+    // step 1. end
+
+    // step 2. start - 從 Jenkins 產生部署檔案
+    stage('Building') {
+      steps {
+        script {
+                    sh """
+                      dotnet publish ${PROJECT_NAME}/${PROJECT_NAME}.csproj -c Release -o publish/${PROJECT_NAME} --disable-build-servers
+                    """
+                }
+      }
+    }
+    // step 2. end
+    
+    // step 3. start - 將部署檔案放到目標 Server
+    stage('Publish Main Host') {
+	  steps {
+	      sshPublisher(publishers: 
+	             [sshPublisherDesc(configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+	                                transfers: [
+	                                    sshTransfer(cleanRemote: true, 
+	                                                   excludes: '', 
+	                                                execCommand: '', 
+	                                                execTimeout: 120000, 
+	                                                    flatten: false, 
+	                                              makeEmptyDirs: false, 
+	                                          noDefaultExcludes: false, 
+	                                           patternSeparator: '[, ]+', 
+	                                            remoteDirectory: "var\\dockerbuildimage\\${PROJECT_NAME}\\publish", 
+	                                         remoteDirectorySDF: false, 
+	                                               removePrefix: "publish\\${PROJECT_NAME}", 
+	                                                sourceFiles: "publish\\${PROJECT_NAME}\\**")],
+	                     usePromotionTimestamp: false, 
+	                   useWorkspaceInPromotion: false, 
+	                                   verbose: false)
+	             ])
+	  }
+    }
+    // step 3. end
+    
+	// step 4. start - 將部署的 DockerFile 放到目標 Server
+    stage('Publish DockerFile') {
+	  steps {
+	      sshPublisher(publishers: 
+		         [sshPublisherDesc(configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+				                    transfers: [
+									    sshTransfer(cleanRemote: false, 
+										               excludes: '', 
+													execCommand: '', 
+													execTimeout: 120000, 
+													    flatten: false, 
+												  makeEmptyDirs: false, 
+											  noDefaultExcludes: false, 
+											   patternSeparator: '[, ]+', 
+											    remoteDirectory: "var\\dockerbuildimage\\${PROJECT_NAME}", 
+											 remoteDirectorySDF: false, 
+											       removePrefix: "${PROJECT_NAME}", 
+												    sourceFiles: "${PROJECT_NAME}\\Dockerfile")], 
+					   usePromotionTimestamp: false, 
+					 useWorkspaceInPromotion: false, 
+					                 verbose: false)
+				])
+	  }
+    }
+    // step 4. end
+	
+	// step 5. start - 建立 Image
+    stage('Build Image Remotely') {
+      steps {
+	    sh """
+		   echo cd /var/dockerbuildimage/${env.PROJECT_NAME} 
+		   echo docker build --no-cache -t ${env.PROJECT_NAME_FOR_DOCKER} .
+		   echo docker tag ${env.PROJECT_NAME_FOR_DOCKER}:latest ${env.PROJECT_NAME_FOR_DOCKER}:hash_${params.GIT_HASH_TAG}
+		   """
+	  
+        sshPublisher(
+            failOnError: true,
+            publishers: [sshPublisherDesc(
+            configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+            transfers: [sshTransfer(
+                excludes: '', 
+                execCommand: "cd /var/dockerbuildimage/${env.PROJECT_NAME} && \
+                              docker build --no-cache -t ${env.PROJECT_NAME_FOR_DOCKER} . && \
+                              docker tag ${env.PROJECT_NAME_FOR_DOCKER}:latest ${env.PROJECT_NAME_FOR_DOCKER}:hash_${params.GIT_HASH_TAG}", 
+                execTimeout: 120000, 
+                patternSeparator: '[, ]+')], 
+            verbose: false)])
+      }
+    }
+	// step 5. end
+	
+	// step 6. start - 重建容器，並且將舊的容器先刪除再運行
+    stage('ReConstruct Container') {
+      steps {
+        sshPublisher(
+            failOnError: true,
+            publishers: [sshPublisherDesc(
+            configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+            transfers: [sshTransfer(
+                excludes: '', 
+                execCommand: "sudo docker stop ${env.PROJECT_NAME_FOR_DOCKER} && \
+                                  docker rm ${env.PROJECT_NAME_FOR_DOCKER} || true && \
+                                  docker run -e ASPNETCORE_ENVIRONMENT=Development --name ${env.PROJECT_NAME_FOR_DOCKER} -d -p 8090:8080 -p 8091:8081 \
+                                  --mount type=bind,source=/var/dockervolumes/${env.PROJECT_NAME}/appsettings.json,target=/app/appsettings.json \
+                                  --mount type=bind,source=/var/dockervolumes/${env.PROJECT_NAME}/appsettings.Development.json,target=/app/appsettings.Development.json \
+                                  ${env.PROJECT_NAME_FOR_DOCKER}:latest", 
+                execTimeout: 120000, 
+                patternSeparator: '[, ]+')], 
+            verbose: false)])
+      }
+    }    
+	// step 6. end
+	
+	// step 7. start - 清除舊的 Image 資料，避免佔用空間
+    stage('Image Purne') {
+      steps {
+         sshPublisher(
+             failOnError: true,
+             publishers: [sshPublisherDesc(
+             configName: "${env.TARGET_MACHINE_CREDENTIAL}", 
+             transfers: [sshTransfer(
+                 excludes: '', 
+                 execCommand: "docker image prune -f", 
+                 execTimeout: 120000, 
+                 patternSeparator: '[, ]+')], 
+             verbose: false)])
+      }
+    }
+	// step 7. end
+  }
+}
