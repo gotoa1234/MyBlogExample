@@ -1,52 +1,48 @@
 ﻿using System.Net.Mail;
 using System.Net.Mime;
 using System.Net;
+using SendGoogleEmailCIDWithAttachementsExample.Models;
 
 namespace SendGoogleEmailCIDWithAttachementsExample.Service
 {
     public class SendEmailService : ISendEmailService
     {
-        public async Task SendEmail()
+        /// <summary>
+        /// 使用附件方式功能，發送郵件
+        /// </summary>
+        public async Task<string> SendEmail(EmailDTO emailDto)
         {
             try
             {
-                // SMTP 設定
-                string smtpServer = "smtp.gmail.com"; // 替換為 SMTP 伺服器
-                int smtpPort = 587; // 465 (SSL) / 587 (TLS)
-                string senderEmail = "cap8826@gmail.com";
-                string senderPassword = "fdwxzlnbaeakmran";
-                string recipientEmail = "cap8825@gmail.com";
+                // 1. 輸入自己的信箱密碼 - 這個要輸入自己安全應用程式上的產生密碼
+                string senderPassword = emailDto.SenderPassword;
 
-                // 建立 MailMessage
+                // 2-1. 建立 MailMessage
                 MailMessage mail = new MailMessage
                 {
-                    From = new MailAddress(senderEmail),
+                    From = new MailAddress(emailDto.SenderEmail),
                     Subject = "個人資料 - 附帶圖片",
-                    IsBodyHtml = true
+                    IsBodyHtml = true,
                 };
-                mail.To.Add(recipientEmail);
+                // 2-2. 郵件副本對象
+                mail.To.Add(emailDto.RecipientEmail);
 
-                // 附件圖片
-                //string imagePath = @"C:\path\to\image.jpg"; // 替換為你的圖片路徑
-                //Attachment inlineImage = new Attachment(imagePath);
+                // 2-3. 可將圖片網址做為傳參
+                var imageBytes = await DownloadImageAsync();
 
-                // 圖片的 URL
-                string imageUrl = "https://gotoa1234.github.io/assets/image/ContinuousDeployment/docker/2025_03_08/005.png"; // 替換為你的圖片網址
-                byte[] imageBytes = await DownloadImageAsync(imageUrl);
+                // 2-4. 將圖片存成附件，讓 Mail 中，不依賴 Url 而是存在 Mail 中
+                //      優點：未來Url失效時，此郵件仍可檢閱圖片
 
-                if (imageBytes == null || imageBytes.Length == 0)
-                {
-                    Console.WriteLine("圖片下載失敗！");
-                    return;
-                }
-                MemoryStream imageStream = new MemoryStream(imageBytes);
-                Attachment inlineImage = new Attachment(imageStream, "louis.jpg", "image/jpeg");
-                inlineImage.ContentId = "MyImage"; // 這個 Content-ID 用於 HTML 內嵌
+                var imageStream = new MemoryStream(imageBytes);
+                var inlineImage = new Attachment(imageStream, "louis.jpg", "image/jpeg");
+
+                // 關鍵：設定，並讓這個 Content-ID 用於 HTML 內嵌
+                inlineImage.ContentId = "MyImage";
                 inlineImage.ContentDisposition.Inline = true;
                 inlineImage.ContentDisposition.DispositionType = DispositionTypeNames.Inline;
                 mail.Attachments.Add(inlineImage);
 
-                // 設定 HTML 內容，使用 <img> 內嵌圖片
+                // 2-5. 撰寫 HTML 內容，並且使用 <img> 內嵌圖片
                 mail.Body = @"
                 <html>
                 <body>
@@ -59,20 +55,20 @@ namespace SendGoogleEmailCIDWithAttachementsExample.Service
                 </body>
                 </html>";
 
-                // 設定 SMTP 用戶端
-                SmtpClient smtpClient = new SmtpClient(smtpServer, smtpPort)
+                // 3. 設定 SMTP 用戶端
+                SmtpClient smtpClient = new SmtpClient(emailDto.SmtpServer, emailDto.SmtpPort)
                 {
-                    Credentials = new NetworkCredential(senderEmail, senderPassword),
+                    Credentials = new NetworkCredential(emailDto.SenderEmail, senderPassword),
                     EnableSsl = true
                 };
 
-                // 發送郵件
+                // 4. 發送郵件
                 smtpClient.Send(mail);
-                Console.WriteLine("郵件發送成功！");
+                return "郵件發送成功！";
             }
             catch (Exception ex)
             {
-                Console.WriteLine("郵件發送失敗：" + ex.Message);
+                return $@"郵件發送失敗：{ex.Message}";
             }
 
         }
@@ -80,18 +76,25 @@ namespace SendGoogleEmailCIDWithAttachementsExample.Service
         /// <summary>
         /// 下載網路圖片
         /// </summary>
-        private static async Task<byte[]> DownloadImageAsync(string url)
+        private static async Task<byte[]> DownloadImageAsync(
+            string url = "https://gotoa1234.github.io/assets/image/ContinuousDeployment/docker/2025_03_08/005.png")
         {
             using (HttpClient client = new HttpClient())
             {
                 try
                 {
-                    return await client.GetByteArrayAsync(url);
+                    var getResult = await client.GetByteArrayAsync(url);
+
+                    if (getResult == null ||
+                        getResult.Length == 0)
+                    {
+                        throw new Exception("圖片下載失敗！");
+                    }
+                    return getResult;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine("圖片下載錯誤：" + ex.Message);
-                    return null;
+                    throw new Exception("圖片下載錯誤：" + ex.Message);
                 }
             }
         }

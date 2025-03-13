@@ -17,18 +17,17 @@ namespace SendGoogleEmailCIDWithAttachementsExample.Controllers
 
         public IActionResult Index()
         {
-           
             return View();
         }
 
-        [HttpPost("Send")]
+        [HttpPost]
         public async Task<IActionResult> SendEmail([FromBody] EmailDTO model)
         {
             try
             {
-                await _sendEmailService.SendEmail();
-                // 建立 SMTP 客戶端
-                return Ok(new { success = true, message = "郵件發送成功" });
+                var result = await _sendEmailService.SendEmail(model);
+                return Ok(
+                    new { success = true, message = result });
             }
             catch (Exception ex)
             {
