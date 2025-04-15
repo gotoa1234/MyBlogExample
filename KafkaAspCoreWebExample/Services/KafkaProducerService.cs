@@ -19,7 +19,8 @@ namespace KafkaAspCoreWebExample.Services
             var config = new ProducerConfig
             {
                 BootstrapServers = _kafkaConfig.BootstrapServers,
-                Acks = Acks.All // Acks 參數定義了生產者發送訊息後，需要多少個 Broker 確認訊息已被接收，才能視為成功發送。
+                Acks = Acks.All, // Acks 參數定義了生產者發送訊息後，需要多少個 Broker 確認訊息已被接收，才能視為成功發送。
+                MessageTimeoutMs = 5000 // 5 秒 timeout
             };
 
             _producer = new ProducerBuilder<string, string>(config).Build();
