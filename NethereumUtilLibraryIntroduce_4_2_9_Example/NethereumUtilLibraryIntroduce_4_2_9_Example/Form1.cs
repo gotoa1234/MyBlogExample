@@ -1,4 +1,5 @@
 using NethereumUtilLibraryIntroduce_4_2_9_Example.Demo;
+using NethereumUtilLibraryIntroduce_4_2_9_Example.DemoMin;
 using System.Text;
 
 namespace NethereumUtilLibraryIntroduce_4_2_9_Example
@@ -24,7 +25,7 @@ namespace NethereumUtilLibraryIntroduce_4_2_9_Example
             try
             { 
                 // 建立 Sha3Keccack 類別的實例，用於計算 Keccak-256 雜湊值
-                var keccak = new DemoSha3Keccack();
+                var keccak = new DemoSha3KeccackMin();
 
                 // 將輸入字串轉換為 UTF-8 編碼的位元組陣列
                 byte[] bytes = Encoding.UTF8.GetBytes(textBoxInput.Text);
