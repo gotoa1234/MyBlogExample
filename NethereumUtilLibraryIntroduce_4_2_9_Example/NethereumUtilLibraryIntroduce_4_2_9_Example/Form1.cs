@@ -1,7 +1,8 @@
-using NethereumUtilLibraryIntroduce_4_2_9_Example.Demo;
+using Nethereum.Util;
 using NethereumUtilLibraryIntroduce_4_2_9_Example.DemoMin;
+using Org.BouncyCastle.Crypto.Digests;
+using System.Security.Cryptography;
 using System.Text;
-
 namespace NethereumUtilLibraryIntroduce_4_2_9_Example
 {
     public partial class Form1 : Form
@@ -13,6 +14,21 @@ namespace NethereumUtilLibraryIntroduce_4_2_9_Example
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            //測試1
+            var keccak = new Sha3Keccack();
+            byte[] inputBytes = Encoding.UTF8.GetBytes("測試資料123");
+            byte[] hashBytes = keccak.CalculateHash(inputBytes);
+
+            var hashHex = BitConverter.ToString(hashBytes).Replace("-", "").ToLowerInvariant();
+            //測試2
+            //var digest = new KeccakDigest(256);
+            //byte[] inputBytes = Encoding.UTF8.GetBytes("測試資料123");
+            //byte[] hashBytes = new byte[32]; // 256 bits = 32 bytes
+            //digest.BlockUpdate(inputBytes, 0, inputBytes.Length);
+            //digest.DoFinal(hashBytes, 0);
+            //string hashHex = BitConverter.ToString(hashBytes).Replace("-", "").ToLower();
+
+
 
         }
 

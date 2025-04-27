@@ -5,7 +5,7 @@ namespace NethereumUtilLibraryIntroduce_4_2_9_Example.Demo
 {
     /// <summary>
     /// 介紹 Nethereum.Util.Sha3Keccack 版本 4.2.9 的代碼
-    /// <para>如何進行加密</para>
+    /// <para>如何進行雜湊產生</para>
     /// </summary>
     public class DemoSha3Keccack
     {

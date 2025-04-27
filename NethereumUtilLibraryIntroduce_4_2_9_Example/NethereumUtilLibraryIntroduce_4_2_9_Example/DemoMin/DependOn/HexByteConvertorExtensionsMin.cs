@@ -27,7 +27,8 @@ namespace NethereumUtilLibraryIntroduce_4_2_9_Example.DemoMin.DependOn
         {
             // 將每個位元組轉換為兩位十六進制數，並連接起來
             // 如需前綴，則添加 "0x"
-            return string.Concat(prefix ? "0x" : "", string.Concat(value.Select((byte b) => b.ToString("x2")).ToArray()));
+            return string.Concat(prefix ? "0x" : "", string.Concat(
+                value.Select((byte b) => b.ToString("x2")).ToArray()));
         }
 
         /// <summary>
@@ -119,7 +120,8 @@ namespace NethereumUtilLibraryIntroduce_4_2_9_Example.DemoMin.DependOn
             }
             catch (FormatException innerException)
             {
-                throw new FormatException($"String '{value}' could not be converted to byte array (not hex?).", innerException);
+                throw new FormatException($"String '{value}' " +
+                    $"could not be converted to byte array (not hex?).", innerException);
             }
         }
 
@@ -149,7 +151,8 @@ namespace NethereumUtilLibraryIntroduce_4_2_9_Example.DemoMin.DependOn
                 // 處理 0-9
                 if (41 >= b || 64 <= b)
                 {
-                    throw new FormatException($"Character '{character}' at index '{index}' is not valid alphanumeric character.");
+                    throw new FormatException($"Character '{character}' at index '{index}' " +
+                        $"is not valid alphanumeric character.");
                 }
 
                 // 將 '0'-'9' 轉換為 0-9 的數值，並根據 shift 進行位移
