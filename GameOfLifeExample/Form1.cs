@@ -53,7 +53,17 @@ namespace GameOfLifeExample
 
             // 初始化 ILGPU
             context = Context.CreateDefault();
-            accelerator = context.CreateCudaAccelerator(0);
+            //accelerator = context.CreateCudaAccelerator(0);//電腦沒有顯示卡，此行會報錯            
+            try
+            {
+                // GPU
+                accelerator = context.CreateCudaAccelerator(0);
+            }
+            catch
+            {
+                // CPU
+                accelerator = context.CreateCPUAccelerator(0);
+            }
             kernel = accelerator.LoadAutoGroupedStreamKernel<Index2D, ArrayView2D<byte, Stride2D.DenseX>, ArrayView2D<byte, Stride2D.DenseX>>(GpuKernel);
 
             // 設定定時更新
