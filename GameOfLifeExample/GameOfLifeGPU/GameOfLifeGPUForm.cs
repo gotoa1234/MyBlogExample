@@ -1,18 +1,19 @@
-using ILGPU;
+ï»¿using ILGPU;
 using ILGPU.Runtime;
 using ILGPU.Runtime.CPU;
 using ILGPU.Runtime.Cuda;
 using System.Drawing.Imaging;
 using Timer = System.Windows.Forms.Timer;
 
-namespace GameOfLifeExample
+namespace GameOfLifeExample.GameOfLifeGPU
 {
-    public partial class Form1 : Form
+    public partial class GameOfLifeGPUForm : Form
     {
         private const int WidthCells = 256;
         private const int HeightCells = 256;
-        private byte[,] current;  // §ï¬°¤Gºû°}¦C
-        private byte[,] next;     // §ï¬°¤Gºû°}¦C
+        private const int CellSize = 3;
+        private byte[,] current;  // æ”¹ç‚ºäºŒç¶­é™£åˆ—
+        private byte[,] next;     // æ”¹ç‚ºäºŒç¶­é™£åˆ—
         private Bitmap bitmap;
         private Timer timer;
 
@@ -20,24 +21,37 @@ namespace GameOfLifeExample
         private Accelerator accelerator;
         private Action<Index2D, ArrayView2D<byte, Stride2D.DenseX>, ArrayView2D<byte, Stride2D.DenseX>> kernel;
 
-        public Form1()
+        public GameOfLifeGPUForm()
         {
             InitializeComponent();
+
+            InitialThisForm();
+
+            void InitialThisForm()
+            {
+                // æ ¹æ“šç¸®æ”¾æ¯”ä¾‹èª¿æ•´è¦–çª—å¤§å°
+                this.ClientSize = new Size(WidthCells * CellSize, HeightCells * CellSize);
+
+                // åˆå§‹åŒ–ç•«é¢
+                this.ClientSize = new Size(WidthCells, HeightCells);
+                this.DoubleBuffered = true;
+                this.Text = "Game of Life GPU";
+            }
         }
 
-        private void Form1_Load(object sender, EventArgs e)
+        private void GameOfLifeGPU_Load(object sender, EventArgs e)
         {
             GameOfLifeGpu();
         }
 
         public void GameOfLifeGpu()
         {
-            // ªì©l¤Æµe­±
+            // åˆå§‹åŒ–ç•«é¢
             this.ClientSize = new Size(WidthCells, HeightCells);
             this.DoubleBuffered = true;
             this.Text = "Game of Life (GPU with ILGPU)";
 
-            // ªì©l¤Æ¸ê®Æ - ­×¥¿¬°¤Gºû°}¦C
+            // åˆå§‹åŒ–è³‡æ–™ - ä¿®æ­£ç‚ºäºŒç¶­é™£åˆ—
             current = new byte[WidthCells, HeightCells];
             next = new byte[WidthCells, HeightCells];
             Random rand = new();
@@ -51,9 +65,9 @@ namespace GameOfLifeExample
 
             bitmap = new Bitmap(WidthCells, HeightCells, PixelFormat.Format24bppRgb);
 
-            // ªì©l¤Æ ILGPU
+            // åˆå§‹åŒ– ILGPU
             context = Context.CreateDefault();
-            //accelerator = context.CreateCudaAccelerator(0);//¹q¸£¨S¦³Åã¥Ü¥d¡A¦¹¦æ·|³ø¿ù            
+            //accelerator = context.CreateCudaAccelerator(0);//é›»è…¦æ²’æœ‰é¡¯ç¤ºå¡ï¼Œæ­¤è¡Œæœƒå ±éŒ¯            
             try
             {
                 // GPU
@@ -66,31 +80,31 @@ namespace GameOfLifeExample
             }
             kernel = accelerator.LoadAutoGroupedStreamKernel<Index2D, ArrayView2D<byte, Stride2D.DenseX>, ArrayView2D<byte, Stride2D.DenseX>>(GpuKernel);
 
-            // ³]©w©w®É§ó·s
-            timer = new Timer { Interval = 100 }; // ¨C 100ms §ó·s
+            // è¨­å®šå®šæ™‚æ›´æ–°
+            timer = new Timer { Interval = 100 }; // æ¯ 100ms æ›´æ–°
             timer.Tick += (s, e) => Step();
             timer.Start();
         }
 
         private void Step()
         {
-            // ³]©w GPU buffer - ª½±µ±q°}¦C¤À°t¨Ã½Æ»s
+            // è¨­å®š GPU buffer - ç›´æ¥å¾é™£åˆ—åˆ†é…ä¸¦è¤‡è£½
             using var bufferCurrent = accelerator.Allocate2DDenseX<byte>(current);
             using var bufferNext = accelerator.Allocate2DDenseX<byte>(new Index2D(WidthCells, HeightCells));
 
-            // °õ¦æ kernel - ¶Ç»¼ View µ¹ kernel
+            // åŸ·è¡Œ kernel - å‚³é View çµ¦ kernel
             kernel(new Index2D(WidthCells, HeightCells), bufferCurrent.View, bufferNext.View);
 
-            // µ¥«İ GPU §¹¦¨
+            // ç­‰å¾… GPU å®Œæˆ
             accelerator.Synchronize();
 
-            // ¨ú±o­pºâµ²ªG
+            // å–å¾—è¨ˆç®—çµæœ
             next = bufferNext.GetAsArray2D();
 
-            // ¥æ´« current / next
+            // äº¤æ› current / next
             (current, next) = (next, current);
 
-            // §ó·sµe­±
+            // æ›´æ–°ç•«é¢
             DrawBitmap();
             Invalidate();
         }
@@ -111,7 +125,7 @@ namespace GameOfLifeExample
                 {
                     for (int x = 0; x < WidthCells; x++)
                     {
-                        int value = current[x, y] * 255;  // ­×¥¿¬°¤Gºû°}¦C¦s¨ú
+                        int value = current[x, y] * 255;  // ä¿®æ­£ç‚ºäºŒç¶­é™£åˆ—å­˜å–
                         ptr[y * stride + x * 3 + 0] = (byte)value; // B
                         ptr[y * stride + x * 3 + 1] = (byte)value; // G
                         ptr[y * stride + x * 3 + 2] = (byte)value; // R
@@ -124,7 +138,18 @@ namespace GameOfLifeExample
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            e.Graphics.DrawImage(bitmap, 0, 0);
+            if (bitmap != null)
+            {
+                // ä½¿ç”¨æœ€è¿‘é„°æ’å€¼ä¾†ä¿æŒåƒç´ çš„æ¸…æ™°åº¦
+                e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+                e.Graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+
+                // ç¸®æ”¾ç¹ªè£½
+                e.Graphics.DrawImage(bitmap,
+                new Rectangle(0, 0, WidthCells * CellSize, HeightCells * CellSize),
+                    new Rectangle(0, 0, WidthCells, HeightCells),
+                    GraphicsUnit.Pixel);
+            }
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)
@@ -137,7 +162,7 @@ namespace GameOfLifeExample
             context?.Dispose();
         }
 
-        // GPU ®Ö¤ßµ{¦¡
+        // GPU æ ¸å¿ƒç¨‹å¼
         static void GpuKernel(Index2D index, ArrayView2D<byte, Stride2D.DenseX> current, ArrayView2D<byte, Stride2D.DenseX> next)
         {
             int x = index.X;
@@ -145,7 +170,7 @@ namespace GameOfLifeExample
             int width = current.IntExtent.X;
             int height = current.IntExtent.Y;
 
-            // ­pºâ¾F©~¼Æ¶q
+            // è¨ˆç®—é„°å±…æ•¸é‡
             int count = 0;
             for (int dy = -1; dy <= 1; dy++)
             {
@@ -153,7 +178,7 @@ namespace GameOfLifeExample
                 {
                     if (dx == 0 && dy == 0) continue;
 
-                    // ³B²zÃä¬É¡]ÀôÂ¶¡^
+                    // è™•ç†é‚Šç•Œï¼ˆç’°ç¹ï¼‰
                     int nx = (x + dx + width) % width;
                     int ny = (y + dy + height) % height;
                     count += current[new Index2D(nx, ny)];
@@ -162,13 +187,13 @@ namespace GameOfLifeExample
 
             byte alive = current[index];
 
-            // Game of Life ³W«h
+            // Game of Life è¦å‰‡
             if (alive == 1 && (count < 2 || count > 3))
-                next[index] = 0; // ¦º¤`
+                next[index] = 0; // æ­»äº¡
             else if (alive == 0 && count == 3)
-                next[index] = 1; // ½Ï¥Í
+                next[index] = 1; // èª•ç”Ÿ
             else
-                next[index] = alive; // «O«ù­ìª¬
+                next[index] = alive; // ä¿æŒåŸç‹€
         }
     }
 }
