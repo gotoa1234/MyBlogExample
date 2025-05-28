@@ -22,8 +22,8 @@ namespace GameOfLifeExample
         private void buttonExecute_Click(object sender, EventArgs e)
         {
             // 1. 建立指定表單
-            //var gameForm = new GameOfLifeForm();
-            var gameForm = new GameOfLifeGPUForm();
+            var gameForm = new GameOfLifeForm();
+            //var gameForm = new GameOfLifeGPUForm();
 
             // 2-1. 設定當 GameOfLifeForm 關閉時要執行的事件
             gameForm.FormClosed += (s, args) =>

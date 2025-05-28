@@ -7,7 +7,7 @@ namespace GameOfLifeExample.GameOfLife
     {
         private const int WidthCells = 256;
         private const int HeightCells = 256;
-        private const int CellSize = 3;
+        private const int CellSize = 2;
         private byte[,] current;
         private byte[,] next;
         private Bitmap bitmap;
@@ -18,30 +18,38 @@ namespace GameOfLifeExample.GameOfLife
             InitializeComponent();
             InitialThisForm();
 
+            // 1. 初始化配置
             void InitialThisForm()
             {
                 // 根據縮放比例調整視窗大小
                 this.ClientSize = new Size(WidthCells * CellSize, HeightCells * CellSize);
 
-                // 初始化畫面
-                this.ClientSize = new Size(WidthCells, HeightCells);
+                // 初始化畫面                
                 this.DoubleBuffered = true;
                 this.Text = "Game of Life (CPU Only)";              
             }
         }
 
+        /// <summary>
+        /// 2-1. 載入 Winform 觸發
+        /// </summary>        
         private void GameOfLifeForm_Load(object sender, EventArgs e)
         {
+            //2-2. 執行 CPU 運算的 Game Of Life
             GameOfLifeCpu();
         }
 
+        /// <summary>
+        /// 3. 實際代碼
+        /// </summary>
         public void GameOfLifeCpu()
         {
-            // 初始化資料
+            // 3-1. 初始化資料，決定像素數量 WidthCells * HeightCells
             current = new byte[WidthCells, HeightCells];
             next = new byte[WidthCells, HeightCells];
             Random rand = new();
 
+            // 3-2. 初始化配置每個細胞 生 與 死
             for (int xAxis = 0; xAxis < WidthCells; xAxis++)
             {
                 for (int yAxis = 0; yAxis < HeightCells; yAxis++)
@@ -50,39 +58,46 @@ namespace GameOfLifeExample.GameOfLife
                 }
             }
 
-            bitmap = new Bitmap(WidthCells, HeightCells, PixelFormat.Format24bppRgb);
+            // 3-3. 建立放大後的 bitmap
+            bitmap = new Bitmap(WidthCells * CellSize, HeightCells * CellSize, PixelFormat.Format24bppRgb);            
 
-            // 設定定時更新
+            // 3-4. 設定定時更新
             timer = new Timer { Interval = 100 };
             timer.Tick += (s, e) => Step();
             timer.Start();
         }
 
+        /// <summary>
+        /// 4. 背景的 Timer 持續執行該方法 Interval 決定觸發的生命週期
+        /// </summary>
         private void Step()
         {
-            // CPU 版本的 Game of Life 計算
-            for (int xAxis = 0; xAxis < WidthCells; xAxis++)
+            // 4-1. Game of Life 計算
+            // 備註: xAxis, yAxis 代表細胞座標
+            // 備註: gridX, gridY 代表鄰居偏移量
+            for (int yAxis = 0; yAxis < HeightCells; yAxis++) 
             {
-                for (int yAxis = 0; yAxis < HeightCells; yAxis++)
+                for (int xAxis = 0; xAxis < WidthCells; xAxis++)
                 {
-                    // 計算鄰居數量
-                    int count = 0;
-                    for (int dy = -1; dy <= 1; dy++)
+                    // 4-2. 以當前細胞為基準點，計算鄰居數量                    
+                    int count = 0;                    
+                    for (int gridY = -1; gridY <= 1; gridY++)
                     {
-                        for (int dx = -1; dx <= 1; dx++)
+                        for (int gridX = -1; gridX <= 1; gridX++)
                         {
-                            if (dx == 0 && dy == 0) continue;
+                            if (gridX == 0 && gridY == 0) 
+                                continue;
 
-                            // 處理邊界（環繞）
-                            int nx = (xAxis + dx + WidthCells) % WidthCells;
-                            int ny = (yAxis + dy + HeightCells) % HeightCells;
-                            count += current[nx, ny];
+                            // ※處理邊界（環繞）
+                            int nx = (xAxis + gridX + WidthCells) % WidthCells;
+                            int ny = (yAxis + gridY + HeightCells) % HeightCells;
+                            count += current[nx, ny];                           
                         }
                     }
 
                     byte alive = current[xAxis, yAxis];
 
-                    // Game of Life 規則
+                    // 4-3. Game of Life 規則
                     if (alive == 1 && (count < 2 || count > 3))
                         next[xAxis, yAxis] = 0; // 死亡
                     else if (alive == 0 && count == 3)
@@ -92,14 +107,17 @@ namespace GameOfLifeExample.GameOfLife
                 }
             }
 
-            // 交換 current / next
+            // 4-4. 將新的生命週期細胞狀態替換 current / next
             (current, next) = (next, current);
 
-            // 更新畫面
+            // 4-5. 更新畫面
             DrawBitmap();
             Invalidate();
         }
 
+        /// <summary>
+        /// 5. 更新到 Bitmap 上
+        /// </summary>
         private void DrawBitmap()
         {
             BitmapData data = bitmap.LockBits(
@@ -127,22 +145,23 @@ namespace GameOfLifeExample.GameOfLife
             bitmap.UnlockBits(data);
         }
 
+        /// <summary>
+        /// 6. 觸發畫 BitMap 時
+        /// </summary>
         protected override void OnPaint(PaintEventArgs e)
         {
             if (bitmap != null)
             {
-                // 使用最近鄰插值來保持像素的清晰度
+                // 6-1. 使用最近鄰插值來保持像素的清晰度
                 e.Graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
                 e.Graphics.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
 
-                // 縮放繪製
+                // 6-2. 繪製
                 e.Graphics.DrawImage(bitmap,
                 new Rectangle(0, 0, WidthCells * CellSize, HeightCells * CellSize),
                     new Rectangle(0, 0, WidthCells, HeightCells),
                     GraphicsUnit.Pixel);
             }
-
-            //e.Graphics.DrawImage(bitmap, 0, 0);
         }
 
         protected override void OnFormClosed(FormClosedEventArgs e)

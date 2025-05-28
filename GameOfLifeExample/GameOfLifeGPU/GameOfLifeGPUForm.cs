@@ -11,7 +11,7 @@ namespace GameOfLifeExample.GameOfLifeGPU
     {
         private const int WidthCells = 256;
         private const int HeightCells = 256;
-        private const int CellSize = 3;
+        private const int CellSize = 2;
         private byte[,] current;  // 改為二維陣列
         private byte[,] next;     // 改為二維陣列
         private Bitmap bitmap;
@@ -32,8 +32,7 @@ namespace GameOfLifeExample.GameOfLifeGPU
                 // 根據縮放比例調整視窗大小
                 this.ClientSize = new Size(WidthCells * CellSize, HeightCells * CellSize);
 
-                // 初始化畫面
-                this.ClientSize = new Size(WidthCells, HeightCells);
+                // 初始化畫面                
                 this.DoubleBuffered = true;
                 this.Text = "Game of Life GPU";
             }
@@ -41,10 +40,10 @@ namespace GameOfLifeExample.GameOfLifeGPU
 
         private void GameOfLifeGPU_Load(object sender, EventArgs e)
         {
-            GameOfLifeGpu();
+            GameOfLifeGPU();
         }
 
-        public void GameOfLifeGpu()
+        public void GameOfLifeGPU()
         {
             // 初始化畫面
             this.ClientSize = new Size(WidthCells, HeightCells);
@@ -63,15 +62,15 @@ namespace GameOfLifeExample.GameOfLifeGPU
                 }
             }
 
-            bitmap = new Bitmap(WidthCells, HeightCells, PixelFormat.Format24bppRgb);
+            // 建立放大後的 bitmap
+            bitmap = new Bitmap(WidthCells * CellSize, HeightCells * CellSize, PixelFormat.Format24bppRgb);            
 
             // 初始化 ILGPU
-            context = Context.CreateDefault();
-            //accelerator = context.CreateCudaAccelerator(0);//電腦沒有顯示卡，此行會報錯            
+            context = Context.CreateDefault();            
             try
             {
                 // GPU
-                accelerator = context.CreateCudaAccelerator(0);
+                accelerator = context.CreateCudaAccelerator(0);//電腦沒有顯示卡，此行會報錯          
             }
             catch
             {
