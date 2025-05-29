@@ -45,10 +45,6 @@ namespace GameOfLifeExample.GameOfLifeGPU
 
         public void GameOfLifeGPU()
         {
-            // 初始化畫面
-            this.ClientSize = new Size(WidthCells, HeightCells);
-            this.DoubleBuffered = true;
-            this.Text = "Game of Life (GPU with ILGPU)";
 
             // 初始化資料 - 修正為二維陣列
             current = new byte[WidthCells, HeightCells];
