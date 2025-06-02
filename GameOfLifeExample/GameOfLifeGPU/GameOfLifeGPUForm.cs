@@ -34,7 +34,7 @@ namespace GameOfLifeExample.GameOfLifeGPU
 
                 // 初始化畫面                
                 this.DoubleBuffered = true;
-                this.Text = "Game of Life GPU";
+                this.Text = $"Game of Life GPU {WidthCells} * {Height}";
             }
         }
 
