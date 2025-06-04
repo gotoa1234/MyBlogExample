@@ -1,4 +1,6 @@
-﻿using System.Drawing.Imaging;
+﻿using System.Diagnostics;
+using System.Diagnostics.Metrics;
+using System.Drawing.Imaging;
 using Timer = System.Windows.Forms.Timer;
 
 namespace GameOfLifeExample.GameOfLife
@@ -8,10 +10,11 @@ namespace GameOfLifeExample.GameOfLife
         private const int WidthCells = 256;
         private const int HeightCells = 256;
         private const int CellSize = 2;
+        private const int PeriodCount = 600;
         private byte[,] current;
         private byte[,] next;
         private Bitmap bitmap;
-        private Timer timer;
+        private Timer timer;        
 
         public GameOfLifeForm()
         {
@@ -59,11 +62,23 @@ namespace GameOfLifeExample.GameOfLife
             }
 
             // 3-3. 建立放大後的 bitmap
-            bitmap = new Bitmap(WidthCells * CellSize, HeightCells * CellSize, PixelFormat.Format24bppRgb);            
+            bitmap = new Bitmap(WidthCells * CellSize, HeightCells * CellSize, PixelFormat.Format24bppRgb);
 
             // 3-4. 設定定時更新
+            Stopwatch stopwatch = new Stopwatch();// 紀錄時間用
+            int counter = 0;   // 執行次數計數器
             timer = new Timer { Interval = 100 };
-            timer.Tick += (s, e) => Step();
+            timer.Tick += (s, e) => {
+                Step();          // 執行你的邏輯
+                counter++;       // 每次 Tick +1
+                if (counter >= PeriodCount)
+                {
+                    timer.Stop();         // 停止 Timer
+                                          // 你也可以加上結束後的邏輯
+                    MessageBox.Show($"已執行 {PeriodCount} 生命週期，實際耗時：{stopwatch.Elapsed.TotalSeconds:F2} 秒");                    
+                }
+            };
+            stopwatch.Start();
             timer.Start();
         }
 

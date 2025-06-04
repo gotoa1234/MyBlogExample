@@ -2,6 +2,7 @@
 using ILGPU.Runtime;
 using ILGPU.Runtime.CPU;
 using ILGPU.Runtime.Cuda;
+using System.Diagnostics;
 using System.Drawing.Imaging;
 using Timer = System.Windows.Forms.Timer;
 
@@ -12,8 +13,9 @@ namespace GameOfLifeExample.GameOfLifeGPU
         private const int WidthCells = 256;
         private const int HeightCells = 256;
         private const int CellSize = 2;
-        private byte[,] current;  // 改為二維陣列
-        private byte[,] next;     // 改為二維陣列
+        private const int PeriodCount = 600;
+        private byte[,] current;  
+        private byte[,] next;     
         private Bitmap bitmap;
         private Timer timer;
 
@@ -27,6 +29,7 @@ namespace GameOfLifeExample.GameOfLifeGPU
 
             InitialThisForm();
 
+            // 1. 初始化配置
             void InitialThisForm()
             {
                 // 根據縮放比例調整視窗大小
@@ -38,23 +41,30 @@ namespace GameOfLifeExample.GameOfLifeGPU
             }
         }
 
+        /// <summary>
+        /// 2-1. 載入 Winform 觸發
+        /// </summary> 
         private void GameOfLifeGPU_Load(object sender, EventArgs e)
         {
+            //2-2. 執行 GPU 運算的 Game Of Life
             GameOfLifeGPU();
         }
 
+        /// <summary>
+        /// 3. 實際代碼
+        /// </summary>
         public void GameOfLifeGPU()
         {
 
-            // 初始化資料 - 修正為二維陣列
+            // 3-1. 初始化資料，決定像素數量 WidthCells * HeightCells
             current = new byte[WidthCells, HeightCells];
             next = new byte[WidthCells, HeightCells];
             Random rand = new();
-            for (int x = 0; x < WidthCells; x++)
+            for (int xAxis = 0; xAxis < WidthCells; xAxis++)
             {
-                for (int y = 0; y < HeightCells; y++)
+                for (int yAxis = 0; yAxis < HeightCells; yAxis++)
                 {
-                    current[x, y] = (byte)(rand.NextDouble() > 0.7 ? 1 : 0);
+                    current[xAxis, yAxis] = (byte)(rand.NextDouble() > 0.7 ? 1 : 0);
                 }
             }
 
@@ -76,8 +86,21 @@ namespace GameOfLifeExample.GameOfLifeGPU
             kernel = accelerator.LoadAutoGroupedStreamKernel<Index2D, ArrayView2D<byte, Stride2D.DenseX>, ArrayView2D<byte, Stride2D.DenseX>>(GpuKernel);
 
             // 設定定時更新
-            timer = new Timer { Interval = 100 }; // 每 100ms 更新
-            timer.Tick += (s, e) => Step();
+            Stopwatch stopwatch = new Stopwatch();// 紀錄時間用
+            int counter = 0;   // 執行次數計數器
+            timer = new Timer { Interval = 100 };
+            timer.Tick += (s, e) => {
+                Step();          // 執行你的邏輯
+                counter++;       // 每次 Tick +1
+
+                if (counter >= PeriodCount)
+                {
+                    timer.Stop();         // 停止 Timer
+                                          // 你也可以加上結束後的邏輯
+                    MessageBox.Show($"已執行 {PeriodCount} 生命週期，實際耗時：{stopwatch.Elapsed.TotalSeconds:F2} 秒");
+                }
+            };
+            stopwatch.Start();
             timer.Start();
         }
 

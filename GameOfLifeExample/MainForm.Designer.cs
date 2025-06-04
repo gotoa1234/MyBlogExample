@@ -29,23 +29,35 @@
         private void InitializeComponent()
         {
             buttonExecute = new Button();
+            button1 = new Button();
             SuspendLayout();
             // 
             // buttonExecute
             // 
             buttonExecute.Location = new Point(12, 12);
             buttonExecute.Name = "buttonExecute";
-            buttonExecute.Size = new Size(75, 23);
+            buttonExecute.Size = new Size(110, 23);
             buttonExecute.TabIndex = 0;
-            buttonExecute.Text = "Execute";
+            buttonExecute.Text = "Execute CPU";
             buttonExecute.UseVisualStyleBackColor = true;
             buttonExecute.Click += buttonExecute_Click;
+            // 
+            // button1
+            // 
+            button1.Location = new Point(139, 12);
+            button1.Name = "button1";
+            button1.Size = new Size(110, 23);
+            button1.TabIndex = 1;
+            button1.Text = "Execute GPU";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(272, 48);
+            Controls.Add(button1);
             Controls.Add(buttonExecute);
             Margin = new Padding(2);
             Name = "MainForm";
@@ -57,5 +69,6 @@
         #endregion
 
         private Button buttonExecute;
+        private Button button1;
     }
 }
