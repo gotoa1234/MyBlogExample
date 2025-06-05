@@ -37,7 +37,7 @@ namespace GameOfLifeExample.GameOfLifeGPU
 
                 // 初始化畫面                
                 this.DoubleBuffered = true;
-                this.Text = $"Game of Life GPU {WidthCells} * {Height}";
+                this.Text = $"Game of Life GPU {WidthCells} * {HeightCells}";
             }
         }
 
@@ -60,6 +60,8 @@ namespace GameOfLifeExample.GameOfLifeGPU
             current = new byte[WidthCells, HeightCells];
             next = new byte[WidthCells, HeightCells];
             Random rand = new();
+
+            // 3-2. 初始化配置每個細胞 生 與 死
             for (int xAxis = 0; xAxis < WidthCells; xAxis++)
             {
                 for (int yAxis = 0; yAxis < HeightCells; yAxis++)
@@ -68,10 +70,10 @@ namespace GameOfLifeExample.GameOfLifeGPU
                 }
             }
 
-            // 建立放大後的 bitmap
+            // 3-3. 建立放大後的 bitmap
             bitmap = new Bitmap(WidthCells * CellSize, HeightCells * CellSize, PixelFormat.Format24bppRgb);            
 
-            // 初始化 ILGPU
+            // 3-4. 初始化 ILGPU
             context = Context.CreateDefault();            
             try
             {
@@ -83,9 +85,10 @@ namespace GameOfLifeExample.GameOfLifeGPU
                 // CPU
                 accelerator = context.CreateCPUAccelerator(0);
             }
+            // 3-5. 設定 kernel 方法
             kernel = accelerator.LoadAutoGroupedStreamKernel<Index2D, ArrayView2D<byte, Stride2D.DenseX>, ArrayView2D<byte, Stride2D.DenseX>>(GpuKernel);
 
-            // 設定定時更新
+            // 3-6. 設定定時更新
             Stopwatch stopwatch = new Stopwatch();// 紀錄時間用
             int counter = 0;   // 執行次數計數器
             timer = new Timer { Interval = 100 };
@@ -104,29 +107,36 @@ namespace GameOfLifeExample.GameOfLifeGPU
             timer.Start();
         }
 
+        /// <summary>
+        /// 4. 背景的 Timer 持續執行該方法 Interval 決定觸發的生命週期
+        /// </summary>
         private void Step()
         {
-            // 設定 GPU buffer - 直接從陣列分配並複製
+            // 4-1. 設定 GPU buffer - 直接從陣列分配並複製
             using var bufferCurrent = accelerator.Allocate2DDenseX<byte>(current);
             using var bufferNext = accelerator.Allocate2DDenseX<byte>(new Index2D(WidthCells, HeightCells));
 
-            // 執行 kernel - 傳遞 View 給 kernel
+            // 4-2. 執行 kernel - 傳遞 View 給 kernel (在步驟 3-5. 宣告方法)
             kernel(new Index2D(WidthCells, HeightCells), bufferCurrent.View, bufferNext.View);
 
-            // 等待 GPU 完成
+            // 4-3. 等待 GPU 完成
             accelerator.Synchronize();
 
-            // 取得計算結果
+            // 4-4. 取得計算結果
             next = bufferNext.GetAsArray2D();
 
-            // 交換 current / next
+            // 4-5. 交換 current / next
             (current, next) = (next, current);
 
-            // 更新畫面
+            // 4-6. 更新畫面
             DrawBitmap();
             Invalidate();
         }
 
+
+        /// <summary>
+        /// 6. 更新到 Bitmap 上
+        /// </summary>
         private void DrawBitmap()
         {
             BitmapData data = bitmap.LockBits(
@@ -154,6 +164,9 @@ namespace GameOfLifeExample.GameOfLifeGPU
             bitmap.UnlockBits(data);
         }
 
+        /// <summary>
+        /// 7. 觸發畫 BitMap 時
+        /// </summary>
         protected override void OnPaint(PaintEventArgs e)
         {
             if (bitmap != null)
@@ -180,32 +193,37 @@ namespace GameOfLifeExample.GameOfLifeGPU
             context?.Dispose();
         }
 
-        // GPU 核心程式
+        /// <summary>
+        /// 5. GPU 核心程式 - 康威生命遊戲的規則 與 3-5 , 4-2 相互關聯
+        /// </summary>        
         static void GpuKernel(Index2D index, ArrayView2D<byte, Stride2D.DenseX> current, ArrayView2D<byte, Stride2D.DenseX> next)
         {
+            // 5-1. Game of Life 計算
+            // 備註: xAxis, yAxis 代表細胞座標
+            // 備註: gridX, gridY 代表鄰居偏移量
             int x = index.X;
             int y = index.Y;
             int width = current.IntExtent.X;
             int height = current.IntExtent.Y;
 
-            // 計算鄰居數量
+            // 5-2. 計算鄰居數量
             int count = 0;
-            for (int dy = -1; dy <= 1; dy++)
+            for (int yAxis = -1; yAxis <= 1; yAxis++)
             {
-                for (int dx = -1; dx <= 1; dx++)
+                for (int xAxis = -1; xAxis <= 1; xAxis++)
                 {
-                    if (dx == 0 && dy == 0) continue;
+                    if (xAxis == 0 && yAxis == 0) continue;
 
                     // 處理邊界（環繞）
-                    int nx = (x + dx + width) % width;
-                    int ny = (y + dy + height) % height;
+                    int nx = (x + xAxis + width) % width;
+                    int ny = (y + yAxis + height) % height;
                     count += current[new Index2D(nx, ny)];
                 }
             }
 
             byte alive = current[index];
 
-            // Game of Life 規則
+            // 5-3. Game of Life 規則
             if (alive == 1 && (count < 2 || count > 3))
                 next[index] = 0; // 死亡
             else if (alive == 0 && count == 3)

@@ -29,7 +29,7 @@ namespace GameOfLifeExample.GameOfLife
 
                 // 初始化畫面                
                 this.DoubleBuffered = true;
-                this.Text = $"Game of Life (CPU Only) {WidthCells} * {Height}";              
+                this.Text = $"Game of Life (CPU Only) {WidthCells} * {HeightCells}";              
             }
         }
 
