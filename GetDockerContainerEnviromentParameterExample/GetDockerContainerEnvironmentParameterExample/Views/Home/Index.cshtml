@@ -1,0 +1,22 @@
+﻿@model GetDockerContainerEnvironmentParameterExample.Models.ContainerEnvironmentModel;
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>AspNetCoreEnvironment</th>
+            <th>DotNetEnvironment</th>
+            <th>SecurityKey</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@Model.AspNetCoreEnvironment</td>
+            <td>@Model.DotNetEnvironment</td>
+            <td>@Model.SecurityKey</td>
+        </tr>
+    </tbody>
+</table>
