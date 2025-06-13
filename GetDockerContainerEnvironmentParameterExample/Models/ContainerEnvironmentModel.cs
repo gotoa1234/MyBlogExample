@@ -10,5 +10,7 @@
 
         public string SecurityKey =>
             Environment.GetEnvironmentVariable("security_key") ?? string.Empty;
+
+        public string SecurityKeyHashMAC { get; set; }
     }
 }
