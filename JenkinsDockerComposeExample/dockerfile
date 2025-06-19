@@ -1,0 +1,16 @@
+FROM jenkins/jenkins:2.452.2
+USER root
+
+RUN curl -O https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb && \
+    dpkg -i packages-microsoft-prod.deb && \
+    apt-get update && \
+    apt-get install -y apt-transport-https && \
+    apt-get install -y dotnet-sdk-8.0
+
+COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
+RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
+
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+RUN echo 'Asia/Shanghai' > /etc/timezone
+
+USER jenkins
