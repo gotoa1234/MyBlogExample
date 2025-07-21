@@ -6,25 +6,22 @@ namespace GoogleCloudStorageSupportS3APIExample
 {
     public partial class Form1 : Form
     {
-        private readonly string _BucketName = $@"milkteagreenstorage";
-        private readonly string _AccessKey = "";
-        private readonly string _SecretKey = "";
-        private readonly AmazonS3Config _Config;
+        private string _BucketName = $@"milkteagreenstorage";
+        private string _AccessKey = "";
+        private string _SecretKey = "";
+        private AmazonS3Config _Config;
 
         public Form1()
         {
-            _Config = new AmazonS3Config
-            {
-                ServiceURL = "https://storage.googleapis.com",
-                ForcePathStyle = true // GCS 需要 Path-style URL
-            };
-
             InitializeComponent();
         }
 
+        /// <summary>
+        /// 初始化載入
+        /// </summary>
         private void Form1_Load(object sender, EventArgs e)
         {
-
+            GCSCredentialbutton_Click(new object(), new EventArgs());
         }
 
         /// <summary>
@@ -109,7 +106,7 @@ namespace GoogleCloudStorageSupportS3APIExample
             {
                 try
                 {
-                    using( var s3Client = new AmazonS3Client(_AccessKey, _SecretKey, _Config))
+                    using (var s3Client = new AmazonS3Client(_AccessKey, _SecretKey, _Config))
                     {
                         string objectName = GCS_Download_FileNameTextBox.Text;
                         string downloadFilePath = Path.Combine(GCS_textBox_downloadPathFile.Text, objectName);
@@ -152,6 +149,40 @@ namespace GoogleCloudStorageSupportS3APIExample
                     MessageBox.Show(message);
                 }
             });
+        }
+
+        /// <summary>
+        /// 使用 GCS 憑證
+        /// </summary>
+        private void GCSCredentialbutton_Click(object sender, EventArgs e)
+        {
+            var useMessage = "GCS";
+            _BucketName = $@"milkteagreenstorage";
+            _AccessKey = "";
+            _SecretKey = "";
+            _Config = new AmazonS3Config
+            {
+                ServiceURL = "https://storage.googleapis.com",
+                ForcePathStyle = true // GCS 需要 Path-style URL
+            };
+            UsedCredentialLable.Text = $@"當前使用憑證：{useMessage}";
+        }
+
+        /// <summary>
+        /// 使用 Minio 憑證
+        /// </summary>
+        private void MinioCredentialbutton_Click(object sender, EventArgs e)
+        {
+            var useMessage = "Minio";
+            _BucketName = $@"milkteagreenstorage";
+            _AccessKey = "";
+            _SecretKey = "";
+            _Config = new AmazonS3Config
+            {
+                ServiceURL = "https://storage.googleapis.com",
+                ForcePathStyle = true // GCS 需要 Path-style URL
+            };
+            UsedCredentialLable.Text = $@"當前使用憑證：{useMessage}";
         }
     }
 }
