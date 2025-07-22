@@ -160,6 +160,7 @@ namespace GoogleCloudStorageSupportS3APIExample
             _BucketName = $@"milkteagreenstorage";
             _AccessKey = "";
             _SecretKey = "";
+
             _Config = new AmazonS3Config
             {
                 ServiceURL = "https://storage.googleapis.com",
@@ -174,13 +175,13 @@ namespace GoogleCloudStorageSupportS3APIExample
         private void MinioCredentialbutton_Click(object sender, EventArgs e)
         {
             var useMessage = "Minio";
-            _BucketName = $@"milkteagreenstorage";
-            _AccessKey = "";
-            _SecretKey = "";
+            _BucketName = $@"louistest";
+            _AccessKey = "Qr0NvVfcdhDIOyG4DnAf";
+            _SecretKey = "ajb3rh5JtnrvAOQTVOOd21r6hDRgA5krZqg3zrjv";
             _Config = new AmazonS3Config
             {
-                ServiceURL = "https://storage.googleapis.com",
-                ForcePathStyle = true // GCS 需要 Path-style URL
+                ServiceURL = "http://stg.minio.mg",
+                ForcePathStyle = true                
             };
             UsedCredentialLable.Text = $@"當前使用憑證：{useMessage}";
         }
