@@ -6,7 +6,8 @@ namespace GoogleCloudStorageSupportS3APIExample
 {
     public partial class Form1 : Form
     {
-        private string _BucketName = $@"milkteagreenstorage";
+        private ServerEnum currentServer = ServerEnum.GoogleCloudStorage;
+        private string _BucketName = $@"";
         private string _AccessKey = "";
         private string _SecretKey = "";
         private AmazonS3Config _Config;
@@ -21,6 +22,7 @@ namespace GoogleCloudStorageSupportS3APIExample
         /// </summary>
         private void Form1_Load(object sender, EventArgs e)
         {
+            GCS_textBox_filepath.Text = "D:\\test.txt";
             GCSCredentialbutton_Click(new object(), new EventArgs());
         }
 
@@ -53,24 +55,62 @@ namespace GoogleCloudStorageSupportS3APIExample
 
             async Task Working()
             {
-
                 try
                 {
-                    using (var s3Client = new AmazonS3Client(_AccessKey, _SecretKey, _Config))
+                    //2-1. 上傳時 AWS S3 SDK 對於 Minio / GCS 下載有兼容性的差異
+                    if (currentServer == ServerEnum.GoogleCloudStorage)
                     {
-                        var transferUtility = new TransferUtility(s3Client);
-
-                        // 上傳檔案
-                        string filePath = GCS_textBox_filepath.Text;
-                        string objectName = Path.GetFileName(filePath);
-
-                        await transferUtility.UploadAsync(filePath, _BucketName, objectName);
-                        await ShowMessageAsync("上傳成功!");
+                        // 2-2. GCS 需要用 PutObjectRequest
+                        await GoogleCloudStorageUpload();
                     }
+                    else if (currentServer == ServerEnum.Minio)
+                    {
+                        // 2-3. Minio Server 與 AWS S3 SDK 高度兼容可使用更新的 TransferUtility
+                        await MinioServerUpload();
+                    }                      
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine($"Exception: {e}");
+                }
+            }
+
+            // AWS S3 SDK 上傳到 Minio Server
+            async Task MinioServerUpload()
+            {
+                using (var s3Client = new AmazonS3Client(_AccessKey, _SecretKey, _Config))
+                {
+                    var transferUtility = new TransferUtility(s3Client);
+
+                    // 上傳檔案資訊
+                    string filePath = GCS_textBox_filepath.Text;
+                    string objectName = Path.GetFileName(filePath);
+
+                    // Minio 高度兼容 S3 API ，可使用最新的 transferUtility 方法
+                    await transferUtility.UploadAsync(filePath, _BucketName, objectName);
+                    await ShowMessageAsync("上傳成功!");
+                }
+            }
+
+            // AWS S3 SDK 上傳到 GCS Server
+            async Task GoogleCloudStorageUpload()
+            {
+                using (var s3Client = new AmazonS3Client(_AccessKey, _SecretKey, _Config))
+                {
+                    // 上傳檔案資訊
+                    string filePath = GCS_textBox_filepath.Text;
+                    string objectName = Path.GetFileName(filePath);
+
+                    // GCS 屬於兼容 S3 API ，因此必須用 PutObjectRequest
+                    var request = new PutObjectRequest
+                    {
+                        BucketName = _BucketName,
+                        Key = objectName,
+                        FilePath = filePath,
+                        ContentType = "application/octet-stream"
+                    };
+                    var response = await s3Client.PutObjectAsync(request);
+                    await ShowMessageAsync("上傳成功!");
                 }
             }
         }
@@ -92,7 +132,6 @@ namespace GoogleCloudStorageSupportS3APIExample
                     GCS_textBox_downloadPathFile.Text = selectedFolderPath; // 在文本框中顯示選取的資料夾路徑
                 }
             }
-
         }
 
         /// <summary>
@@ -106,6 +145,7 @@ namespace GoogleCloudStorageSupportS3APIExample
             {
                 try
                 {
+                    // 4-1. 下載代碼 GCS / Minio 完整兼容
                     using (var s3Client = new AmazonS3Client(_AccessKey, _SecretKey, _Config))
                     {
                         string objectName = GCS_Download_FileNameTextBox.Text;
@@ -117,6 +157,7 @@ namespace GoogleCloudStorageSupportS3APIExample
                             Key = objectName
                         };
 
+                        // 4-2. 使用 AWS S3 SDK 的 GetObjectAsync  下載檔案
                         using var response = await s3Client.GetObjectAsync(request);
                         await using var responseStream = response.ResponseStream;
                         await using var fileStream = File.Create(downloadFilePath);
@@ -131,7 +172,6 @@ namespace GoogleCloudStorageSupportS3APIExample
                 }
             }
         }
-
 
         /// <summary>
         /// 非同步顯示 MessageBox
@@ -157,15 +197,17 @@ namespace GoogleCloudStorageSupportS3APIExample
         private void GCSCredentialbutton_Click(object sender, EventArgs e)
         {
             var useMessage = "GCS";
-            _BucketName = $@"milkteagreenstorage";
+            currentServer = ServerEnum.GoogleCloudStorage;
+            _BucketName = $@"";
             _AccessKey = "";
             _SecretKey = "";
 
             _Config = new AmazonS3Config
-            {
+            {                
                 ServiceURL = "https://storage.googleapis.com",
-                ForcePathStyle = true // GCS 需要 Path-style URL
+                ForcePathStyle = true,
             };
+            
             UsedCredentialLable.Text = $@"當前使用憑證：{useMessage}";
         }
 
@@ -175,15 +217,17 @@ namespace GoogleCloudStorageSupportS3APIExample
         private void MinioCredentialbutton_Click(object sender, EventArgs e)
         {
             var useMessage = "Minio";
-            _BucketName = $@"louistest";
-            _AccessKey = "Qr0NvVfcdhDIOyG4DnAf";
-            _SecretKey = "ajb3rh5JtnrvAOQTVOOd21r6hDRgA5krZqg3zrjv";
+            currentServer = ServerEnum.Minio;
+            _BucketName = $@"";
+            _AccessKey = "";
+            _SecretKey = "";
             _Config = new AmazonS3Config
             {
                 ServiceURL = "http://stg.minio.mg",
                 ForcePathStyle = true                
             };
             UsedCredentialLable.Text = $@"當前使用憑證：{useMessage}";
-        }
+        }        
+
     }
 }
