@@ -1,3 +1,4 @@
+using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
@@ -60,7 +61,7 @@ namespace GoogleCloudStorageSupportS3APIExample
                     //2-1. 上傳時 AWS S3 SDK 對於 Minio / GCS 下載有兼容性的差異
                     if (currentServer == ServerEnum.GoogleCloudStorage)
                     {
-                        // 2-2. GCS 需要用 PutObjectRequest
+                        // 2-2. GCS 需要用 PutObjectRequest (Minio也可支援)
                         await GoogleCloudStorageUpload();
                     }
                     else if (currentServer == ServerEnum.Minio)
@@ -107,7 +108,8 @@ namespace GoogleCloudStorageSupportS3APIExample
                         BucketName = _BucketName,
                         Key = objectName,
                         FilePath = filePath,
-                        ContentType = "application/octet-stream"
+                        ContentType = "application/octet-stream",
+                        UseChunkEncoding = false
                     };
                     var response = await s3Client.PutObjectAsync(request);
                     await ShowMessageAsync("上傳成功!");
@@ -145,25 +147,16 @@ namespace GoogleCloudStorageSupportS3APIExample
             {
                 try
                 {
-                    // 4-1. 下載代碼 GCS / Minio 完整兼容
-                    using (var s3Client = new AmazonS3Client(_AccessKey, _SecretKey, _Config))
+                    //4-1. 上傳時 AWS S3 SDK 對於 Minio / GCS 下載有兼容性的差異
+                    if (currentServer == ServerEnum.GoogleCloudStorage)
                     {
-                        string objectName = GCS_Download_FileNameTextBox.Text;
-                        string downloadFilePath = Path.Combine(GCS_textBox_downloadPathFile.Text, objectName);
-
-                        var request = new GetObjectRequest
-                        {
-                            BucketName = _BucketName,
-                            Key = objectName
-                        };
-
-                        // 4-2. 使用 AWS S3 SDK 的 GetObjectAsync  下載檔案
-                        using var response = await s3Client.GetObjectAsync(request);
-                        await using var responseStream = response.ResponseStream;
-                        await using var fileStream = File.Create(downloadFilePath);
-                        await responseStream.CopyToAsync(fileStream);
-
-                        await ShowMessageAsync("下載成功!");
+                        // 4-2. GCS 需要用 GetObjectRequest (Minio也可支援)
+                        await GoogleCloudStorageDownload();
+                    }
+                    else if (currentServer == ServerEnum.Minio)
+                    {
+                        // 4-3. Minio Server 與 AWS S3 SDK 高度兼容可使用更新的 TransferUtility
+                        await MinioServerDownload();
                     }
                 }
                 catch (Exception e)
@@ -171,6 +164,46 @@ namespace GoogleCloudStorageSupportS3APIExample
                     Console.WriteLine($"Exception: {e}");
                 }
             }
+
+            // AWS S3 SDK 從 Minio Server 下載檔案
+            async Task MinioServerDownload()
+            {
+                using (var s3Client = new AmazonS3Client(_AccessKey, _SecretKey, _Config))
+                {
+                    string objectName = GCS_Download_FileNameTextBox.Text;
+                    string downloadFilePath = Path.Combine(GCS_textBox_downloadPathFile.Text, objectName);
+
+                    // 可用更精簡、高校的 TransferUtility 
+                    var transferUtility = new TransferUtility(s3Client);                    
+                    await transferUtility.DownloadAsync(downloadFilePath, _BucketName, objectName);
+
+                    await ShowMessageAsync("下載成功!");
+                }
+            }
+
+            // AWS S3 SDK 從 GCS Server 下載檔案 (Minio 亦支援此方法)
+            async Task GoogleCloudStorageDownload()
+            {
+                using (var s3Client = new AmazonS3Client(_AccessKey, _SecretKey, _Config))
+                {
+                    string objectName = GCS_Download_FileNameTextBox.Text;
+                    string downloadFilePath = Path.Combine(GCS_textBox_downloadPathFile.Text, objectName);
+
+                    var request = new GetObjectRequest
+                    {
+                        BucketName = _BucketName,
+                        Key = objectName
+                    };
+                    
+                    using var response = await s3Client.GetObjectAsync(request);
+                    await using var responseStream = response.ResponseStream;
+                    await using var fileStream = File.Create(downloadFilePath);
+                    await responseStream.CopyToAsync(fileStream);
+
+                    await ShowMessageAsync("下載成功!");
+                }
+            }
+
         }
 
         /// <summary>
