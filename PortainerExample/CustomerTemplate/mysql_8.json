@@ -1,0 +1,50 @@
+{
+  "version": "2",
+  "templates": [
+    {
+      "type": "container",
+      "title": "MySQL 8",
+      "description": "Deploy MySQL 8 container with preset credentials",
+      "note": "Default port 3306",
+      "categories": ["Database"],
+      "platform": "linux",
+      "logo": "https://raw.githubusercontent.com/docker-library/docs/master/mysql/logo.png",
+      "image": "mysql:8.0",
+      "ports": [
+        {
+          "container": 3306,
+          "host": 3306
+        }
+      ],
+      "env": [
+        {
+          "name": "MYSQL_ROOT_PASSWORD",
+          "label": "MySQL root password",
+          "default": "MySecretPass123"
+        },
+        {
+          "name": "MYSQL_DATABASE",
+          "label": "Initial Database Name",
+          "default": "demo"
+        },
+        {
+          "name": "MYSQL_USER",
+          "label": "App Username",
+          "default": "user123"
+        },
+        {
+          "name": "MYSQL_PASSWORD",
+          "label": "App User Password",
+          "default": "userpass456"
+        }
+      ],
+      "volumes": [
+        {
+          "container": "/var/lib/mysql",
+          "bind": "/data/mysql"
+        }
+      ],
+      "restart_policy": "always"
+    }
+  ]
+}
