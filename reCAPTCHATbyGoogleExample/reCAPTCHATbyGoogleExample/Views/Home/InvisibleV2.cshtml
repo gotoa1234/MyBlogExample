@@ -2,17 +2,27 @@
     ViewData["Title"] = "reCAPTCHA V2 - 隱藏在背景機制";
 }
 
-<h2>reCAPTCHA Demo</h2>
+<h2>reCAPTCHA V2 - 隱藏在背景機制 Demo</h2>
 
-<form method="post" asp-action="Index">
+<form id="demo-form" method="post" asp-action="InvisibleV2Validate">
     <input type="text" name="Username" placeholder="輸入名稱" />
 
-    <div class="g-recaptcha" data-sitekey="6Ld8zqErAAAAAOCngiA0B_rcMWjMdz3w3fjr8puv"></div>
 
-    <button type="submit">送出</button>
+    <button class="g-recaptcha"
+            data-sitekey="6Ld0m6QrAAAAALRPum4xz9IUcUB55tjDtMl4WMx7"
+            data-callback="onSubmit"
+            data-size="invisible">
+            送出
+    </button>
 </form>
 
 <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+<script>
+    function onSubmit(token) {
+        document.getElementById("demo-form").submit();
+    }
+</script>
 
 @if (ViewBag.Message != null)
 {

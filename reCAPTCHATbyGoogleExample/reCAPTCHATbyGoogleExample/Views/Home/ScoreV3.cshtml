@@ -2,17 +2,22 @@
     ViewData["Title"] = "reCAPTCHA V3 - Score 機制";
 }
 
-<h2>reCAPTCHA Demo</h2>
+<h2>reCAPTCHA V3 - Score 機制 Demo</h2>
 
-<form method="post" asp-action="Index">
+<form id="score-form" method="post" asp-action="ScoreV3Validate">
     <input type="text" name="Username" placeholder="輸入名稱" />
-
-    <div class="g-recaptcha" data-sitekey="6Ld8zqErAAAAAOCngiA0B_rcMWjMdz3w3fjr8puv"></div>
-
+    <input type="hidden" name="g-recaptcha-response" id="g-recaptcha-response" />
     <button type="submit">送出</button>
 </form>
 
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+<script src="https://www.google.com/recaptcha/api.js?render=6Ldqo6QrAAAAAHoycY5qc7pwJjE1b8igiXXJ8vCq"></script>
+<script>
+    grecaptcha.ready(function () {
+        grecaptcha.execute('6Ldqo6QrAAAAAHoycY5qc7pwJjE1b8igiXXJ8vCq', { action: 'submit' }).then(function (token) {
+            document.getElementById('g-recaptcha-response').value = token;
+        });
+    });
+</script>
 
 @if (ViewBag.Message != null)
 {

@@ -1,20 +1,63 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "首頁";
 }
+
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 12px;
+        text-align: left;
+    }
+
+    th {
+        background-color: #f8f9fa;
+    }
+</style>
 
 <h2>reCAPTCHA Demo</h2>
-
-<form method="post" asp-action="Index">
-    <input type="text" name="Username" placeholder="輸入名稱" />
-
-    <div class="g-recaptcha" data-sitekey="6Ld8zqErAAAAAOCngiA0B_rcMWjMdz3w3fjr8puv"></div>
-
-    <button type="submit">送出</button>
-</form>
-
-<script src="https://www.google.com/recaptcha/api.js" async defer></script>
-
-@if (ViewBag.Message != null)
-{
-    <p>@ViewBag.Message</p>
-}
+<div>DEMO Google 3 種類型的 reCAPTCHA </div>
+<br />
+<hr>
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th>類型</th>
+            <th>適合應用</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>1. </td>
+            <td>
+                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="CheckBoxV2">reCAPTCHA V2 - 核取方塊，我不是機器人機制</a>
+            </td>
+            <td>
+                表單、註冊、留言板的快速實作防護
+            </td>
+        </tr>
+        <tr>
+            <td>2. </td>
+            <td>
+                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="InvisibleV2">reCAPTCHA V2 - 隱藏在背景機制</a>
+            </td>
+            <td>
+                需要平滑驗證流程的平台（如登入、提交）
+            </td>
+        </tr>
+        <tr>
+            <td>3. </td>
+            <td>
+                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="ScoreV3">reCAPTCHA V3 - Score 機制</a>
+            </td>
+            <td>
+                大型網站、高流量平台，須自訂彈性策略防護
+            </td>
+        </tr>
+    </tbody>
+</table>

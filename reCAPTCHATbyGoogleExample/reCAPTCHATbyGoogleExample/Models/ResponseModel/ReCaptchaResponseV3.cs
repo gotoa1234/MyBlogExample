@@ -1,12 +1,11 @@
 ﻿namespace reCAPTCHATbyGoogleExample.Models.ResponseModel
 {
-    // 匹配 google 的 recaptcha api 的 Response Json
-    public class ReCaptchaResponse
+    public class ReCaptchaResponseV3
     {
         public bool success { get; set; }
+        public float score { get; set; }
+        public string action { get; set; }
         public string challenge_ts { get; set; }
         public string hostname { get; set; }
-        public string[] error_codes { get; set; }
     }
 }
-

@@ -4,15 +4,14 @@ namespace reCAPTCHATbyGoogleExample.Controllers;
 
 public partial class HomeController : Controller
 {
-    private readonly string MyWebSiteKey = $@"";
-    private readonly string _secretKey = $@"";
-
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ILogger<HomeController> _logger;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ILogger<HomeController> logger,
+        IHttpClientFactory httpClientFactory)
     {
         _logger = logger;
+        _httpClientFactory = httpClientFactory;
     }
 
     [HttpGet]
