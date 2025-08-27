@@ -2,5 +2,6 @@
 {
     public interface ITesseractOCRService
     {
+        public string TesseractOCRVersionImage();
     }
 }
