@@ -19,7 +19,7 @@ namespace TesseractOCRNetExample.Service
         public string TesseractOCRVersionImage()
         {
             // 語言包路徑
-            string tessDataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tessdata");
+            string tessDataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"Source\tessdata");
             
             // 解析的文字內容
             var result = string.Empty;

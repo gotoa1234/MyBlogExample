@@ -18,13 +18,13 @@ namespace TesseractOCRNetExample.Service
         public string TesseractVersionImage()
         {
             // 語言包路徑
-            var tessDataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "tessdata");
+            var tessDataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $@"Source\tessdata");
 
             // 解析的文字內容
             var result = string.Empty;
             try
             {
-                using (var engine = new TesseractEngine(tessDataPath, "chi_tra", EngineMode.Default))
+                using (var engine = new TesseractEngine(tessDataPath, "chi_sim", EngineMode.Default))
                 {
                     using (var img = Pix.LoadFromFile(StaticHelper._ImageFileName))
                     {

@@ -11,4 +11,13 @@
     <PackageReference Include="TesseractOCR" Version="5.5.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Source\tessdata\chi_sim.traineddata">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Source\tessdata\eng.traineddata">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

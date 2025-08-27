@@ -21,7 +21,7 @@ namespace TesseractOCRNetExample.Controllers
         public IActionResult Index()
         {
             ViewBag.TesseractOCR = _tesseractOCRService.TesseractOCRVersionImage();
-            //ViewBag.Tesseract = _tesseractService.TesseractVersionImage();
+            ViewBag.Tesseract = _tesseractService.TesseractVersionImage();
             return View();
         }
     }
