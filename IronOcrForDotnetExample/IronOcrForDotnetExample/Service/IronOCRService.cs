@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.DataProtection.KeyManagement;
+﻿using IronOcr;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 
 namespace IronOcrForDotnetExample.Service
 {
@@ -13,10 +14,11 @@ namespace IronOcrForDotnetExample.Service
             _logger = logger;
         }
 
-        public void SSS()
+        public string IronOCR()
         {
-            IronOcr.License.LicenseKey = key;
+            IronOcr.License.LicenseKey = _IronKey;
             var ocr = new IronTesseract();
+            var ocrResult = string.Empty;
             ocr.Language = OcrLanguage.EnglishBest; // 簡中
             ocr.AddSecondaryLanguage(OcrLanguage.ChineseSimplifiedBest);
             try
@@ -28,14 +30,15 @@ namespace IronOcrForDotnetExample.Service
                     ocrInput.Invert();         // 反色 (黑底白字)
                                                // ocrInput.EnhanceResolution(); // 增加對比
                     ocrInput.LoadImage("div.png");
-                    var ocrResult = ocr.Read(ocrInput);
-                    Console.WriteLine(ocrResult.Text);
+                    ocrResult = ocr.Read(ocrInput).Text;                    
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
             }
+            return ocrResult;
         }
+
     }
 }

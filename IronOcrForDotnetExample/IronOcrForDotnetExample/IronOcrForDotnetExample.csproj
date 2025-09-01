@@ -6,4 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="IronOcr" Version="2025.8.6" />
+    <PackageReference Include="IronOcr.Languages.ChineseSimplified" Version="4.4.4.1" />
+  </ItemGroup>
+
 </Project>
