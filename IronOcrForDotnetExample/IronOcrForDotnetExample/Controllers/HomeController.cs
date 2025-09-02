@@ -1,6 +1,5 @@
 using IronOcrForDotnetExample.Service;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace IronOcrForDotnetExample.Controllers
 {
@@ -18,7 +17,7 @@ namespace IronOcrForDotnetExample.Controllers
 
         public IActionResult Index()
         {
-            ViewBag.Title = _ocrService.IronOCR();
+            ViewBag.IronOCR = _ocrService.IronOCR();
             return View();
         }
     }

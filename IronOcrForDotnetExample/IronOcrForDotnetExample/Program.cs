@@ -4,6 +4,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// 注入所需使用的 IronOCRService
 builder.Services.AddScoped<IIronOCRService, IronOCRService>();
 
 var app = builder.Build();
