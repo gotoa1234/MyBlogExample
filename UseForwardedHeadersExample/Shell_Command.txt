@@ -1,0 +1,9 @@
+cd /var/dockervolumes/UseForwardedHeadersExample/UseForwardedHeadersExample/UseForwardedHeadersExample
+docker build --no-cache -f DockerFile -t useforwardedheadersexample_image .
+docker run --hostname 192.168.51.93 --name useforwardedheadersexample -d -p 7777:8080 useforwardedheadersexample_image:latest
+
+
+
+cd /var/dockervolumes/UseForwardedHeadersExample/NotUseForwardedHeadersExample/NotUseForwardedHeadersExample
+docker build --no-cache -f Dockerfile -t notuseforwardedheadersexample_image .
+docker run --hostname 192.168.51.93 --name notuseforwardedheadersexample -d -p 8888:8080 notuseforwardedheadersexample_image:latest
