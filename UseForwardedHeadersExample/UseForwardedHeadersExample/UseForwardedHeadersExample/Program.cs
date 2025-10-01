@@ -15,9 +15,7 @@ try
         ForwardLimit = 5
     };
 
-    // 明確清空預設值
-    forwardedHeadersOptions.KnownProxies.Clear();
-    forwardedHeadersOptions.KnownNetworks.Clear();
+
 
     app.UseForwardedHeaders(forwardedHeadersOptions);
 
