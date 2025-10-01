@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UseForwardedHeadersExample", "UseForwardedHeadersExample\UseForwardedHeadersExample.csproj", "{C09E3576-182D-451A-A4B8-8A6BA174C648}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotUseForwardedHeadersExample", "..\NotUseForwardedHeadersExample\NotUseForwardedHeadersExample\NotUseForwardedHeadersExample.csproj", "{E9202E27-4FC0-40F6-A852-C23F351D9098}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C09E3576-182D-451A-A4B8-8A6BA174C648}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C09E3576-182D-451A-A4B8-8A6BA174C648}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C09E3576-182D-451A-A4B8-8A6BA174C648}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C09E3576-182D-451A-A4B8-8A6BA174C648}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E9202E27-4FC0-40F6-A852-C23F351D9098}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E9202E27-4FC0-40F6-A852-C23F351D9098}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E9202E27-4FC0-40F6-A852-C23F351D9098}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E9202E27-4FC0-40F6-A852-C23F351D9098}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AB4C4D85-941E-4F85-A896-91FAAC4B661E}
+	EndGlobalSection
+EndGlobal

@@ -54,6 +54,47 @@ namespace SendGoogleEmailCIDWithAttachementsExample.Service
                     <p>Thanks, have a good day.</p>
                 </body>
                 </html>";
+                
+                mail.Body = @"
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Home</title>
+</head>
+
+<body style=""margin: 0; padding: 0; width: 100%;"">
+    <table role=""presentation"" style=""width: 100%; margin-top: 50px; border-collapse: collapse;"">
+        <tr>
+            <td align=""center"" style=""width: 100%; "">
+                <div style=""max-width: 600px; text-align: start; font-size: 16px;"">
+                    <img src=""cid:MyImage"" width=""150"" height=""150"" alt="""">
+                    <p>您好, 欢迎使用 <span style=""font-weight: bold;"">OC88！</span> </p>
+                    <p style=""  margin: 20px 0;"">
+                        准备好在预测市场交易了吗？只需于注册页面输入下方安全码：
+                    </p>
+
+                    <div
+                        style=""width: 400px; height: 88px; font-size: 42px; font-weight: bold; text-align: center; line-height: 88px; color: #008CFF; background-color: #F5F8FF; border-radius: 4px; margin: 20px 0; letter-spacing: 20px;"">
+                        {securityCode}</div>
+                    <p style=""margin: 20px 0;"">我们希望很快就能见到您使用
+                        <span style=""font-weight: bold;"">OC88！</span>
+                    </p>
+                    <hr style=""border: 1px solid #B3B3B3"">
+                    <p style=""color:#B3B3B3;font-size: 14px;"">此为自动发送的邮件，无法回复此电子邮件。</p>
+                </div>
+            </td>
+        </tr>
+    </table>
+</body>
+
+</html>
+
+
+
+
+
+";
 
                 // 3. 設定 SMTP 用戶端
                 SmtpClient smtpClient = new SmtpClient(emailDto.SmtpServer, emailDto.SmtpPort)

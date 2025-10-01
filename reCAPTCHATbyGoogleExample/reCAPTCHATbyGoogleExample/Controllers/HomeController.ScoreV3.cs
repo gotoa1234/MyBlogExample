@@ -10,9 +10,9 @@ namespace reCAPTCHATbyGoogleExample.Controllers;
 public partial class HomeController : Controller
 {
     // 1-1.  前端使用的網站金鑰
-    private readonly string _ScoreV3WebSiteKey = $@"";
+    private readonly string _ScoreV3WebSiteKey = $@"6Ldqo6QrAAAAAHoycY5qc7pwJjE1b8igiXXJ8vCq";
     // 1-2. 後端使用的金鑰
-    private readonly string _ScoreV3WebSecretKey = $@"";
+    private readonly string _ScoreV3WebSecretKey = $@"6Ldqo6QrAAAAAIgJb4wYW3K9Za3ukfOZlvsTe0j-";
 
     /// <summary>
     /// 2. 檢視 View

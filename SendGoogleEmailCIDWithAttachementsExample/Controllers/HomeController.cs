@@ -25,6 +25,7 @@ namespace SendGoogleEmailCIDWithAttachementsExample.Controllers
         {
             try
             {
+                model.SenderPassword = "fsxu difd bnqd gqym";
                 var result = await _sendEmailService.SendEmail(model);
                 return Ok(
                     new { success = true, message = result });
