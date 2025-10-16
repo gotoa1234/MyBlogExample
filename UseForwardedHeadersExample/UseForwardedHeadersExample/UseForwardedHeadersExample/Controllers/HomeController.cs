@@ -25,7 +25,7 @@ namespace UseForwardedHeadersExample.Controllers
             var remoteIp = HttpContext.Connection.RemoteIpAddress;
 
             // 方便 Demo 說明轉換成純 IPv4
-            var ipv4 = remoteIp?.MapToIPv4();
+            var ipv4 = remoteIp?.MapToIPv4().ToString();
 
             var result = new
             {
