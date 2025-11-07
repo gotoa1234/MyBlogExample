@@ -1,0 +1,67 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <!--引用 SignalR 8.0.0-->
+    <script src="~/js/signalr8.0.0.js" asp-append-version="true"></script>
+</head>
+<body>
+    <!-- 8. 設定dom元件 發送 & 接收內容 -->
+    <input type="text" id="userInput" placeholder="姓名">
+    <input type="text" id="messageInput" placeholder="發送訊息">
+    <button onclick="sendMessage()">Send</button>
+
+    <div id="updateContainer"></div>
+
+    <script>
+        // 3. 預設頁面值
+        var updateContainer = document.getElementById("updateContainer");
+        updateContainer.innerHTML = `<p>New update: 初始化 </p>`;
+
+        // 4. 創建 SignalR 連接
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("UpdateHub", { accessTokenFactory: () => "I am jwtToken" })
+            .build();
+
+        // 5. 監聽 SendUpdate 事件
+        connection.on("SendUpdate", (message) => {
+            const updateContainer = document.getElementById("updateContainer");
+            updateContainer.innerHTML += `<p>${message.message}</p>`;
+        });
+
+         // 6. 訂閱可接收訊息
+        connection.on("ReceiveMessage", function (jsonMessage) {
+            const updateContainer = document.getElementById("updateContainer");
+            // 6-2. 接收到後端SignalR Server 回傳聊天室歷史訊息
+            var message = JSON.parse(jsonMessage);
+            // 6-3. 將資料時間轉為可讀格式 格式為 yyyy-MM-ddTHH:mm:ss
+            var date = new Date(message.CreateTime * 1000); //※乘以 1000 將秒轉換為毫秒
+            var dateString = date.toISOString().replace("T", " ").substr(0, 19);
+            updateContainer.innerHTML += `<p>[站點${message.SiteValues} ${dateString}] ${message.UserName}：${message.Message}</p>`;
+        });
+
+        // 6. 啟動
+        connection.start()
+            .then(() => {
+                console.log("連接 SignalR 成功");
+            })
+            .catch((error) => {
+                console.log("錯誤訊息：" + error);
+            });
+
+         // 7. 發送訊息到Hub 伺服器上
+         function sendMessage() {
+             var user = document.getElementById("userInput").value;
+             var message = document.getElementById("messageInput").value;
+             connection.invoke("SendMessage", user, message).catch(function (err) {
+                 console.error("Error invoking SendMessage: " + err.toString());
+             });
+         }
+    </script>
+</body>
+
+</html>
+
