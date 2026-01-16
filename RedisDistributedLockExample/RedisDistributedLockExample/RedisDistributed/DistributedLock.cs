@@ -54,7 +54,6 @@ namespace RedisDistributedLockExample.RedisDistributed
         {
             var redisLockKey = $"{_keyPrefix}_{redisKey}";
 
-            // 使用 await using 自動管理生命週期
             await using var redLock = await _lockFactory.CreateLockAsync(
                 resource: redisLockKey,
                 expiryTime: expiry,
@@ -66,6 +65,7 @@ namespace RedisDistributedLockExample.RedisDistributed
             if (redLock.IsAcquired)
             {
                 await act();
+                await Task.Delay(1000);//至少1秒處理時間，避免執行太快，另一個業務也能拿到
             }
         }
     }

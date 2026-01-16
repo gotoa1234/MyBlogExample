@@ -34,26 +34,26 @@ namespace RedisDistributedLockExample.BackGround
             // 1. 當前運行的 Job (標記判斷)
             var sourceTag = context.MergedJobDataMap.GetString("SourceTag") ?? string.Empty;
 
-            // 2. Redis 阻塞鎖 :  WaitLockExecuteAsync
-            Console.WriteLine(DateTime.Now.ToLongTimeString());
-            await _distributedLock.WaitLockExecuteAsync(redisKey, async() =>
-            {
-                // 3. 寫入資料庫，模擬併發碰撞
-                await InsertData(sourceTag);
-
-            }, expiryTime: TimeSpan.FromSeconds(10),
-               waitTime: TimeSpan.FromSeconds(2),
-               retryTime: TimeSpan.FromSeconds(1));
-
-            //// 2. Redis 非阻塞鎖 : TryLockExecuteAsync
+            //// 2. Redis 阻塞鎖 :  WaitLockExecuteAsync
             //Console.WriteLine(DateTime.Now.ToLongTimeString());
-            //await _distributedLock.TryLockExecuteAsync(redisKey, async () =>
+            //await _distributedLock.WaitLockExecuteAsync(redisKey, async() =>
             //{
             //    // 3. 寫入資料庫，模擬併發碰撞
             //    await InsertData(sourceTag);
 
-            //}, expiryTime: TimeSpan.FromSeconds(10) // 要給定合理時間，避免過久鎖住事務，未釋放
-            //);
+            //}, expiryTime: TimeSpan.FromSeconds(10),
+            //   waitTime: TimeSpan.FromSeconds(2),
+            //   retryTime: TimeSpan.FromSeconds(1));
+
+            // 2. Redis 非阻塞鎖 : TryLockExecuteAsync
+            Console.WriteLine(DateTime.Now.ToLongTimeString());
+            await _distributedLock.TryLockExecuteAsync(redisKey, async () =>
+            {
+                // 3. 寫入資料庫，模擬併發碰撞
+                await InsertData(sourceTag);
+
+            }, expiryTime: TimeSpan.FromSeconds(60) // 要給定合理時間，避免過久鎖住事務，未釋放
+            );
         }
 
         /// <summary>
