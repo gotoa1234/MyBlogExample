@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "RedisNetLockExample": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
