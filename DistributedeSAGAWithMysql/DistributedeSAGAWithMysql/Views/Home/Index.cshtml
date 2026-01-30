@@ -1,0 +1,111 @@
+﻿@{
+    ViewData["Title"] = "SAGA 測試頁面";
+}
+
+<div class="text-center">
+    <h1 class="display-4">SAGA Test Page.</h1>
+    <div class="row mb-4">
+        <div class="col">
+            <button class="btn btn-primary" type="button" id="step_1_SAGA">1. Log庫寫入後，開始異常</button>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col">
+            <button class="btn btn-primary" type="button" id="step_2_SAGA">2. Log庫 + 金額庫寫入後，開始異常</button>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col">
+            <button class="btn btn-primary" type="button" id="step_3_SAGA">3. Log庫 + 金額庫 + 會員庫寫入後，開始異常</button>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col">
+            <button class="btn btn-primary" type="button" id="step_4_SAGA">4. Log庫 + 金額庫 + 會員庫 + Log 庫寫入全都正常寫入</button>
+        </div>
+    </div>
+    <div id="showinfo">...</div>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+
+            $("#step_1_SAGA").click(function () {
+                callStep_1_SAGA_Simulator();
+            });
+
+            $("#step_2_SAGA").click(function () {
+                callStep_2_SAGA_Simulator();
+            });
+
+            $("#step_3_SAGA").click(function () {
+                callStep_3_SAGA_Simulator();
+            });
+
+            $("#step_4_SAGA").click(function () {
+                callStep_4_SAGA_Simulator();
+            });
+        });
+
+        // 1. Log庫寫入後，開始異常
+        function callStep_1_SAGA_Simulator() {
+            $.ajax({
+                url: '@Url.Action("Step1SAGA", "Home")',
+                type: 'GET',
+                data: null,
+                success: function (response) {
+                    document.getElementById('showinfo').innerHTML = response;
+;                },
+                error: function () {
+                }
+            });
+        }
+
+        // 2. Log庫 + 金額庫寫入後，開始異常
+        function callStep_2_SAGA_Simulator() {
+            $.ajax({
+                url: '@Url.Action("Step2SAGA", "Home")',
+                type: 'GET',
+                data: null,
+                success: function (response) {
+                    document.getElementById('showinfo').innerHTML = response;
+                },
+                error: function () {
+                }
+            });
+        }
+
+        // 3. Log庫 + 金額庫 + 會員庫寫入後，開始異常
+        function callStep_3_SAGA_Simulator() {
+            $.ajax({
+                url: '@Url.Action("Step3SAGA", "Home")',
+                type: 'GET',
+                data: null,
+                success: function (response) {
+                    document.getElementById('showinfo').innerHTML = response;
+                },
+                error: function () {
+                }
+            });
+        }
+        
+        // 4. Log庫 + 金額庫 + 會員庫 + Log 庫寫入全都正常寫入
+        function callStep_4_SAGA_Simulator() {
+            $.ajax({
+                url: '@Url.Action("Step4SAGA", "Home")',
+                type: 'GET',
+                data: null,
+                success: function (response) {
+                    document.getElementById('showinfo').innerHTML = response;
+                },
+                error: function () {
+                }
+            });
+        }
+        
+
+    </script>
+}
