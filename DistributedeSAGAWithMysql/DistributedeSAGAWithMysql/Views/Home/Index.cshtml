@@ -6,6 +6,12 @@
     <h1 class="display-4">SAGA Test Page.</h1>
     <div class="row mb-4">
         <div class="col">
+            <button class="btn btn-primary" type="button" id="step_Full_SAGA">正常情況下，沒有任何異常的寫入</button>
+        </div>
+    </div>
+    <br/><hr><br />
+    <div class="row mb-4">
+        <div class="col">
             <button class="btn btn-primary" type="button" id="step_1_SAGA">1. Log庫寫入後，開始異常</button>
         </div>
     </div>
@@ -32,7 +38,9 @@
     <script>
         $(document).ready(function () {
 
-
+            $("#step_Full_SAGA").click(function () {
+                callStep_Full_SAGA_Simulator();
+            });
             $("#step_1_SAGA").click(function () {
                 callStep_1_SAGA_Simulator();
             });
@@ -49,6 +57,21 @@
                 callStep_4_SAGA_Simulator();
             });
         });
+
+        // 正常情況下，沒有任何異常的寫入
+        function callStep_Full_SAGA_Simulator() {
+            $.ajax({
+                url: '@Url.Action("FullSAGA", "Home")',
+                type: 'GET',
+                data: null,
+                success: function (response) {
+                    document.getElementById('showinfo').innerHTML = response;
+                    ;
+                },
+                error: function () {
+                }
+            });
+        }
 
         // 1. Log庫寫入後，開始異常
         function callStep_1_SAGA_Simulator() {

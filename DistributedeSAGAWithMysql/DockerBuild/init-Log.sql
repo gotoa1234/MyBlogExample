@@ -3,7 +3,7 @@ USE Log;
 
 -- SAGA 主表
 CREATE TABLE SagaTransaction (
-    SagaId      VARCHAR(50) PRIMARY KEY,
+    SagaId      VARCHAR(36) PRIMARY KEY,
     MemberId    BIGINT NOT NULL,
     ProductId  BIGINT NOT NULL,
     Amount      DECIMAL(18,2) NOT NULL,

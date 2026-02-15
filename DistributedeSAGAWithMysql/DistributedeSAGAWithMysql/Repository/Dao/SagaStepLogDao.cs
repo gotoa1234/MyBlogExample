@@ -3,6 +3,7 @@
     public class SagaStepLogDao
     {
         public long Id { get; set; }
+
         public string SagaId { get; set; } = string.Empty;
 
         /// <summary>

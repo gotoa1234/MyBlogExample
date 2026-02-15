@@ -1,7 +1,11 @@
-﻿namespace DistributedeSAGAWithMysql.Repository.Interface
+﻿using DistributedeSAGAWithMysql.Repository.Dao;
+
+namespace DistributedeSAGAWithMysql.Repository.Interface
 {
     public interface ILogRepository
     {
-        Task BuildLog();
+        Task<string> CreateLog(SagaTransactionDao insertData);
+
+        Task UpdateLogStatus(string sagaId);
     }
 }

@@ -10,8 +10,7 @@ CREATE TABLE Member (
 CREATE TABLE Product (
     ProductId       BIGINT PRIMARY KEY,
     ProductName     VARCHAR(100) NOT NULL,
-    Price           DECIMAL(18,2) NOT NULL,
-	StockCount           INT DEFAULT 0 NOT NULL
+    Price           DECIMAL(18,2) NOT NULL
 );
 
 CREATE TABLE Purchase (
