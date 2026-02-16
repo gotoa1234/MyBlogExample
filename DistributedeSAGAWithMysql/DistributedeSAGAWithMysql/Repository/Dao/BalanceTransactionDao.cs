@@ -12,6 +12,7 @@
         public decimal Amount { get; set; }
 
         public string SagaId { get; set; } = string.Empty;
+        public long ProductId { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

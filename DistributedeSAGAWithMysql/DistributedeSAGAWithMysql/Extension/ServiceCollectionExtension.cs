@@ -1,9 +1,8 @@
-﻿using Framework.Database.Enum;
+﻿using DistributedeSAGAWithMysql.BackGround;
+using Framework.Database.Enum;
 using Framework.Database.Implementations.Mysql;
 using Framework.Database.Interfaces;
 using Quartz;
-using Microsoft.Extensions.DependencyInjection;
-using DistributedeSAGAWithMysql.BackGround;
 
 namespace DistributedeSAGAWithMysql.Extension
 {
@@ -30,10 +29,10 @@ namespace DistributedeSAGAWithMysql.Extension
                     q.AddTrigger(opts => opts
                         .ForJob(selfKey)
                         .WithIdentity("CompensatoryServices")
-                        .UsingJobData("Compensatory", "ServerA") // 標記 - 假設架設在機器A
+                        .UsingJobData("Compensatory", "ServerA")// 標記 
                         .StartAt(startedDateTime)
                         .WithSimpleSchedule(x => x
-                            .WithIntervalInSeconds(10)// 模擬同時每 10s 併發碰撞
+                            .WithIntervalInSeconds(300)// 模擬每 300s 觸發補償
                             .RepeatForever()));
 
                 });

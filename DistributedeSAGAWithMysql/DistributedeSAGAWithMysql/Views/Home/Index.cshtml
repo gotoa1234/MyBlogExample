@@ -12,22 +12,22 @@
     <br/><hr><br />
     <div class="row mb-4">
         <div class="col">
-            <button class="btn btn-primary" type="button" id="step_1_SAGA">1. Log庫寫入後，開始異常</button>
+            <button class="btn btn-primary" type="button" id="step_1_SAGA">1. 第一步執行前中斷 (未執行)</button>
         </div>
     </div>
     <div class="row mb-4">
         <div class="col">
-            <button class="btn btn-primary" type="button" id="step_2_SAGA">2. Log庫 + 金額庫寫入後，開始異常</button>
+            <button class="btn btn-primary" type="button" id="step_2_SAGA">2. 第二步執行前中斷 (寫入 Log 結束)</button>
         </div>
     </div>
     <div class="row mb-4">
         <div class="col">
-            <button class="btn btn-primary" type="button" id="step_3_SAGA">3. Log庫 + 金額庫 + 會員庫寫入後，開始異常</button>
+            <button class="btn btn-primary" type="button" id="step_3_SAGA">3. 第三步執行前中斷 (寫入 Log + 扣款 Balance 表 結束)</button>
         </div>
     </div>
     <div class="row mb-4">
         <div class="col">
-            <button class="btn btn-primary" type="button" id="step_4_SAGA">4. Log庫 + 金額庫 + 會員庫 + Log 庫寫入全都正常寫入</button>
+            <button class="btn btn-primary" type="button" id="step_4_SAGA">4. 第四步執行前中斷(寫入 Log + 扣款 Balance 表 + 本地 Member 表 結束)</button>
         </div>
     </div>
     <div id="showinfo">...</div>
@@ -73,7 +73,7 @@
             });
         }
 
-        // 1. Log庫寫入後，開始異常
+        // 1. 第一步執行前中斷 (未執行)
         function callStep_1_SAGA_Simulator() {
             $.ajax({
                 url: '@Url.Action("Step1SAGA", "Home")',
@@ -87,7 +87,7 @@
             });
         }
 
-        // 2. Log庫 + 金額庫寫入後，開始異常
+        // 2. 第二步執行前中斷 (寫入 Log 結束)
         function callStep_2_SAGA_Simulator() {
             $.ajax({
                 url: '@Url.Action("Step2SAGA", "Home")',
@@ -101,7 +101,7 @@
             });
         }
 
-        // 3. Log庫 + 金額庫 + 會員庫寫入後，開始異常
+        // 3. 第三步執行前中斷 (寫入 Log + 扣款 Balance 表 結束)
         function callStep_3_SAGA_Simulator() {
             $.ajax({
                 url: '@Url.Action("Step3SAGA", "Home")',
@@ -114,8 +114,8 @@
                 }
             });
         }
-        
-        // 4. Log庫 + 金額庫 + 會員庫 + Log 庫寫入全都正常寫入
+
+        // 4. 第四步執行前中斷(寫入 Log + 扣款 Balance 表 + 本地 Member 表 結束)
         function callStep_4_SAGA_Simulator() {
             $.ajax({
                 url: '@Url.Action("Step4SAGA", "Home")',

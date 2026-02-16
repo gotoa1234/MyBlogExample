@@ -34,19 +34,19 @@ INSERT INTO SagaTransaction(`SagaId`, `MemberId`, `ProductId`, `Amount`, `Status
             return guid;
         }
 
-        public async Task UpdateLogStatus(string sagaId)
+        public async Task UpdateLogStatus(string sagaId, string status)
         {
             var uow = _uowAccessor.Current
           ?? throw new InvalidOperationException("UoW 未初始化，請檢查 Service 層。");
 
             var updateSql = $@"
 UPDATE SagaTransaction
-   SET  Status = 'COMPLETED'
- WHERE @SagaId = @SagaId
+   SET  Status = '{status}'
+ WHERE SagaId = @SagaId
 ;";
             await uow.Connection.ExecuteAsync(updateSql, new
             {
-                SagaId = sagaId
+                @SagaId = sagaId
             });
         }
     }

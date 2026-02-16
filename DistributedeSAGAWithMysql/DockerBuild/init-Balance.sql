@@ -13,6 +13,7 @@ CREATE TABLE BalanceTransaction (
     MemberId    BIGINT NOT NULL,
     Amount      DECIMAL(18,2) NOT NULL, -- 正數=扣款，負數=退款
     SagaId      VARCHAR(50) NOT NULL,
+	PurchaseId  BIGINT NOT NULL,
     CreatedAt  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 

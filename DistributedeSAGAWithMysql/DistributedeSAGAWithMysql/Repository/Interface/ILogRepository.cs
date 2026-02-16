@@ -6,6 +6,6 @@ namespace DistributedeSAGAWithMysql.Repository.Interface
     {
         Task<string> CreateLog(SagaTransactionDao insertData);
 
-        Task UpdateLogStatus(string sagaId);
+        Task UpdateLogStatus(string sagaId, string status);
     }
 }

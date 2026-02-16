@@ -32,8 +32,15 @@ namespace DistributedeSAGAWithMysql.Service.Instance
             _memberRespository = memberRespository;
         }
 
-        public async Task Shoppinng(RequestModel shoppingData)
+        /// <summary>
+        /// 購物車 - 正常流程
+        /// </summary>
+        /// <param name="shoppingData">會員購物資料</param>
+        /// <param name="stepEnum">模擬中斷</param>
+        /// <returns></returns>
+        public async Task Shoppinng(RequestModel shoppingData, InterruptStepEnum stepEnum= InterruptStepEnum.None)
         {
+            // 取得資料
             var prdouctInfo = await GetProductInfo(shoppingData.ProductId);
             var memberInfo = await GetMemberInfo(shoppingData.MemberId);
 
@@ -41,16 +48,28 @@ namespace DistributedeSAGAWithMysql.Service.Instance
             if (memberInfo == null || prdouctInfo == null)
                 throw new Exception("傳入參數錯誤");
 
+            if (stepEnum == InterruptStepEnum.InterruptStep1)
+                throw new Exception("第一步執行前中斷 (未執行)");
             // 1.Log DB：建立交易紀錄(Pending)
             var sagaId = await CreateLog(shoppingData, prdouctInfo);
 
+
+            if (stepEnum == InterruptStepEnum.InterruptStep2)
+                throw new Exception("第二步執行前中斷 (寫入 Log 結束)");
             // 2.Balance DB：扣款
             await Deduction(shoppingData, prdouctInfo, sagaId);
 
+
+            if (stepEnum == InterruptStepEnum.InterruptStep3)
+                throw new Exception("第三步執行前中斷 (寫入 Log + 扣款 Balance 表 結束)");
             // 3.Member DB：更新會員消費 / 訂單狀態
             await UpdateMemberAndProudct(shoppingData, prdouctInfo, sagaId);
+            
 
+            if (stepEnum == InterruptStepEnum.InterruptStep4)
+                throw new Exception("第四步執行前中斷(寫入 Log + 扣款 Balance 表 + 本地 Member 表 結束)");
             // 4.Log DB：更新交易狀態 = Completed
+
             await FinishLog(sagaId);
         }
 
@@ -88,7 +107,7 @@ namespace DistributedeSAGAWithMysql.Service.Instance
 
                 await _balanceRepository.UpdateBalance(shoppingData.MemberId, totalCost);                
                 
-                await _balanceRepository.CreateBalanceTransaction(shoppingData.MemberId, totalCost, sagaId);
+                await _balanceRepository.CreateBalanceTransaction(shoppingData.MemberId, totalCost, product.ProductId, sagaId);
 
                 await uow.CommitAsync();
 
@@ -116,7 +135,7 @@ namespace DistributedeSAGAWithMysql.Service.Instance
                 Amount = totalCost,
                 MemberId = shoppingData.MemberId,
                 ProductId = product.ProductId,
-                Status = SagaTransactionStatusEnum.PENDING.ToString(),
+                Status = SagaTransactionStatusEnum.COMPLETED.ToString(),
             };
 
             try
@@ -138,7 +157,7 @@ namespace DistributedeSAGAWithMysql.Service.Instance
         }
 
         /// <summary>
-        // /4. 更新交易狀態 = Completed => DB : Log
+        // 4. 更新交易狀態 = Completed => DB : Log
         /// </summary>
         public async Task FinishLog(string sagaId)
         {
@@ -147,7 +166,7 @@ namespace DistributedeSAGAWithMysql.Service.Instance
 
             try
             {
-                await _logRepository.UpdateLogStatus(sagaId);
+                await _logRepository.UpdateLogStatus(sagaId, "COMPLETED");
             }
             catch (Exception ex)
             {
@@ -159,7 +178,7 @@ namespace DistributedeSAGAWithMysql.Service.Instance
         /// <summary>
         /// 取得產品資訊
         /// </summary>
-        private async Task<ProductDao> GetProductInfo(long productId)
+        public async Task<ProductDao> GetProductInfo(long productId)
         {
             using var uow = await _uowFactory.CreateAsync(MysqlDbConnectionEnum.Member);            
             _uowAccessor.Current = uow;
@@ -169,7 +188,7 @@ namespace DistributedeSAGAWithMysql.Service.Instance
         /// <summary>
         /// 取得系統內會員資料
         /// </summary>
-        private async Task<MemberDao> GetMemberInfo(long memberId)
+        public async Task<MemberDao> GetMemberInfo(long memberId)
         {
             using var uow = await _uowFactory.CreateAsync(MysqlDbConnectionEnum.Member);
             _uowAccessor.Current = uow;

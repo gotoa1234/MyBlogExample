@@ -21,7 +21,10 @@ namespace DistributedeSAGAWithMysql.Controllers
             return View();
         }
 
-
+        /// <summary>
+        /// 完整走完
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         public async Task<ActionResult> FullSAGA()
         {
@@ -31,30 +34,48 @@ namespace DistributedeSAGAWithMysql.Controllers
            
         }
 
+        /// <summary>
+        /// 第一步執行前中斷 (未執行)
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult> Step1SAGA()
         {
             var resultData = GetMemberShoppingData();
-            await _shoppingCartService.Shoppinng(resultData);
-            return Ok("成功 Step1 - SAGA (寫 Log 庫)");
+            await _shoppingCartService.Shoppinng(resultData, Enum.InterruptStepEnum.InterruptStep1);
+            return Ok();
         }
 
+        /// <summary>
+        /// 第二步執行前中斷 (寫入 Log 結束)
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult> Step2SAGA()
         {
-            return Ok("成功 Step2 - SAGA (寫 Balance 庫 - 扣款)");
+            var resultData = GetMemberShoppingData();
+            await _shoppingCartService.Shoppinng(resultData, Enum.InterruptStepEnum.InterruptStep2);
+            return Ok();
         }
 
+        /// <summary>
+        /// 第三步執行前中斷 (寫入 Log + 扣款 Balance 表 結束)
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult> Step3SAGA()
         {
-            return Ok("成功 Step3 - SAGA (寫 Member 庫 - 更新用戶紀錄)");
+            var resultData = GetMemberShoppingData();
+            await _shoppingCartService.Shoppinng(resultData, Enum.InterruptStepEnum.InterruptStep3);
+            return Ok();
         }
 
+        /// <summary>
+        /// 第四步執行前中斷 (寫入 Log + 扣款 Balance 表 + 本地 Member 表 結束)
+        /// </summary>
         [HttpGet]
         public async Task<ActionResult> Step4SAGA()
         {
-            return Ok("成功 Step4 - SAGA (寫 Log 庫 - 完成 SAGA 模式最終一致性)");
+            var resultData = GetMemberShoppingData();
+            await _shoppingCartService.Shoppinng(resultData, Enum.InterruptStepEnum.InterruptStep4);
+            return Ok();
         }
 
         /// <summary>

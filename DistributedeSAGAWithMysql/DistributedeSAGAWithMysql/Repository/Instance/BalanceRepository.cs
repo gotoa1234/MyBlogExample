@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using DistributedeSAGAWithMysql.Repository.Dao;
 using DistributedeSAGAWithMysql.Repository.Interface;
 using Framework.Database.Interfaces;
 
@@ -42,13 +43,13 @@ UPDATE AccountBalance
         /// <summary>
         /// 紀錄餘額庫的交易
         /// </summary>        
-        public async Task CreateBalanceTransaction(long memberId, decimal totalCost, string sagaId)
+        public async Task CreateBalanceTransaction(long memberId, decimal totalCost,long productId, string sagaId)
         {
             var uow = _uowAccessor.Current
                   ?? throw new InvalidOperationException("UoW 未初始化，請檢查 Service 層。");
             var sql = $@"
-INSERT BalanceTransaction(`MemberId`, `Amount`,`SagaId`, `CreatedAt`)
-                   VALUES(@MemberId, @Amount, @SagaId, NOW() )
+INSERT BalanceTransaction(`MemberId`, `Amount`,`SagaId`,`ProductId`, `CreatedAt`)
+                   VALUES(@MemberId, @Amount, @SagaId, @ProductId, NOW() )
 ;";
             try
             {
@@ -56,12 +57,42 @@ INSERT BalanceTransaction(`MemberId`, `Amount`,`SagaId`, `CreatedAt`)
                 {
                     @MemberId = memberId,
                     @Amount = totalCost,
-                    @SagaId = sagaId,                    
+                    @SagaId = sagaId,
+                    @ProductId = productId,
                 });
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
+            }
+        }
+
+        /// <summary>
+        /// 取得對應的 SagaIds 的資料
+        /// </summary>
+        public async Task<IEnumerable<BalanceTransactionDao>> GetBalanceTransactionItems(List<string> sagaIds)
+        {
+            var uow = _uowAccessor.Current
+                  ?? throw new InvalidOperationException("UoW 未初始化，請檢查 Service 層。");
+            var sql = $@"
+SELECT SagaId,
+       MemberId,
+       Amount,
+       ProductId
+  FROM BalanceTransaction
+ WHERE SagaId = @SagaIds
+;";
+            try
+            {
+                return await uow.Connection.QueryAsync<BalanceTransactionDao>(sql, new
+                {
+                    SagaIds = sagaIds
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
             }
         }
     }
