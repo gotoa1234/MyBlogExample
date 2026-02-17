@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  mysql-bank-a:
+  mysql-shop:
     image: mysql:8.0
     container_name: mysql-sage
     environment:
@@ -18,12 +18,12 @@ services:
             --innodb_lock_wait_timeout=120
             --max_connections=1000
     networks:
-      xa-network:
+      saga-network:
         ipv4_address: 172.20.0.2
 
 
 networks:
-  xa-network:
+  saga-network:
     driver: bridge
     ipam:
       config:
