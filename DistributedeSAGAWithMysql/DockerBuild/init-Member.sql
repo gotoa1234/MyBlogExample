@@ -27,5 +27,5 @@ CREATE TABLE Purchase (
 INSERT INTO Member(MemberId, Member.NAME, TotalSpent)
 Values(1, 'MilkTeaGreen', 0);
 
-INSERT INTO Product(ProductId, ProductName, Price, StockCount)
-VALUES(1001, '電視', 38000, 10);
+INSERT INTO Product(ProductId, ProductName, Price)
+VALUES(1001, '電視', 38000);

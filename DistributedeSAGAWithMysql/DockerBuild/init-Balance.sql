@@ -18,4 +18,4 @@ CREATE TABLE BalanceTransaction (
 );
 
 INSERT INTO AccountBalance(MemberId, Balance)
-VALUES(1, 30000);
+VALUES(1, 200000);

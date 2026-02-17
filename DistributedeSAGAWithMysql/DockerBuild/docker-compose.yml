@@ -8,7 +8,7 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: Member
     ports:
-      - "3306:3306"
+      - "3016:3306"
     volumes:
       - ./mysql-bank-a-data:/var/lib/mysql
       - ./init-Balance.sql:/docker-entrypoint-initdb.d/init-Balance.sql
@@ -18,13 +18,9 @@ services:
             --innodb_lock_wait_timeout=120
             --max_connections=1000
     networks:
-      saga-network:
-        ipv4_address: 172.20.0.2
+      - saga-network
 
 
 networks:
   saga-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16
