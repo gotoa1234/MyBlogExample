@@ -67,11 +67,11 @@ namespace DistributedeSAGAWithMysql.BackGround
             }
 
             // 1-4. 補償3 : 將尚未標記 Complate 的 SagaId 處理完成 - 影響 Log 庫
-            if (compensatoryInfo.notMarkComplateSagaIds.Any())
+            // 標記要包含本次有執行 (寫入 Log + 扣款 Balance 表 結束) 的資料
+            var executeMarkIds = compensatoryInfo.notMarkComplateSagaIds;
+            executeMarkIds.AddRange(compensatoryInfo.notPurchaseSagaIds);
+            if (executeMarkIds.Any())
             {
-                // 標記要包含本次有執行 (寫入 Log + 扣款 Balance 表 結束) 的資料
-                var executeMarkIds = compensatoryInfo.notMarkComplateSagaIds;
-                executeMarkIds.AddRange(compensatoryInfo.notPurchaseSagaIds);
                 await CompensatorynotMarkComplate(executeMarkIds);
                 Console.WriteLine($@"[{seqTime}] 補償3  : SagaId : {string.Join(", ", executeMarkIds)}");
             }
