@@ -26,14 +26,16 @@
                 });
 
                 function CallPublishLineBot() {
-                    debugger;
+                    var postData = {
+                        "Message": document.getElementById('message').value,
+                        "GroupId": document.getElementById('groupId').value
+                    };
+                    
                     $.ajax({
                         url: '@Url.Action("LinePublish", "Home")',
-                        type: 'GET',
-                        data: {
-                            "message": document.getElementById('message').value,
-                            "groupId": document.getElementById('groupId').value,
-                        },
+                        contentType: 'application/json',
+                        data: JSON.stringify(postData),
+                        type: 'POST',
                         success: function (response) {
                             alert(response);
                             document.getElementById('showinfo').innerHTML = response;

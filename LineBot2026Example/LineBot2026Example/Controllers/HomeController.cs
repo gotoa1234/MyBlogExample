@@ -7,7 +7,7 @@ namespace LineBot2026Example.Controllers
     public class HomeController : Controller
     {
         private readonly ILineBotService _lineBotService;
-        private readonly ILogger<HomeController> _logger;        
+        private readonly ILogger<HomeController> _logger;
         private readonly string _channelSecret;
 
         public HomeController(ILogger<HomeController> logger, ILineBotService lineBotService, IConfiguration config)
@@ -35,25 +35,31 @@ namespace LineBot2026Example.Controllers
         /// 用於 LineBot 推播訊息至指定群組
         /// <para>https://chat.line.biz/</para>
         /// </summary>
-        [HttpGet]
-        public async Task<IActionResult> LinePublish(string message, string groupId)
+        [HttpPost]
+        public async Task<IActionResult> LinePublish([FromBody] LineRequest request)
         {
             try
             {
-                await _lineBotService.HandleEventsPublishAsync(message, groupId);
+                // 從 request 物件拿資料
+                await _lineBotService.HandleEventsPublishAsync(request.Message, request.GroupId);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "推播失敗");
                 return BadRequest("推播失敗");
             }
-            
             return Ok("推播成功");
         }
 
         public IActionResult Index()
         {
             return View();
+        }
+
+        public class LineRequest
+        {
+            public string Message { get; set; } = string.Empty;
+            public string GroupId { get; set; } = string.Empty;
         }
     }
 }
