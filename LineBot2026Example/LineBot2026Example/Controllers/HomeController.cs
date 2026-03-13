@@ -50,6 +50,19 @@ namespace LineBot2026Example.Controllers
             }
             return Ok("推播成功");
         }
+        
+        /// <summary>
+        /// 用於 LineBot Flex Message 至指定群組
+        /// <para>https://chat.line.biz/</para>
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> LineFlexMessagePublish([FromBody] LineRequest request)
+        {
+            // 這裡調用發送 Flex Message 的方法
+            await _lineBotService.HandleFlexPublishAsync(request.Message, request.GroupId);
+
+            return Ok("推播成功");
+        }
 
         public IActionResult Index()
         {

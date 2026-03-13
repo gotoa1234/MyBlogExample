@@ -4,7 +4,7 @@
 
 
 <div class="text-center">
-    <h1 class="display-4">LineBot 機器人測試頁面</h1>
+    <h1 class="display-4">LineBot 機器人測試頁面 - 推播功能 - Text</h1>
     <div class="row mb-4">
         <input type="text" class="form-control" id="message" placeholder="請輸入要推播的訊息">
         <input type="text" class="form-control" id="groupId" placeholder="請輸入 Line 群組的 GroupId 的訊息">
@@ -13,6 +13,17 @@
         </div>
     </div>
     <div id="showinfo">...</div>
+    <hr>
+    <h1 class="display-4">LineBot 機器人測試頁面 - 推播功能 - FlexMessage</h1>
+    <div class="row mb-4">
+        <textarea class="form-control" id="messageflex" placeholder="請貼上要推播的Flex Json"></textarea>
+        <input type="text" class="form-control" id="groupIdflex" placeholder="請輸入 Line 群組的 GroupId 的訊息">
+        <div class="col">
+            <button class="btn btn-primary" type="button" id="publishLineBotflex">送出推播訊息</button>
+        </div>
+    </div>
+    <div id="showinfoflex">...</div>
+
 </div>
 
 
@@ -22,6 +33,10 @@
 
                     $("#publishLineBot").click(function () {
                         CallPublishLineBot();
+                    });
+
+                    $("#publishLineBotflex").click(function () {
+                        CallPublishLineBotFlex();
                     });
                 });
 
@@ -39,6 +54,27 @@
                         success: function (response) {
                             alert(response);
                             document.getElementById('showinfo').innerHTML = response;
+                            ;
+                        },
+                        error: function () {
+                        }
+                    });
+                }
+
+                 function CallPublishLineBotFlex() {
+                    var postData = {
+                        "Message": document.getElementById('messageflex').value,
+                        "GroupId": document.getElementById('groupIdflex').value
+                    };
+                    
+                    $.ajax({
+                        url: '@Url.Action("LineFlexMessagePublish", "Home")',
+                        contentType: 'application/json',
+                        data: JSON.stringify(postData),
+                        type: 'POST',
+                        success: function (response) {
+                            alert(response);
+                            document.getElementById('showinfoflex').innerHTML = response;
                             ;
                         },
                         error: function () {

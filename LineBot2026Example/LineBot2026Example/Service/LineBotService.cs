@@ -53,6 +53,27 @@ namespace LineBot2026Example.Service
             await _lineClient.PushMessageAsync(groupId, $@"推播訊息 : {message}");
         }
 
+        /// <summary>
+        /// 進行推播 (使用 JSON 格式，適用於 Flex Message)
+        /// </summary>
+        public async Task HandleFlexPublishAsync(string message, string groupId)
+        {
+            // 檢查 message 是否為有效的 JSON (Flex Message 的內容)
+            if (message.Trim().StartsWith("{"))
+            {
+                // 推播訊息至指定群組
+                try
+                {
+                    await _lineClient.PushMessageWithJsonAsync(groupId, $@"{message}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }
+        }
+        
+
 
         /// <summary>
         /// 取得來源 Id
